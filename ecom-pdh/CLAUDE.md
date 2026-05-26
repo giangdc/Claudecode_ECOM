@@ -88,6 +88,6 @@
 - **Modules:** VOUCHER-LIST | VOUCHER-DETAIL | VOUCHER-APPLY | VOUCHER-CANCEL | VOUCHER-RECHECK | VOUCHER-AUTO | VOUCHER-API
 - **API Output BA yeu cau (bat buoc trong TC):** API_01 data[]: 8 fields (voucherCode Y, voucherType Y, description, note, expiredDate dd/MM/yyyy, applyTypeId, promotionTypeId, policyGroupId) | API_02 + API_03 response: 17 top-level fields + applies[] 10 sub-fields (chi tiet xem MEMORY.md §5)
 - **Vung rui ro cao:** VOUCHER-AUTO 5 UCs (Score 25); VOUCHER-APPLY + VOUCHER-RECHECK output validation (Score 20); hasManualVoucher flag logic (Score 20)
-- **Clarifications chua resolve:** 6 (CLA-VOUCHER-001 den 006) — Priority: CLA-001 (endpoint discrepancy API_02) va CLA-002 (HTTP error codes) can resolve truoc khi finalize TC
-- **TC API da gen:** 03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx (109 TC) — API_02 sheet can update sau khi resolve CLA-001
+- **Clarifications chua resolve:** 5 (CLA-VOUCHER-001, 003, 004, 005, 006) — CLA-002 da resolve (API tra HTTP 200 cho ca failed cases — da xoa HTTP code khoi TC); Priority con lai: CLA-001 (endpoint discrepancy API_02)
+- **TC API da gen + cap nhat 2026-05-26:** 03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx (109 TC) — Da sua: (1) xoa HTTP code 93 TC; (2) API_01.19 bo sung applyTypeId/promotionTypeId/policyGroupId; (3) API_02.25-28 rewrite dung BA spec discount/applies[]; (4) API_03.28 bo sung du 17 fields + 10 sub-fields
 - **MEMORY:** `02_analyze-requirements/chucnang_Voucher/MEMORY.md`

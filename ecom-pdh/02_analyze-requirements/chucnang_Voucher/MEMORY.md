@@ -51,16 +51,16 @@
 | SC-LIST-003 | Cập nhật khi context thay đổi | VOUCHER-LIST | DOC-VOUCHER-02 | P1 | Functional | ✅ Đã tạo |
 | SC-LIST-004 | Không có EVC → result=0, 200 | VOUCHER-LIST | DOC-VOUCHER-02 | P1 | Negative | ✅ Đã tạo |
 | SC-LIST-005 | Validate voucherCode + voucherType | VOUCHER-LIST | DOC-VOUCHER-03 | P1 | Functional | ✅ Đã tạo |
-| SC-LIST-006 | Validate optional fields đầy đủ | VOUCHER-LIST | DOC-VOUCHER-03 | P2 | Functional | ⚠️ Partial — cần bổ sung applyTypeId/promotionTypeId/policyGroupId |
+| SC-LIST-006 | Validate optional fields đầy đủ | VOUCHER-LIST | DOC-VOUCHER-03 | P2 | Functional | ✅ Đã cập nhật — API_01.19 bổ sung đủ 8 fields BA yêu cầu (applyTypeId, promotionTypeId, policyGroupId) — 2026-05-26 |
 | SC-LIST-007 | Không lẫn EVC kênh khác | VOUCHER-LIST | DOC-VOUCHER-02 | P2 | Functional | ✅ Đã tạo |
-| SC-DETAIL-001 | Validate promotion/discount fields | VOUCHER-DETAIL | DOC-VOUCHER-04 | P1 | Functional | 🔄 Cần update — TC cũ dùng sai output spec (contents[] thay vì discount/applies[]) |
-| SC-DETAIL-002 | Validate applies[] sub-fields | VOUCHER-DETAIL | DOC-VOUCHER-04 | P1 | Functional | 🔄 Cần update |
+| SC-DETAIL-001 | Validate promotion/discount fields | VOUCHER-DETAIL | DOC-VOUCHER-04 | P1 | Functional | ✅ Đã cập nhật — API_02.25 rewrite theo BA spec (discount/applies[]), validate đủ 17 top-level fields — 2026-05-26 |
+| SC-DETAIL-002 | Validate applies[] sub-fields | VOUCHER-DETAIL | DOC-VOUCHER-04 | P1 | Functional | ✅ Đã cập nhật — API_02.26 rewrite: validate đủ 10 sub-fields applies[] — 2026-05-26 |
 | SC-DETAIL-003 | On-demand only | VOUCHER-DETAIL | DOC-VOUCHER-02 | P2 | Functional | ✅ Đã tạo |
 | SC-DETAIL-004 | voucher_code invalid → error | VOUCHER-DETAIL | DOC-VOUCHER-02 | P1 | Negative | ✅ Đã tạo |
 | SC-DETAIL-005 | Thiếu voucher_code → 400 | VOUCHER-DETAIL | DOC-VOUCHER-04 | P1 | Negative | ✅ Đã tạo |
 | SC-APPLY-001 | Apply lần đầu — happy path | VOUCHER-APPLY | DOC-VOUCHER-02 | P1 | Functional | ✅ Đã tạo |
-| SC-APPLY-002 | Validate promotion/discount output fields | VOUCHER-APPLY | DOC-VOUCHER-05 | P1 | Functional | ✅ Đã tạo |
-| SC-APPLY-003 | Validate applies[] output | VOUCHER-APPLY | DOC-VOUCHER-05 | P1 | Functional | ✅ Đã tạo |
+| SC-APPLY-002 | Validate promotion/discount output fields | VOUCHER-APPLY | DOC-VOUCHER-05 | P1 | Functional | ✅ Đã cập nhật — API_03.28 bổ sung đủ 17 top-level fields (thiếu: referrer_code, discount_ex_vat_value, discount_rate, apply_type, apply_from, apply_to, original_discount_value, original_discount_ex_vat, voucher_type, voucher_type_l2, type_id) — 2026-05-26 |
+| SC-APPLY-003 | Validate applies[] output | VOUCHER-APPLY | DOC-VOUCHER-05 | P1 | Functional | ✅ Đã cập nhật — API_03.28 bổ sung đủ 10 sub-fields applies[] (thiếu: sub_service_type_id, sub_service_id, service_code, discount_ex_vat, original_discount_value, original_discount_ex_vat) — 2026-05-26 |
 | SC-APPLY-004 | QLCS fail → success=false, unchanged | VOUCHER-APPLY | DOC-VOUCHER-02 | P1 | Negative | ✅ Đã tạo |
 | SC-APPLY-005 | Có A, apply B fail → A vẫn giữ | VOUCHER-APPLY | DOC-VOUCHER-02 | P1 | Negative | ✅ Đã tạo |
 | SC-APPLY-006 | Apply thêm → CO gửi [A+B] sang QLCS | VOUCHER-APPLY | DOC-VOUCHER-02 | P2 | Integration | ✅ Đã tạo |
@@ -164,7 +164,7 @@
 | # | Req ID | DOC Source | Vấn đề | Answer | Status | Ảnh hưởng TC |
 |---|--------|-----------|--------|--------|--------|--------------|
 | CLA-VOUCHER-001 | REQ-DETAIL-001..004 | DOC-VOUCHER-04 vs DOC-VOUCHER-02 | **[Critical]** Excel API_02 `/voucher/content` output = discount/applies[]; URD US-03 endpoint `GET /{checkoutId}/evouchers/{voucherCode}` output = contents[]. Là 2 endpoint khác nhau hay cùng 1? | | **Open** | Toàn bộ API_02 TC — SC-DETAIL-001, SC-DETAIL-002 |
-| CLA-VOUCHER-002 | REQ-API-001, REQ-API-002 | DOC-VOUCHER-06 | HTTP code cụ thể cho: thiếu header / sai giá trị / hết hạn (X-Checkout-Token và Authorization) | | **Open** | SC-API-001..006 expected response |
+| CLA-VOUCHER-002 | REQ-API-001, REQ-API-002 | DOC-VOUCHER-06 | HTTP code cụ thể cho: thiếu header / sai giá trị / hết hạn (X-Checkout-Token và Authorization) | API trả HTTP 200 cho tất cả trường hợp (kể cả thất bại), kèm message lỗi trong body | **Resolved (partial)** — HTTP code đã xóa khỏi Expected Response toàn bộ TC; chỉ còn kiểm tra message/body | SC-API-001..006 expected response đã cập nhật |
 | CLA-VOUCHER-003 | REQ-AUTO-012, REQ-AUTO-014 | DOC-VOUCHER-01 | Cơ chế track "user chủ động bỏ voucher" vs "context remove" — field nào trong model? | | **Open** | SC-AUTO-012, SC-AUTO-014 |
 | CLA-VOUCHER-004 | REQ-AUTO-001, REQ-AUTO-004 | DOC-VOUCHER-01 | Tie-breaker khi nhiều voucher cùng DiscountVAT cao nhất: chọn voucher nào? | | **Open** | SC-AUTO-001, SC-AUTO-004 |
 | CLA-VOUCHER-005 | REQ-API-003 | DOC-VOUCHER-06 | Client-Id "không bắt buộc" — có ảnh hưởng kết quả API hay chỉ metadata? | | **Open** | SC-API-007 |
@@ -176,4 +176,5 @@
 
 | DOC ID | Ngày tạo/cập nhật | Tổng TC | File Excel | TC Version | Ghi chú |
 |--------|-------------------|---------|------------|------------|---------|
-| DOC-VOUCHER-03, 04, 05, 06 | 2026-05-26 | 109 TC (API_01: 28; API_02: 32; API_03: 49) | `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx` | v1.0 | ⚠️ API_02 sheet dùng output spec contents[] (URD US-03) — cần update lại theo Excel API_02 spec (discount/applies[]) sau khi resolve CLA-VOUCHER-001 |
+| DOC-VOUCHER-03, 04, 05, 06 | 2026-05-26 | 109 TC (API_01: 28; API_02: 32; API_03: 49) | `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx` | v1.0 (khởi tạo) | API_02 sheet dùng sai output spec contents[] — đã sửa trong lần cập nhật 2026-05-26 |
+| DOC-VOUCHER-03, 04, 05, 06 | 2026-05-26 | 109 TC (không thay đổi số lượng) | `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx` | v1.0 (cập nhật) | **Thay đổi:** (1) Xóa HTTP status code khỏi Expected Response toàn bộ 93 TC — API trả 200 cho cả failed cases; (2) API_01.19: bổ sung applyTypeId/promotionTypeId/policyGroupId; (3) API_02.25-28: rewrite từ contents[] sang đúng BA spec (discount/applies[]) — API_02.25 validate 17 top-level fields, API_02.26 validate 10 sub-fields applies[]; (4) API_03.28: bổ sung đủ 17 top-level fields + 10 sub-fields applies[] |
