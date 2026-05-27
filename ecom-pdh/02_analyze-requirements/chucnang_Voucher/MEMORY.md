@@ -1,6 +1,6 @@
 # MEMORY — Analyze Requirements Output: Chức năng Voucher (EVC Checkout)
 
-> Cập nhật lần cuối: 2026-05-26 — Phân tích lần đầu (Mode 1: INIT)
+> Cập nhật lần cuối: 2026-05-27 — Phân tích bổ sung api doc v1.xlsx: tạo test_data_catalog.md, bổ sung CLA-APISPEC-001..005
 
 ---
 
@@ -98,7 +98,22 @@
 
 ---
 
-## 5. API Output Requirements — ⭐ BẮT BUỘC CÓ TRONG TESTCASE
+## 5. Test Data Summary
+
+> **File:** `02_analyze-requirements/chucnang_Voucher/test_data_catalog.md` — tạo 2026-05-27
+
+| Module/Area | Fields chính | Có boundary? | Ghi chú |
+|-------------|-------------|--------------|---------|
+| Headers (cả 3 API) | X-Checkout-Token (Y), Authorization (Y), Client-Id (N), Accept-Language, Content-Type | Có (token sắp hết hạn) | Phân loại valid/invalid/boundary cho từng header |
+| API_01 response | voucherCode (Y), voucherType (Y,int 1\|2), expiredDate (dd/MM/yyyy), note, description, applyTypeId, promotionTypeId, policyGroupId | Có | expiredDate format boundary; voucherType integer boundary |
+| API_02 request | voucher_code (Y, string) | Có (100+ ký tự, XSS, SQL injection) | Security boundary cases |
+| API_02 response | 16 top-level fields (discount_value/ex_vat/rate, apply_from/to, original_*, etc.) + 10 applies[] sub-fields | Có (≥0, dismonth 0=1 lần, is_deduct_order 0\|1) | discount_value ≥ 0; dismonth; is_deduct_order boundary |
+| API_03 request | vouchers[]\{voucher_code (Y,string), voucher_type (Y,string "General")\} | Có (array rỗng []) | ⚠️ voucher_type string ≠ voucherType integer API_01 — CLA-APISPEC-002 |
+| API_03 response | Giống API_02 | Có | — |
+
+---
+
+## 5.1 API Output Requirements — ⭐ BẮT BUỘC CÓ TRONG TESTCASE
 
 > Đây là các field mà BA yêu cầu trong output API. Test case phải validate từng field.
 
@@ -169,6 +184,11 @@
 | CLA-VOUCHER-004 | REQ-AUTO-001, REQ-AUTO-004 | DOC-VOUCHER-01 | Tie-breaker khi nhiều voucher cùng DiscountVAT cao nhất: chọn voucher nào? | | **Open** | SC-AUTO-001, SC-AUTO-004 |
 | CLA-VOUCHER-005 | REQ-API-003 | DOC-VOUCHER-06 | Client-Id "không bắt buộc" — có ảnh hưởng kết quả API hay chỉ metadata? | | **Open** | SC-API-007 |
 | CLA-VOUCHER-006 | REQ-CANCEL-004 | DOC-VOUCHER-02 | `vouchers=[]` khi chưa có voucher: CO trả HTTP 400 hay HTTP 200 graceful? | | **Open** | SC-CANCEL-004 |
+| CLA-APISPEC-001 | REQ-API-001..003 | DOC-VOUCHER-03/04/05/06 | `Accept-Language` có trong cURL của cả 3 API nhưng không có rule nào trong sheet "Rule chung cho header". Header này có ảnh hưởng đến response không (ngôn ngữ message lỗi, v.v.)? | | **Open** | SC-API-001..006 (message lỗi có đa ngôn ngữ không?) |
+| CLA-APISPEC-002 | REQ-DETAIL-001, REQ-APPLY-001 | DOC-VOUCHER-04/05 vs DOC-VOUCHER-03 | `voucher_type` trong request body API_03 có giá trị mẫu là `"General"` (string). Nhưng `voucherType` trong response API_01 là integer 1 hoặc 2. Đây có phải là 2 field khác nhau? Nếu cùng 1 field — "General" map sang integer nào? | | **Open** | SC-APPLY-001, voucher_type mapping |
+| CLA-APISPEC-003 | REQ-DETAIL-001..004, REQ-APPLY-001..003 | DOC-VOUCHER-04, DOC-VOUCHER-05 | API_02 (`/content`) và API_03 (`/apply`) có output structure giống hệt nhau (17 top-level fields + applies[] 10 sub-fields). Đây là thiết kế có chủ đích (2 endpoint riêng, cùng schema) hay BA muốn differentiate thêm? | | **Open** | SC-DETAIL-001..002, SC-APPLY-002..003 |
+| CLA-APISPEC-004 | REQ-API-001..003 | DOC-VOUCHER-03/04/05/06 | Error response structure không được define trong Excel. Khi API fail (auth sai, voucher_code không tồn tại, QLCS lỗi), format response body là gì? (field names: success, errorCode, errorMessage, message, data — hay schema khác?) | | **Open** | SC-API-001..006, SC-DETAIL-004..005, SC-APPLY-004..005 |
+| CLA-APISPEC-005 | REQ-LIST-001..004 | DOC-VOUCHER-03 | API_01 không có request body. Context (gói, PTTT, địa chỉ) được lấy hoàn toàn từ `X-Checkout-Token` (decode token)? Hay có checkout context khác được đọc từ server-side state (DB)? Câu hỏi ảnh hưởng đến test isolation. | | **Open** | SC-LIST-001..004 |
 
 ---
 
@@ -178,3 +198,4 @@
 |--------|-------------------|---------|------------|------------|---------|
 | DOC-VOUCHER-03, 04, 05, 06 | 2026-05-26 | 109 TC (API_01: 28; API_02: 32; API_03: 49) | `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx` | v1.0 (khởi tạo) | API_02 sheet dùng sai output spec contents[] — đã sửa trong lần cập nhật 2026-05-26 |
 | DOC-VOUCHER-03, 04, 05, 06 | 2026-05-26 | 109 TC (không thay đổi số lượng) | `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx` | v1.0 (cập nhật) | **Thay đổi:** (1) Xóa HTTP status code khỏi Expected Response toàn bộ 93 TC — API trả 200 cho cả failed cases; (2) API_01.19: bổ sung applyTypeId/promotionTypeId/policyGroupId; (3) API_02.25-28: rewrite từ contents[] sang đúng BA spec (discount/applies[]) — API_02.25 validate 17 top-level fields, API_02.26 validate 10 sub-fields applies[]; (4) API_03.28: bổ sung đủ 17 top-level fields + 10 sub-fields applies[] |
+| DOC-VOUCHER-03, 04, 05, 06 | 2026-05-27 | — (không gen TC mới) | `02_analyze-requirements/chucnang_Voucher/test_data_catalog.md` | — | Phân tích sâu api doc v1.xlsx: tạo mới test_data_catalog.md với valid/invalid/boundary data cho headers + 3 API (request + response fields). Bổ sung CLA-APISPEC-001..005 vào §6. |

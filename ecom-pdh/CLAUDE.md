@@ -82,12 +82,13 @@
 - **Clarifications chua resolve:** 6 (CLA-DACTINH-001 den 006) — 4 high priority can BA confirm truoc khi gen TC
 - **MEMORY:** `02_analyze-requirements/chucnang_QLdactinh/MEMORY.md`
 
-## Ket qua phan tich requirement — 2026-05-26 (Chuc nang Voucher) [Updated: 2026-05-26]
+## Ket qua phan tich requirement — 2026-05-26 (Chuc nang Voucher) [Updated: 2026-05-27]
 - **Tai lieu:** DOC-VOUCHER-01 FCP_Ver1.1_Auto_Voucher_Checkout.md | DOC-VOUCHER-02 FCP_Ver1.1_Tich_hop_Evoucher_Checkout.md | DOC-VOUCHER-03/04/05/06 api doc v1.xlsx (3 API sheets + header rules)
 - **Tong requirement:** 45 | **Tong scenario:** 49 (P1: 36 | P2: 13)
 - **Modules:** VOUCHER-LIST | VOUCHER-DETAIL | VOUCHER-APPLY | VOUCHER-CANCEL | VOUCHER-RECHECK | VOUCHER-AUTO | VOUCHER-API
-- **API Output BA yeu cau (bat buoc trong TC):** API_01 data[]: 8 fields (voucherCode Y, voucherType Y, description, note, expiredDate dd/MM/yyyy, applyTypeId, promotionTypeId, policyGroupId) | API_02 + API_03 response: 17 top-level fields + applies[] 10 sub-fields (chi tiet xem MEMORY.md §5)
+- **API Output BA yeu cau (bat buoc trong TC):** API_01 data[]: 8 fields (voucherCode Y, voucherType Y, description, note, expiredDate dd/MM/yyyy, applyTypeId, promotionTypeId, policyGroupId) | API_02 + API_03 response: 17 top-level fields + applies[] 10 sub-fields (chi tiet xem MEMORY.md §5.1)
 - **Vung rui ro cao:** VOUCHER-AUTO 5 UCs (Score 25); VOUCHER-APPLY + VOUCHER-RECHECK output validation (Score 20); hasManualVoucher flag logic (Score 20)
-- **Clarifications chua resolve:** 5 (CLA-VOUCHER-001, 003, 004, 005, 006) — CLA-002 da resolve (API tra HTTP 200 cho ca failed cases — da xoa HTTP code khoi TC); Priority con lai: CLA-001 (endpoint discrepancy API_02)
+- **Clarifications chua resolve:** 10 total — 5 CLA-VOUCHER (001, 003, 004, 005, 006) + 5 CLA-APISPEC (001..005 tu phan tich sau api doc v1.xlsx — Accept-Language rule, voucher_type string vs integer mapping, API_02/03 schema giong nhau, error response format, API_01 context source)
 - **TC API da gen + cap nhat 2026-05-26:** 03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx (109 TC) — Da sua: (1) xoa HTTP code 93 TC; (2) API_01.19 bo sung applyTypeId/promotionTypeId/policyGroupId; (3) API_02.25-28 rewrite dung BA spec discount/applies[]; (4) API_03.28 bo sung du 17 fields + 10 sub-fields
+- **Phan tich bo sung 2026-05-27:** Tao moi test_data_catalog.md (valid/invalid/boundary data cho 3 API + headers); bo sung CLA-APISPEC-001..005 vao traceability + MEMORY §6
 - **MEMORY:** `02_analyze-requirements/chucnang_Voucher/MEMORY.md`
