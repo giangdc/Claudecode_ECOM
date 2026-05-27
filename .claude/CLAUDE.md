@@ -38,6 +38,7 @@ qc manual/                          ← Mở folder này trong Cowork / Claude C
 | `gen-testcase-webapp` | Tạo TC Web/Mobile lần đầu (sau analyze) |
 | `gen-testcase-api` | Tạo TC REST API từ tài liệu API / cURL / Swagger |
 | `update-testcase` | Cập nhật TC khi có URD version mới |
+| `gen-testcase-checkout-service` | Tạo TC riêng cho 1 dịch vụ Checkout mới — chỉ viết phần đặc thù, không clone common |
 
 ---
 
@@ -53,6 +54,9 @@ analyze-requirement  →  02_analyze-requirements/
         ▼                                      ▼
 gen-testcase-webapp              gen-testcase-api
 03_test-cases/*.xlsx             03_test-cases/api/*.xlsx
+        │
+        ├── gen-testcase-checkout-service  (dịch vụ Checkout mới)
+        │   03_test-cases/*.xlsx  (sheet mới thêm vào TC_checkout.xlsx)
         │
         ▼
 update-testcase  (khi có URD mới)

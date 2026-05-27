@@ -83,12 +83,13 @@
 - **MEMORY:** `02_analyze-requirements/chucnang_QLdactinh/MEMORY.md`
 
 ## Ket qua phan tich requirement — 2026-05-26 (Chuc nang Voucher) [Updated: 2026-05-27]
-- **Tai lieu:** DOC-VOUCHER-01 FCP_Ver1.1_Auto_Voucher_Checkout.md | DOC-VOUCHER-02 FCP_Ver1.1_Tich_hop_Evoucher_Checkout.md | DOC-VOUCHER-03/04/05/06 api doc v1.xlsx (3 API sheets + header rules)
-- **Tong requirement:** 45 | **Tong scenario:** 49 (P1: 36 | P2: 13)
-- **Modules:** VOUCHER-LIST | VOUCHER-DETAIL | VOUCHER-APPLY | VOUCHER-CANCEL | VOUCHER-RECHECK | VOUCHER-AUTO | VOUCHER-API
-- **API Output BA yeu cau (bat buoc trong TC):** API_01 data[]: 8 fields (voucherCode Y, voucherType Y, description, note, expiredDate dd/MM/yyyy, applyTypeId, promotionTypeId, policyGroupId) | API_02 + API_03 response: 17 top-level fields + applies[] 10 sub-fields (chi tiet xem MEMORY.md §5.1)
-- **Vung rui ro cao:** VOUCHER-AUTO 5 UCs (Score 25); VOUCHER-APPLY + VOUCHER-RECHECK output validation (Score 20); hasManualVoucher flag logic (Score 20)
-- **Clarifications chua resolve:** 10 total — 5 CLA-VOUCHER (001, 003, 004, 005, 006) + 5 CLA-APISPEC (001..005 tu phan tich sau api doc v1.xlsx — Accept-Language rule, voucher_type string vs integer mapping, API_02/03 schema giong nhau, error response format, API_01 context source)
-- **TC API da gen + cap nhat 2026-05-26:** 03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.0.xlsx (109 TC) — Da sua: (1) xoa HTTP code 93 TC; (2) API_01.19 bo sung applyTypeId/promotionTypeId/policyGroupId; (3) API_02.25-28 rewrite dung BA spec discount/applies[]; (4) API_03.28 bo sung du 17 fields + 10 sub-fields
-- **Phan tich bo sung 2026-05-27:** Tao moi test_data_catalog.md (valid/invalid/boundary data cho 3 API + headers); bo sung CLA-APISPEC-001..005 vao traceability + MEMORY §6
+- **Tai lieu:** DOC-VOUCHER-01 FCP_Ver1.1_Auto_Voucher_Checkout.md | DOC-VOUCHER-02 FCP_Ver1.1_Tich_hop_Evoucher_Checkout.md | DOC-VOUCHER-03/04/05/06 api doc v1.xlsx (3 API sheets + header rules) | DOC-VOUCHER-07 FCP_ Ver1.1_Tich hop Evoucher Checkout.docx (ban goc) | DOC-VOUCHER-08 FCP__Ver1.1_Auto Voucher_Checkout.docx (ban goc, 5 images: sequence diagrams + UI screenshots)
+- **Tong requirement:** 60 | **Tong scenario:** 63 (P1: 42 | P2: 21)
+- **Modules:** VOUCHER-LIST | VOUCHER-DETAIL | VOUCHER-APPLY | VOUCHER-CANCEL | VOUCHER-RECHECK | VOUCHER-AUTO | VOUCHER-API | VOUCHER-AUTO-UI | VOUCHER-UI
+- **API Output BA yeu cau (bat buoc trong TC):** API_01 data[]: 8 fields (voucherCode Y, voucherType Y 1=Ma chung/2=Ma le, description, note, expiredDate dd/MM/yyyy, applyTypeId, promotionTypeId, policyGroupId) | API_02 response: voucher_code + Content1-Content6 | API_03 response: 17 top-level fields + applies[] 10 sub-fields (chi tiet xem MEMORY.md §5.1)
+- **Vung rui ro cao:** VOUCHER-AUTO 5 UCs (Score 25); VOUCHER-APPLY + VOUCHER-RECHECK output validation (Score 20); hasManualVoucher flag logic (Score 20); VOUCHER-AUTO-UI source="auto" + silent fail (Score 20)
+- **Clarifications chua resolve:** 15 total (13 Open) — CLA-VOUCHER: 002, 003, 004, 005, 006, 007 (expiredDate conflict), 008 (applies[] Required conflict) | CLA-APISPEC: 002, 004, 005 | CLA-AUTO: 001 (source field spec), 002 (badge count API), 003 (notify wording) | Resolved: CLA-VOUCHER-001, CLA-APISPEC-001, CLA-APISPEC-003
+- **TC API da gen + cap nhat:** 03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.1.xlsx (100 TC, gen-testcase-api-v3)
+- **UI thuc te xac nhan tu screenshots DOC-VOUCHER-08:** "Ap dung voucher uu dai thanh cong" (green box), voucher code + "-500.000d" (red), badge "3" tren "Chon uu dai", "Can thanh toan: 2.480.000d" updated, "Thanh toan" button
+- **Bo sung 2026-05-27:** DOC-VOUCHER-07 → CLA-VOUCHER-007/008, enrich voucherType + is_deduct_order; DOC-VOUCHER-08 → VOUCHER-AUTO-UI (6 SC), VOUCHER-UI (12 SC), CLA-AUTO-001/002/003
 - **MEMORY:** `02_analyze-requirements/chucnang_Voucher/MEMORY.md`

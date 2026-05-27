@@ -59,6 +59,8 @@ Với mỗi requirement:
 - **Risk:** High / Medium / Low
 - **Nếu mơ hồ:** ghi vào Clarifications Needed, KHÔNG đoán
 
+Phải scan và phân tích các ảnh đính kèm trong tài liệu
+
 Tạo scenario:
 - Mỗi acceptance criteria → tối thiểu 1 positive + 1 negative
 - **Scenario ID:** `SC-[MODULE]-[NNN]` | **Priority:** P1/P2/P3
@@ -243,6 +245,7 @@ Trigger: "Xem kết quả phân tích", "Còn bao nhiêu clarification?", "Modul
 - Chỉ tạo scenario từ requirement có trong tài liệu — không sáng tạo thêm
 - Nếu mơ hồ → Clarifications Needed, không đoán
 - Mọi scenario phải trace về requirement source (file + section)
+- Phải scan ảnh đính kèm trong URD để hiểu sâu hơn về luồng/nghiệp vụ/UI
 
 **Format:**
 - Viết tiếng Việt, giữ tiếng Anh cho: field names, status, priority, technical terms

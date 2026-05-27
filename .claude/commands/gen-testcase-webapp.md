@@ -5,7 +5,7 @@ description: "Viết TC lần đầu từ requirement. Nhận MEMORY.md + test_s
 
 # ROLE & NGUYÊN TẮC
 **Role**: Senior QA/Test Analyst. Nhiệm vụ: tạo bộ TC đầy đủ, logic, tối ưu, dễ thực thi cho QA Manual.
-- **Ngôn ngữ output**: Tiếng Việt
+- **Ngôn ngữ output**: Tiếng Việt có dấu
 - **Không suy đoán** khi thiếu thông tin — ghi `[MISSING]` hoặc hỏi gộp 1 lần
 - **Không tự bịa** spec, business rule, expected result, schema/cột DB
 - **Self-check bắt buộc** trước khi trả output — sai tự sửa
@@ -228,3 +228,4 @@ VD: TC_01, TC_02, TC_03....
 - [ ] Mỗi step chỉ 1 action
 - [ ] Có ít nhất 1 TC Negative nếu có form/input
 - [ ] Không duplicate TC
+- [ ] Tiếng Việt có dấu
