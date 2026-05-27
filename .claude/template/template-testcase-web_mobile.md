@@ -27,8 +27,8 @@ Header chiếm **2 dòng** (row 7–8), nền màu xanh dương (`#4472C4`), ch�
 
 #### Cấu trúc merge header thực tế
 
-- Các cột `A → G` được merge theo chiều dọc giữa row `7–8`
-- Các cột `H → K` được merge ngang tại row `7` để tạo block `Round 1`
+- Các cột `A → H` được merge theo chiều dọc giữa row `7–8`
+- Các cột `I → L` được merge ngang tại row `7` để tạo block `Round 1`
 - Sub-header của `Round 1` nằm ở row `8`
 
 #### Mapping chi tiết
@@ -42,20 +42,21 @@ Header chiếm **2 dòng** (row 7–8), nền màu xanh dương (`#4472C4`), ch�
 | E | Điều Kiện / Dữ Liệu Test | Pre-condition / Test Data | Điều kiện tiên quyết và dữ liệu test |
 | F | Các Bước Thực Hiện | Test Steps | Các bước thao tác |
 | G | Kết Quả Mong Đợi | Expected Results | Kết quả hệ thống mong đợi |
-| H | Kết Quả Thực Hiện | Actual Result | `Pass` / `Fail` / `Block` / `N/A` |
-| I | Người Thực Hiện | Executed By | Người chạy testcase |
-| J | ID Bugs | ID Bugs | Jira bug ID nếu testcase fail |
-| K | Ghi Chú | Remark | Ghi chú thêm |
+| **H** | **Có thể Tự Động Hóa** | **Auto?** | `Y` = automatable · `N` = manual-only · _(blank)_ = chưa phân loại |
+| I | Kết Quả Thực Hiện | Actual Result | `Pass` / `Fail` / `Block` / `N/A` |
+| J | Người Thực Hiện | Executed By | Người chạy testcase |
+| K | ID Bugs | ID Bugs | Jira bug ID nếu testcase fail |
+| L | Ghi Chú | Remark | Ghi chú thêm |
 
 #### Cấu trúc Round block
 
 ```text
-H7:K7 = Round 1 (merge cells)
+I7:L7 = Round 1 (merge cells)
 
-H8 = Actual Result
-I8 = Executed By
-J8 = ID Bugs
-K8 = Remark
+I8 = Actual Result
+J8 = Executed By
+K8 = ID Bugs
+L8 = Remark
 ```
 
 > Khi thêm round mới:
@@ -73,7 +74,7 @@ Các testcase được chia theo nhóm nghiệp vụ.
 #### Đặc điểm group header
 
 - Nền màu xanh lá nhạt (`#A9D08E`)
-- Merge toàn bộ cột `B → K`
+- Merge toàn bộ cột `B → L`
 - Không có Testcase ID
 - Dùng để phân chia nhóm testcase
 
@@ -98,7 +99,7 @@ Nhóm 3: Business Flow
 Mỗi dòng testcase có format:
 
 ```text
-| QC/AI | TC ID | Priority | Test Title | Pre-condition | Test Steps | Expected Result | Actual Result | Executed By | ID Bugs | Remark |
+| QC/AI | TC ID | Priority | Test Title | Pre-condition | Test Steps | Expected Result | Auto? | Actual Result | Executed By | ID Bugs | Remark |
 ```
 
 ---
@@ -196,7 +197,21 @@ Hệ thống hiển thị thông báo:
 
 ---
 
-### 3.5 Actual Result
+### 3.5 Auto? (cột H)
+
+| Giá trị | Ý nghĩa | Ai điền |
+|---|---|---|
+| `Y` | TC có thể tự động hóa bằng Playwright/Selenium | AI (gen-testcase-webapp) hoặc QC sửa tay |
+| `N` | TC chỉ test thủ công (CAPTCHA, visual check, hardware...) | AI (gen-testcase-webapp) hoặc QC sửa tay |
+| _(blank)_ | Chưa phân loại — mặc định khi TC cũ chưa được đánh giá | QC điền sau |
+
+**Nguyên tắc AI điền `Auto?`:**
+- `N` khi TC yêu cầu: xác minh màu sắc/hình ảnh thực tế, CAPTCHA, xác nhận qua email/SMS thực, thiết bị phần cứng, kiểm tra in ấn/PDF bằng mắt
+- `Y` cho các trường hợp còn lại (functional flow, validation, permission, API response)
+
+---
+
+### 3.6 Actual Result
 
 | Giá trị | Ý nghĩa |
 |---|---|
@@ -217,10 +232,11 @@ Khi skill `gen-testcase-webapp` hoặc `qc-toolkit` sinh file `.xlsx`, cần áp
 | Cell D3 | Function ID |
 | Cell D4 | Function Name |
 | Header row 7–8 | Merge + màu `#4472C4` + font trắng bold |
-| Group Header | Merge `B → K` + màu `#A9D08E` |
+| Group Header | Merge `B → L` + màu `#A9D08E` |
 | TC ID | Công thức auto increment |
 | Cột A | `QC` hoặc `AI` |
 | Priority | Chỉ dùng `High` / `Medium` / `Low` |
+| **Cột H — Auto?** | `Y` / `N` / _(blank)_ — skill `gen-testcase-webapp` điền khi sinh TC; QC có thể sửa thủ công |
 | Actual Result | Chỉ dùng `Pass` / `Fail` / `Block` / `N/A` |
 
 ---

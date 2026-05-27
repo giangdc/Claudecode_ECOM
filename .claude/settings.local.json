@@ -4,7 +4,9 @@
       "Bash(python3 -c ' *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(git pull *)"
     ]
   }
 }

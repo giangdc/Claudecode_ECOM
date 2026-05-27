@@ -46,6 +46,16 @@ Thông báo:
 ```
 
 ---
+## Template Excel
+
+**Detect loại task → chọn template:**
+
+Nếu dùng đến skill này thì luôn lấy template:  | `./template/template-testcase-web_mobile.md` |
+
+**Sau khi đọc template:**
+- Template tìm thấy → dùng cấu trúc cột, màu sắc, format từ template. Bỏ qua phần Column Rules bên dưới.
+- Template có section mô tả (`# Context`, `# Feature`, `# Mô tả`, `## Overview`) → dùng làm context bổ sung, không hỏi lại user.
+- Không tìm thấy template → dùng Column Rules mặc định bên dưới, thông báo ngắn cho user.
 
 ## STEP 1 — Requirement Understanding (Option B only)
 
@@ -152,21 +162,6 @@ Nếu < 8/10 → refactor trước khi output.
 
 # OUTPUT
 
-## Template Excel
-
-Đọc template ngay trước khi tạo file — không đọc sớm hơn.
-
-**Detect loại task → chọn template:**
-
-Nếu dùng đến skill này thì luôn lấy template:  | `./template/template-testcase-web_mobile.md` |
-
-**Sau khi đọc template:**
-- Template tìm thấy → dùng cấu trúc cột, màu sắc, format từ template. Bỏ qua phần Column Rules bên dưới.
-- Template có section mô tả (`# Context`, `# Feature`, `# Mô tả`, `## Overview`) → dùng làm context bổ sung, không hỏi lại user.
-- Không tìm thấy template → dùng Column Rules mặc định bên dưới, thông báo ngắn cho user.
-
-> Path tương đối từ project root — hoạt động trên mọi máy.
-
 ---
 
 ## File name
@@ -229,3 +224,6 @@ VD: TC_01, TC_02, TC_03....
 - [ ] Có ít nhất 1 TC Negative nếu có form/input
 - [ ] Không duplicate TC
 - [ ] Tiếng Việt có dấu
+- [ ] Cột H `Auto?` đã điền `Y` hoặc `N` cho mỗi TC (không để blank khi sinh mới)
+  - `N` khi TC yêu cầu: CAPTCHA, xác nhận qua email/SMS thực, kiểm tra màu/hình bằng mắt, thiết bị phần cứng, thanh toán khi phải mở app thứ 3 như momo,zalo pay,vnpay. Verified thông tin trên tool thứ 3
+  - `Y` cho các trường hợp còn lại (functional flow, validation, permission), thanh toán nhập thông tin thẻ, COD

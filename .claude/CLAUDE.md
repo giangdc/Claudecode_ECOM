@@ -39,6 +39,11 @@ qc manual/                          ← Mở folder này trong Cowork / Claude C
 | `gen-testcase-api` | Tạo TC REST API từ tài liệu API / cURL / Swagger |
 | `update-testcase` | Cập nhật TC khi có URD version mới |
 | `gen-testcase-checkout-service` | Tạo TC riêng cho 1 dịch vụ Checkout mới — chỉ viết phần đặc thù, không clone common |
+| `generate_automation_framework` | **[Một lần]** Scaffold automation framework (Playwright TS mặc định) vào `automation-framework/` |
+| `generate_automation_from_testcases` | Convert TC Excel Web (cột `Auto?=Y`) thành Page Objects + Test scripts |
+| `generate_locator` | Sinh locator ổn định cho 1 element cụ thể (dùng khi locator bị break) |
+| `generate_data_verify` | Sinh script verify data live web vs Excel data file — nhiều dịch vụ cùng layout, thêm gói chỉ cần thêm dòng Excel |
+| `sync-tc-results` | Đọc Playwright JSON report → điền Pass/Fail vào cột Actual Result của TC Excel |
 
 ---
 
@@ -61,7 +66,36 @@ gen-testcase-webapp              gen-testcase-api
         ▼
 update-testcase  (khi có URD mới)
 03_test-cases/*_TC_v2.0.xlsx, v3.0...
+        │
+        ▼  ── Automation lane (Web UI) ──────────────────────────
+        │  [một lần] generate_automation_framework
+        │  → automation-framework/  (ngang hàng với <project>/, ngoài project folder)
+        │
+        ▼
+generate_automation_from_testcases
+  └─ Input: 03_test-cases/*.xlsx  (chỉ TC có cột H "Auto?" = Y)
+  └─ Input: URL ứng dụng (phải accessible, không sau VPN)
+  → automation-framework/src/pages/*.ts    (Page Object classes)
+  → automation-framework/src/tests/*.spec.ts  (Test scripts, đã chạy PASS)
+
+generate_data_verify   (nhiều dịch vụ cùng layout, khác data)
+  └─ Input: test-data/service_data.xlsx    (mỗi gói/dịch vụ = 1 dòng)
+  └─ Input: Base URL
+  → automation-framework/src/utils/service-data-reader.ts
+  → automation-framework/src/tests/service-data-verify.spec.ts
+  [thêm gói mới: chỉ thêm dòng vào Excel, không chạy lại skill]
+        │
+        ▼ (sau khi chạy npx playwright test --reporter=json)
+sync-tc-results
+  └─ Input: test-results/report.json
+  └─ Input: 03_test-cases/*.xlsx
+  → 03_test-cases/*_results_{date}.xlsx   (Pass/Fail điền vào cột Actual Result)
 ```
+
+**Prerequisite automation lane:**
+- `automation-framework/` chưa tồn tại → chạy `generate_automation_framework` trước
+- App URL accessible trực tiếp từ máy (MCP browser tool cần inspect DOM thực tế)
+- TC Excel đã được đánh dấu cột H `Auto? = Y/N`
 
 ---
 

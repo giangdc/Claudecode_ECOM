@@ -31,12 +31,22 @@ File: `CLAUDE.md` (ở root của mỗi project)
   │
   ├─► gen-testcase-webapp  →  03_test-cases/
   │       Output: AI_ISC_{project_name}_[version]_TC_v1.0.xlsx (Web/Mobile)
+  │               (cột H "Auto?" được điền Y/N cho từng TC)
   │
   ├─► gen-testcase-api     →  03_test-cases/api/
   │       Output: AI_ISC_{project_name}_[version]_TC_API_v1.0.xlsx (REST API)
   │
-  └─► update-testcase  →  03_test-cases/
-          Output: AI_ISC_{project_name}_[version]_TC_v2.0.xlsx (v3.0...)
+  ├─► update-testcase  →  03_test-cases/
+  │       Output: AI_ISC_{project_name}_[version]_TC_v2.0.xlsx (v3.0...)
+  │
+  └─► [Automation — Web UI] ──────────────────────────────────────
+      [một lần] generate_automation_framework
+        → automation-framework/  (ngang hàng với {project_name}/)
+      generate_automation_from_testcases
+        Input : 03_test-cases/*.xlsx  (chỉ TC có Auto? = Y)
+        Input : URL ứng dụng (phải accessible)
+        → automation-framework/src/pages/*.ts
+        → automation-framework/src/tests/*.spec.ts
 \`\`\`
 
 ## Naming Conventions
