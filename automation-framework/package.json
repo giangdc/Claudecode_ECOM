@@ -1,0 +1,22 @@
+{
+  "name": "automation-framework",
+  "version": "1.0.0",
+  "description": "Playwright TypeScript Automation Framework — ecom-pdh ISC/ECP",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "allure:generate": "allure generate allure-results --clean -o allure-report",
+    "allure:open": "allure open allure-report",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "allure-playwright": "^3.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
