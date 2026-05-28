@@ -151,3 +151,23 @@ Detailed rules live in `.claude/rules/`. Key points:
 - **Waits:** Playwright auto-wait + `expect()` assertions; Selenium `WebDriverWait`; Appium explicit waits. `Thread.sleep()` / `waitForTimeout()` are **banned**.
 - **Test data:** Never hardcode unique fields (email, username). Use UUID/timestamp format: `auto_[testName]_[timestamp]_[random]@test.com`
 - **Headed mode** required during debug; headless only in CI or after 100% pass on headed.
+
+---
+
+## Kết quả phân tích requirement — 2026-05-28
+
+- **Tài liệu:** `ecom-pdh/02_analyze-requirements/chucnang_Voucher/ECP_API_voucher_v1.xlsx`
+- **Tổng requirement:** 6 | **Tổng scenario:** 33 (P1:14 P2:16 P3:3)
+- **Modules:** VOUCHER_API — 4 endpoints: voucher/list, voucher/content, voucher/apply, voucher/check
+- **Vùng rủi ro cao:** POST /voucher/apply (Score=20), Authentication X-Checkout-Token (Score=15)
+- **Clarifications chưa resolve:** 5 (CLARY-001..005, xem requirement_traceability.md)
+- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_Voucher/MEMORY.md`
+
+## Kết quả phân tích requirement — 2026-05-28 (Đăng ký UltraFast)
+
+- **Tài liệu:** `ecom-pdh/00_input/chucnang_dangkyultraFast/dang ky dich ultraFast.xlsx` (2 sheets: Đăng ký UltraFast + Rule common)
+- **Tổng requirement:** 9 | **Tổng scenario:** 24 (P1:13 P2:9 P3:2)
+- **Modules:** DANGKYUF — Checkout flow UltraFast (B1 navigate → B2 thanh toán)
+- **Vùng rủi ro cao:** Luồng thanh toán Online 3rd party (Score=20); Block PTTT Online-only load theo QLCS (Score=15)
+- **Clarifications chưa resolve:** 5 (CLARY-DANGKYUF-001..005) — CLARY-001 ưu tiên cao (địa chỉ/họ tên có áp dụng không)
+- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_dangkyultraFast/MEMORY.md`

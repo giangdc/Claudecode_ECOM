@@ -1,49 +1,46 @@
-# Risk Assessment — Chức năng Voucher (EVC Checkout)
-
-> Hướng dẫn: Risk Score = Business Impact (1–5) × Complexity (1–5)
-> High ≥ 15 | Medium 8–14 | Low ≤ 7
+# Risk Assessment — chucnang_Voucher (API)
+## Hướng dẫn: Risk Score = Business Impact (1-5) × Complexity (1-5)
 
 ---
 
 ## Ma trận rủi ro
 
-| Module / Feature | Business Impact | Complexity | Risk Score | Mức rủi ro | Đề xuất |
-|-----------------|-----------------|------------|------------|------------|---------|
-| VOUCHER-AUTO — Auto-apply 5 UC (UC-01 đến UC-05) | 5 | 5 | **25** | 🔴 High | Ưu tiên test sớm; cần mock QLCS; test đầy đủ 5 luồng |
-| VOUCHER-APPLY — Manual apply UC-04 (a/b/c) | 5 | 4 | **20** | 🔴 High | Verify đủ output fields; test combo voucher; QLCS mock |
-| VOUCHER-RECHECK — Complete checkout UC-06 | 5 | 4 | **20** | 🔴 High | 3 result code (1/0/-1) phải test đủ; liên quan tạo order |
-| VOUCHER-AUTO — hasManualVoucher flag logic | 5 | 4 | **20** | 🔴 High | Flag quyết định toàn bộ luồng auto vs manual; dễ bug edge case |
-| VOUCHER-LIST — API output field validation | 4 | 3 | **12** | 🟡 Medium | Validate schema đầy đủ 8 fields; voucherType must be 1 or 2 |
-| VOUCHER-DETAIL — API output field validation | 4 | 3 | **12** | 🟡 Medium | Blocked bởi CLA-VOUCHER-001; validate 17+ fields + applies[] |
-| VOUCHER-APPLY — API output field validation | 4 | 3 | **12** | 🟡 Medium | 17 fields + applies[] 10 sub-fields; verify số tiền discount đúng |
-| VOUCHER-CANCEL — Reset và tính lại giá | 5 | 2 | **10** | 🟡 Medium | Floating point risk; CO không gọi QLCS |
-| VOUCHER-LIST — Context change | 3 | 3 | **9** | 🟡 Medium | QLCS call lại đúng context mới |
-| VOUCHER-API — Authentication (3 headers) | 5 | 2 | **10** | 🟡 Medium | 3 auth factors; cross-auth mismatch; replay attack |
-| VOUCHER-CANCEL — Edge case (cancel khi rỗng) | 2 | 2 | **4** | 🟢 Low | Graceful handling; CLA-VOUCHER-006 cần resolve |
-| VOUCHER-DETAIL — On-demand only | 2 | 1 | **2** | 🟢 Low | Verify log; không ảnh hưởng user |
+| Module/Feature | Business Impact | Complexity | Risk Score | Mức độ | Đề xuất |
+|---|---|---|---|---|---|
+| POST /voucher/apply | 5 | 4 | **20** | HIGH | Test đầu tiên và kỹ nhất — ảnh hưởng trực tiếp đến giá trị đơn hàng checkout. Phủ đủ: apply 1/nhiều/null voucher, duplicate check, discount_value=0 rule |
+| Authentication (X-Checkout-Token) | 5 | 3 | **15** | HIGH | Bảo mật phiên checkout — test token missing/invalid/expired cho cả 4 APIs |
+| POST /voucher/list | 4 | 2 | **8** | MEDIUM | Hiển thị danh sách voucher đúng/đủ cho user chọn. Edge case: list rỗng, checkout chưa chọn PTTT |
+| POST /voucher/check | 3 | 2 | **6** | MEDIUM | Validate trước khi apply — sai ảnh hưởng UX nhưng apply sẽ fail an toàn. Test is_valid=true/false |
+| Response Structure Contract | 3 | 2 | **6** | MEDIUM | Bất kỳ thay đổi cấu trúc nào sẽ break client UI. Test assertion meta fields |
+| POST /voucher/content | 2 | 2 | **4** | LOW | Chỉ ảnh hưởng hiển thị UI (content1..content6). Edge case data=null phải handle gracefully |
+| Accept-Language / i18n | 1 | 1 | **1** | LOW | Chỉ ảnh hưởng ngôn ngữ hiển thị error message |
 
 ---
 
 ## Vùng rủi ro cao (Score ≥ 15)
 
-1. **VOUCHER-AUTO** (Score 25) — Logic auto-apply 5 UC phức tạp; flag `hasManualVoucher` kiểm soát toàn bộ luồng; dễ bug ở edge case context change
-2. **VOUCHER-APPLY manual** (Score 20) — Core feature; nhiều nhánh (04.a, 04.b, 04.c); output phải validate 17 fields + applies[]
-3. **VOUCHER-RECHECK** (Score 20) — 3 result code ảnh hưởng đến order creation; result=0 phải remove voucher + recalculate; result=-1 phải giữ nguyên
-4. **hasManualVoucher flag** (Score 20) — Flag duy nhất quyết định toàn bộ hành vi CO; sai flag = sai toàn bộ luồng
+1. **POST /voucher/apply** (Score=20): Endpoint phức tạp nhất — business rule "discount=0 sau apply, tính sau calculate", logic xử lý array nhiều voucher, duplicate detection, recheck failed. Nếu sai → đơn hàng bị tính giá sai.
+2. **Authentication X-Checkout-Token** (Score=15): Xác thực phiên làm việc checkout — nếu bypass được hoặc token validate sai → security breach.
 
 ---
 
 ## Dependencies
 
 | Feature A | Phụ thuộc vào | Ảnh hưởng nếu fail |
-|-----------|--------------|---------------------|
-| VOUCHER-LIST | QLCS API GetListEvoucher | Không có danh sách → không test được APPLY, DETAIL, AUTO |
-| VOUCHER-DETAIL | QLCS API GetEvoucherInfor / GetVoucherContent | Không test được output fields |
-| VOUCHER-APPLY | VOUCHER-LIST (cần voucherCode + voucherType) | Apply phải có voucherCode lấy từ list |
-| VOUCHER-APPLY | QLCS API GetEvoucherInfor + Recheck | Không mock được → không test được negative cases |
-| VOUCHER-RECHECK | VOUCHER-APPLY (phải apply trước) | Không test được nếu apply bị fail |
-| VOUCHER-AUTO | VOUCHER-LIST + QLCS GetListEvoucher + GetEvoucherInfor + Recheck | Toàn bộ auto-apply phụ thuộc chuỗi QLCS calls |
-| VOUCHER-CANCEL | VOUCHER-APPLY (phải apply trước để cancel) | Cancel test phụ thuộc apply thành công trước |
+|---|---|---|
+| voucher/list | Checkout session tồn tại + đã chọn PTTT | Không hiển thị được danh sách voucher cho user |
+| voucher/content | voucher_code hợp lệ (thường lấy từ kết quả list) | Không hiển thị được điều kiện/HSD voucher |
+| voucher/apply | Checkout session + đã chọn PTTT + voucher/check (optional) | Voucher không được áp dụng vào đơn hàng |
+| voucher/check | voucher_code (user nhập hoặc từ list) | User nhập sai voucher sẽ không có cảnh báo sớm |
+| Tính giá (calculate API) | voucher/apply phải gọi trước | discount_value = 0 cho đến khi calculate được gọi |
+
+---
+
+## Clarification Risk
+
+Có 5 clarifications chưa resolve (xem `requirement_traceability.md`). Rủi ro ảnh hưởng TC:
+- **CLARY-001** (HTTP 400 vs 401 mapping) — ảnh hưởng tất cả negative TCs có assertion HTTP status code
+- **CLARY-002** (null vs [] trong apply) — ảnh hưởng SC-VOUCHER-API-015
 
 ---
 
@@ -51,36 +48,31 @@
 
 ```
 1. Smoke P1:
-   → Auth (SC-API-001 đến SC-API-006) — đảm bảo truy cập được API
-   → SC-LIST-001 (lấy danh sách) — đảm bảo có data để test tiếp
+   - SC-VOUCHER-API-001 (list - happy path)
+   - SC-VOUCHER-API-003 (list - thiếu token)
+   - SC-VOUCHER-API-007 (content - happy path)
+   - SC-VOUCHER-API-013 (apply - 1 voucher)
+   - SC-VOUCHER-API-016 (apply - discount=0 rule)
+   - SC-VOUCHER-API-023 (check - is_valid=true)
+   - SC-VOUCHER-API-030 (response structure)
 
-2. Risk cao nhất:
-   → SC-APPLY-001, SC-APPLY-002, SC-APPLY-003 (output validation đủ fields)
-   → SC-RECHECK-001, SC-RECHECK-002, SC-RECHECK-003
-   → SC-AUTO-001, SC-AUTO-004 (auto-apply happy path + no stack)
-   → SC-AUTO-008, SC-AUTO-012 (hasManualVoucher blocking logic)
+2. Risk cao nhất (apply business rules):
+   - SC-VOUCHER-API-014 (apply nhiều voucher)
+   - SC-VOUCHER-API-015 (gỡ bỏ tất cả)
+   - SC-VOUCHER-API-017 (duplicate voucher code)
+   - SC-VOUCHER-API-018 (recheck failed)
 
-3. Full regression:
-   → Tất cả SC-AUTO-* (UC-01 đến UC-05)
-   → SC-CANCEL-001, SC-CANCEL-002 (giá gốc đúng)
-   → SC-DETAIL-001, SC-DETAIL-002 (output fields)
-   → SC-LIST-005, SC-LIST-006 (schema validation)
+3. Authentication cross-cutting:
+   - SC-VOUCHER-API-004, 005, 006 (list auth errors)
+   - SC-VOUCHER-API-012 (content auth)
+   - SC-VOUCHER-API-020 (apply auth)
+   - SC-VOUCHER-API-029 (check auth)
 
-4. Blocked — chờ clarification:
-   → SC-DETAIL-001 đến SC-DETAIL-005 (chờ CLA-VOUCHER-001)
-   → SC-CANCEL-004 (chờ CLA-VOUCHER-006)
-   → Tất cả SC-API-* expected HTTP code (chờ CLA-VOUCHER-002)
+4. Validation & Boundary:
+   - SC-VOUCHER-API-009, 010 (content required/empty)
+   - SC-VOUCHER-API-022 (apply thiếu voucher_code)
+   - SC-VOUCHER-API-025, 026 (check required/empty)
+
+5. P3 và edge cases:
+   - SC-VOUCHER-API-032, 033 (i18n, system error)
 ```
-
----
-
-## Test Data yêu cầu
-
-| Loại | Mô tả | Cần chuẩn bị |
-|------|-------|-------------|
-| Checkout test | Checkout hợp lệ với lineitem | Cần tạo sẵn trên STG |
-| EVC active | KH có 3-5 EVC active khác nhau DiscountVAT | Phối hợp QLCS/vận hành tạo |
-| EVC expired | EVC đã hết hạn | Cần EVC với expiredDate < today |
-| EVC wrong channel | EVC thuộc kênh khác | Confirm với QLCS team |
-| Token expired | Bearer token + X-Checkout-Token đã hết hạn | Giữ lại token cũ |
-| QLCS mock | Các kịch bản QLCS trả result=0/-1 | Cần môi trường có mock QLCS hoặc phối hợp Dev |
