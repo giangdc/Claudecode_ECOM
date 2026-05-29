@@ -136,18 +136,21 @@ BẮT BUỘC generate:
 - Multi-session conflict
 
 ---
+---
 
-## MINIMUM AUTH TESTCASE RULE
+---
 
-Nếu API có:
-- >=2 auth headers
-→ tối thiểu 8 auth TC
+## STANDARD STEPS — Cột "Các Bước Thực Hiện"
 
-- >=3 auth headers
-→ tối thiểu 12 auth TC
+Với **mọi TC API**, cột "Các Bước Thực Hiện" (cột F) PHẢI dùng chuẩn sau — không thêm, không tùy biến:
 
-Nếu chưa đạt:
-→ tự generate thêm.
+```
+1. Gởi request theo điều kiện test
+2. Kiểm tra response trả về
+```
+
+> Chi tiết test data, headers, request body → ghi vào cột "Điều Kiện/ Dữ Liệu Test" (cột E).  
+> Kết quả mong đợi cụ thể → ghi vào cột "Kết Quả Mong Đợi" (cột G).
 
 ---
 
@@ -159,3 +162,4 @@ Nếu chưa đạt:
 - [ ] Có cross-auth validation
 - [ ] Có replay/token tampering testcase
 - [ ] Có tối thiểu số lượng auth testcase
+- [ ] Cột "Các Bước Thực Hiện" dùng đúng chuẩn 2 bước

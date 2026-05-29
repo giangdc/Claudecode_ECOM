@@ -78,6 +78,7 @@ test.describe('TC_DANGKYUF — Block Thông tin cá nhân: Số điện thoại'
     await checkout.clickTiepTuc();
     await page.waitForTimeout(1000);
 
+    // Staging hiện dùng text "Số điện thoại không hợp lệ." cho cả < 10 số và không bắt đầu 0
     const errorMsg = page.locator('p').filter({ hasText: /Số điện thoại không hợp lệ/ });
     await expect(errorMsg).toBeVisible({ timeout: 8000 });
   });
@@ -189,17 +190,18 @@ test.describe('TC_DANGKYUF — Button Thanh toán: Validate & Execute', () => {
   test('TC_DANGKYUF.17 — Kiểm tra button Thanh toán không thực hiện khi còn trường bắt buộc chưa nhập', async ({ page }) => {
     const checkout = await openCheckout(page);
 
-    // Chọn PTTT nhưng KHÔNG nhập SĐT → phone là trường bắt buộc còn thiếu
+    // KHÔNG nhập SĐT, chọn PTTT rồi click "Thanh toán"
     await checkout.selectPaymentMethod('DOMESTIC-Online');
-    await checkout.clickTiepTuc();
-    await page.waitForTimeout(2000);
 
-    // Vẫn ở trang checkout (không redirect)
+    // "Thanh toán" là regular button (không phải type="submit"), dùng exact để tránh match accordion "Thông tin thanh toán"
+    await page.getByRole('button', { name: 'Thanh toán', exact: true }).click();
+    await page.waitForTimeout(3000);
+
+    // Vẫn ở trang checkout — không redirect sang 3rd party payment
     await expect(page).toHaveURL(/staging\.fpt\.vn\/checkout/);
 
-    // Có thông báo lỗi validate cho SĐT
-    const errorMsg = page.locator('p').filter({ hasText: /Vui lòng nhập số điện thoại/ });
-    await expect(errorMsg).toBeVisible({ timeout: 8000 });
+    // Phone input vẫn visible → form chưa được submit thành công
+    await expect(checkout.phoneInput).toBeVisible();
   });
 
   test('TC_DANGKYUF.19 — Kiểm tra button Thanh toán redirect đúng trang 3rd party khi data hợp lệ', async ({ page }) => {

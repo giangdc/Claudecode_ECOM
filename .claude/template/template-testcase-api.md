@@ -139,12 +139,9 @@ Viết đủ thông tin để QC có thể verify mà không cần đoán:
 
 ## 7. Ví dụ dữ liệu mẫu (đồng nhất với guideline)
 
-| TC ID | Priority | Test Title | Request Body | Expected Response |
+| TC ID | Priority | Test Title | Request Body |Các Bước Thực Hiện| Expected Response |
 |---|---|---|---|---|
-| API_01.1 | High | Đăng nhập thành công với credentials hợp lệ | `{"username":"user1@example.com","password":"Pass@1234"}` | HTTP 200 — `response.message = "Login successful"` — `data.access_token`: có giá trị |
-| API_01.2 | High | Đăng nhập thất bại khi sai password | `{"username":"user1@example.com","password":"WrongPass"}` | HTTP 401 — `response.message = "Invalid username or password"` — `data.access_token`: không có |
-| API_01.3 | Medium | Đăng nhập thất bại khi thiếu field username | `{"password":"Pass@1234"}` | HTTP 400 — `response.message = "username is required"` |
-
+| API_01.1 | High | Đăng nhập thành công với credentials hợp lệ | `{"username":"user1@example.com","password":"Pass@1234"}` | 1. Send requet theo data 2. Quan sát response trả về|HTTP 200 — `response.message = "Login successful"` — `data.access_token`: có giá trị |
 ---
 
 ## 8. Quy ước tổ chức file Excel
