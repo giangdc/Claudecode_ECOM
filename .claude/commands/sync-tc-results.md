@@ -1,5 +1,5 @@
 ---
-description: Đọc Playwright JSON report → map kết quả Pass/Fail vào đúng dòng TC trong file Excel. Điền cột Actual Result, Executed By, và Round date tự động.
+description: Đọc Playwright JSON report → map kết quả vào đúng dòng TC trong file Excel. TC đã chạy điền Pass/Fail + ngày thực hiện; TC skip (manual Auto?=N hoặc [BLOCKED]) điền Block + lý do. Phủ kín mọi TC, không để trống ô Kết Quả.
 ---
 
 # Workflow: Sync Test Results → TC Excel
@@ -9,10 +9,25 @@ description: Đọc Playwright JSON report → map kết quả Pass/Fail vào đ
 
 ## ⚠️ Nguyên tắc thực thi
 
-- **KHÔNG overwrite Actual Result nếu cell đã có giá trị và report không có TC đó** — chỉ ghi khi có mapping
-- **Ghi backup trước khi sửa Excel** — không overwrite trực tiếp file gốc nếu không được phép
-- **Log rõ mọi TC được điền và TC bị skip** — user phải biết chính xác gì đã thay đổi
+- **Ghi backup trước khi sửa Excel** — mặc định KHÔNG overwrite file gốc; tạo file `*_results_{date}.xlsx`
+- **Log rõ mọi TC được điền và lý do** — user phải biết chính xác gì đã thay đổi
 - **Tất cả output bằng Tiếng Việt**
+
+### Định nghĩa "skip" (QUAN TRỌNG)
+
+> **"Skip" = bất kỳ TC nào trong Excel KHÔNG nhận được kết quả Pass/Fail từ report của lần chạy này.**
+> Bao gồm cả 2 nhóm:
+> 1. TC manual `Auto?=N` (cột H) — không nằm trong scope automation
+> 2. TC `[BLOCKED]` (tiền tố trong cột Nội Dung Test) — chưa thể thực hiện do thiếu feature/spec
+>
+> → **Mọi TC skip đều phải đánh `Kết Quả Thực Hiện = Block` + ghi lý do cụ thể vào cột Ghi Chú.**
+> KHÔNG để trống ô Kết Quả. Sau khi sync, mọi TC trong Excel phải có 1 trong 3 giá trị: `Pass` / `Fail` / `Block`.
+
+### Quy tắc điền cột Ghi Chú
+
+- **TC đã chạy (Pass/Fail):** note **ngày thực hiện** vào Ghi Chú, VD: `Thực hiện tự động (Auto): 2026-05-30`
+- **TC Fail:** thêm lý do fail (xác nhận từ DOM/report) vào Ghi Chú; nếu đã có bug → ghi Bug ID vào cột **ID Bugs**
+- **TC Block (skip):** ghi lý do block cụ thể vào Ghi Chú (VD: `Block: TC manual (Auto?=N) - chưa test tay` / `Block: voucher chưa implement`)
 
 ## Convention bắt buộc — Tên test phải chứa TC ID
 
@@ -117,13 +132,19 @@ reporter: [['json', { outputFile: 'test-results/report.json' }]]
 2. **Với mỗi sheet**, xác định:
    - **Function ID** từ cell `D3` (VD: `TC_LOGIN`, `TC_VOUCHER`)
    - **TC ID column** = cột `B` (Testcase ID — có thể là formula)
-   - **Actual Result column** = tính từ cột `A`:
-     - Template chuẩn (có cột `Auto?`): Actual Result ở **cột I** (Round 1)
-     - Template cũ (không có cột `Auto?`): Actual Result ở **cột H** (Round 1)
-     - Tự detect bằng cách đọc header row 8: tìm cell có text `Actual Result` hoặc `Kết Quả Thực Hiện`
-   - **Executed By column** = cột ngay sau Actual Result
-   - **Round header row** = row 7 (cell merge chứa `Round 1`, `Round 2`...)
-   - **Round date** = nếu có row phụ dưới Round header → ghi date vào đó; nếu không có → ghi vào Remark
+   - **Auto? column** = cột `H` (giá trị `Y`/`N`/blank) — dùng để phân loại skip
+   - **Round 1 block** = các cột `I`→`L`, header ở row 8. Layout chuẩn template web/mobile:
+
+     | Cột | Index | Header (row 8) | Ghi gì |
+     |---|---|---|---|
+     | **I** | 9 | `Kết Quả Thực Hiện` | `Pass`/`Fail`/`Block` (+ màu) |
+     | **J** | 10 | `Người Thực Hiện` | `Auto` hoặc tên user |
+     | **K** | 11 | `ID Bugs` | Bug ID khi Fail (để trống nếu chưa có) |
+     | **L** | 12 | `Ghi Chú` | ngày thực hiện / lý do fail / lý do block |
+
+   > Tự verify bằng cách đọc header row 8 (tìm `Kết Quả Thực Hiện`, `Người Thực Hiện`, `ID Bugs`, `Ghi Chú`). KHÔNG ghi note vào cột `ID Bugs` (K) — note phải vào `Ghi Chú` (L).
+   - **Round header row** = row 7 (cell merge `I7:L7` chứa `Round 1`...). Ghi `Round 1 — {date}` vào `I7`.
+   - **Round N** (N>1): offset cột = `base + (N-1)*4` → Round 2 ở `M`→`P`, v.v.
 
 3. **Xác định round cần điền:**
    - Đếm số Round block đã có trong header row 7
@@ -147,30 +168,38 @@ reporter: [['json', { outputFile: 'test-results/report.json' }]]
 
 ### Bước 3: Map & Điền Kết Quả
 
-1. **Với mỗi test result có TC ID** (từ Bước 1):
-   - Lookup TC ID trong `tc_map`
-   - Nếu tìm thấy → ghi vào Excel
-   - Nếu không tìm thấy → log warning, skip
+**Duyệt TỪNG TC trong Excel (không chỉ TC trong report)** — phân 3 nhánh:
 
-2. **Điền các cells:**
+1. **TC có trong report** (đã chạy) → điền `Pass`/`Fail`:
+   - `I` = Pass/Fail (+ màu) · `J` = `Auto` · `L` = `Thực hiện tự động (Auto): {date}`
+   - Nếu Fail: nối thêm lý do fail vào `L`; ghi Bug ID vào `K` nếu đã có
 
-   | Cell | Giá trị | Ghi chú |
-   |---|---|---|
-   | `Actual Result` (cột I hoặc detect) | `Pass` / `Fail` / `Block` | Màu cell: Pass=xanh nhạt `#C6EFCE`, Fail=đỏ nhạt `#FFC7CE`, Block=vàng nhạt `#FFEB9C` |
-   | `Executed By` (cột J hoặc detect) | `Auto` hoặc tên user cung cấp | |
-   | Round header | `Round {N} — {date}` | Chỉ ghi nếu cell trống |
+2. **TC KHÔNG có trong report nhưng CÓ `[BLOCKED]` trong Nội Dung Test** → `Block` + lý do từ nội dung TC (voucher chưa implement / auth chưa định nghĩa / ...)
 
-3. **Policy overwrite:**
-   - Nếu `Actual Result` cell đã có giá trị → **overwrite** (lần chạy mới nhất thắng)
-   - Nếu muốn giữ lịch sử → user chỉ định round number khác nhau mỗi lần
+3. **TC KHÔNG có trong report và `Auto?=N`** (manual chưa chạy) → `Block` + lý do `TC manual (Auto?=N) - chưa thực hiện trong run này, cần test tay`
 
-4. **Log từng thao tác:**
-   ```
-   ✅ TC_LOGIN.1  → Sheet "Login" row 12 → Pass
-   ✅ TC_LOGIN.2  → Sheet "Login" row 13 → Fail
-   ⚠️  TC_LOGIN.5  → Tìm thấy trong report nhưng KHÔNG có trong Excel → skip
-   ℹ️  TC_PAY.3   → Có trong Excel nhưng KHÔNG có trong report → giữ nguyên
-   ```
+> ⚠️ KHÔNG để trống ô Kết Quả cho bất kỳ TC nào. Mọi TC skip (nhánh 2+3) đều = `Block` + lý do ở `Ghi Chú`.
+
+**Bảng điền cells (Round 1):**
+
+| Cột | Pass | Fail | Block (skip) |
+|---|---|---|---|
+| **I** Kết Quả | `Pass` (xanh `#C6EFCE`) | `Fail` (đỏ `#FFC7CE`) | `Block` (vàng `#FFEB9C`) |
+| **J** Người TH | `Auto` | `Auto` | `Auto` |
+| **K** ID Bugs | (trống) | Bug ID nếu có | (trống) |
+| **L** Ghi Chú | ngày thực hiện | ngày + lý do fail | lý do block |
+| `I7` Round header | `Round {N} — {date}` (chỉ ghi nếu trống) |||
+
+**Policy overwrite:** ô đã có giá trị → overwrite (lần chạy mới nhất thắng). Giữ lịch sử → dùng round number khác.
+
+**Log từng thao tác:**
+```
+✅ TC_LOGIN.1  → row 12 → Pass  (Thực hiện: 2026-05-30)
+❌ TC_LOGIN.2  → row 13 → Fail  (lý do: ...)
+⏸️ TC_LOGIN.5  → row 16 → Block (Auto?=N, chưa test tay)
+⏸️ TC_LOGIN.8  → row 19 → Block ([BLOCKED] - feature chưa implement)
+⚠️  TC_LOGIN.9  → có trong report nhưng KHÔNG có trong Excel → log warning, skip
+```
 
 ---
 
@@ -202,16 +231,16 @@ In ra báo cáo cuối để user review:
 ║ Round        : Round 1                               ║
 ║ Thời gian    : 2024-01-15 10:30                      ║
 ╠══════════════════════════════════════════════════════╣
-║ ĐIỀN THÀNH CÔNG                                      ║
+║ KẾT QUẢ (phủ kín mọi TC trong Excel)                ║
 ║   ✅ Pass  : [n] TC                                  ║
 ║   ❌ Fail  : [n] TC                                  ║
-║   ⏸️  Block : [n] TC                                  ║
+║   ⏸️  Block : [n] TC  (skip: manual Auto?=N + BLOCKED)║
 ╠══════════════════════════════════════════════════════╣
-║ KHÔNG MAP ĐƯỢC                                       ║
+║   Trong đó Block tách:                               ║
+║     - Manual Auto?=N (chưa test tay) : [n]           ║
+║     - [BLOCKED] (thiếu feature/spec) : [n]           ║
 ║   ⚠️  Trong report nhưng ko có trong Excel: [n]      ║
 ║      (TC ID không tìm thấy — kiểm tra convention)    ║
-║   ℹ️  Trong Excel nhưng ko có trong report: [n]      ║
-║      (TC chưa được automate hoặc bị skip)            ║
 ╠══════════════════════════════════════════════════════╣
 ║ FILE OUTPUT  : TC_v1.0_results_20240115.xlsx         ║
 ╚══════════════════════════════════════════════════════╝
@@ -220,6 +249,8 @@ TC FAIL — cần xem lại:
   ❌ TC_LOGIN.2  → Sheet "Login" row 13
   ❌ TC_VOUCHER.5 → Sheet "Voucher" row 28
 ```
+
+> Tổng `Pass + Fail + Block` phải = tổng số TC trong Excel (trừ các dòng group header). Nếu còn ô Kết Quả trống → chưa áp dụng đúng rule skip.
 
 ---
 
@@ -258,7 +289,11 @@ npx playwright test --reporter=json > test-results/report.json
 
 | ❌ Không được làm | ✅ Thay thế |
 |---|---|
-| Overwrite file gốc mà không hỏi | Tạo file backup mặc định |
-| Điền kết quả cho TC không có trong report | Chỉ điền khi có match chính xác TC ID |
+| Overwrite file gốc mà không hỏi | Tạo file backup `*_results_{date}.xlsx` mặc định |
+| Bịa `Pass`/`Fail` cho TC không có trong report | TC không có trong report → đánh `Block` + lý do (không bịa Pass/Fail) |
+| Để trống ô Kết Quả của TC skip | Mọi TC skip → `Block` + lý do ở Ghi Chú |
+| Ghi note vào cột `ID Bugs` (K) | Note phải vào cột `Ghi Chú` (L); K chỉ chứa Bug ID |
 | Đổi kết quả Fail thành Pass để "cho đẹp" | Ghi đúng kết quả từ report |
 | Skip TC fail mà không report | Log đầy đủ danh sách TC fail vào summary |
+
+> **Khi save gặp `PermissionError` (file đang mở trong Excel):** dừng lại, báo user đóng file rồi chạy lại — KHÔNG tự đổi sang tên file khác trừ khi user đồng ý.

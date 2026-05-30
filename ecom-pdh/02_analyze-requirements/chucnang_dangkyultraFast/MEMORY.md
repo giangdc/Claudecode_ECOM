@@ -1,5 +1,5 @@
 # MEMORY — Analyze Requirements Output
-> Cập nhật lần cuối: 2026-05-28 — Update: Resolve toàn bộ 5 CLARY (BA confirm); SC-015 Blocked (voucher chưa implement)
+> Cập nhật lần cuối: 2026-05-30 — Update: BA đổi text lỗi SĐT sai định dạng "Số điện thoại không hợp lệ." → "Số điện thoại chưa đúng, mời nhập lại" (ảnh hưởng SC-006, SC-007)
 
 ---
 
@@ -46,8 +46,8 @@
 | SC-DANGKYUF-003 | Block sản phẩm hiển thị đúng | DANGKYUF | DOC-UF-01 | P1 | Functional | ✅ Đã tạo |
 | SC-DANGKYUF-004 | SĐT hợp lệ — nhập thành công | DANGKYUF | DOC-UF-02 | P1 | Functional | ✅ Đã tạo |
 | SC-DANGKYUF-005 | SĐT trống → required error | DANGKYUF | DOC-UF-02 | P1 | Negative | ✅ Đã tạo |
-| SC-DANGKYUF-006 | SĐT < 10 số → sai định dạng | DANGKYUF | DOC-UF-02 | P2 | Negative | ✅ Đã tạo |
-| SC-DANGKYUF-007 | SĐT không bắt đầu 0 → lỗi | DANGKYUF | DOC-UF-02 | P2 | Negative | ✅ Đã tạo |
+| SC-DANGKYUF-006 | SĐT < 10 số → sai định dạng | DANGKYUF | DOC-UF-02 | P2 | Negative | ✅ Đã tạo (text lỗi updated 2026-05-30 → TC_DANGKYUF.7) |
+| SC-DANGKYUF-007 | SĐT không bắt đầu 0 → lỗi | DANGKYUF | DOC-UF-02 | P2 | Negative | ✅ Đã tạo (text lỗi updated 2026-05-30 → TC_DANGKYUF.8) |
 | SC-DANGKYUF-008 | SĐT > 10 số → không nhập thêm | DANGKYUF | DOC-UF-02 | P2 | Boundary | ✅ Đã tạo |
 | SC-DANGKYUF-009 | Icon X xóa data SĐT | DANGKYUF | DOC-UF-02 | P2 | UI | ✅ Đã tạo |
 | SC-DANGKYUF-010 | PTTT load đúng theo QLCS | DANGKYUF | DOC-UF-01 | P1 | Functional | ✅ Đã tạo |
@@ -96,6 +96,7 @@ Key data cần chuẩn bị khi execute:
 | CLARY-DANGKYUF-003 | REQ-DANGKYUF-005 | DOC-UF-01 Row 36 | Block TTKH load từ đâu? Thiếu data → hiển thị gì? | Mặc định rỗng; hiện đúng field nào đã có data (VD: SĐT đã nhập → hiện SĐT) | **Resolved** 2026-05-28 | SC-013 đã cập nhật Given/Then |
 | CLARY-DANGKYUF-004 | REQ-DANGKYUF-004 | DOC-UF-01 Row 35 | QLCS chỉ cấu hình COD → UltraFast xử lý thế nào? | QLCS không cho phép cấu hình COD cho UltraFast → không xảy ra | **Resolved** 2026-05-28 | SC-010, SC-011 giữ nguyên |
 | CLARY-DANGKYUF-005 | REQ-DANGKYUF-006 | DOC-UF-01 Row 38 | Voucher áp dụng từ bước nào? | Áp dụng tại bước thanh toán nhưng chưa implement | **Resolved** 2026-05-28 | SC-015 → 🚫 Blocked |
+| DEFECT-DANGKYUF-001 | REQ-DANGKYUF-004 | SC-DANGKYUF-011 | Staging hiển thị "Thanh toán khi triển khai" (COD) trong Block PTTT của UltraFast | BA xác nhận 2026-05-30: **UltraFast KHÔNG có COD** → đây là bug staging (cấu hình/UI), cần Dev fix | **Defect — Open** 2026-05-30 | TC_DANGKYUF.12 FAIL (đúng) — giữ test, chờ Dev fix rồi re-run |
 
 ---
 
@@ -104,3 +105,5 @@ Key data cần chuẩn bị khi execute:
 | DOC ID | Ngày tạo/cập nhật | Tổng TC | File Excel | TC Version | Ghi chú |
 |---|---|---|---|---|---|
 | DOC-UF-01, DOC-UF-02 | 2026-05-28 | 28 | AI_ISC_ecom-pdh_v1.1_TC_v1.0.xlsx (sheet: DangKy_UltraFast) | v1.0 | High:13 Medium:13 Low:2 \| Blocked:3 (voucher, auth, mobile) \| Auto Y:20 N:8 |
+| DOC-UF-02 | 2026-05-30 | 2 updated | AI_ISC_ecom-pdh_v1.1_TC_v1.0.xlsx (sheet: DangKy_UltraFast) | v1.0 (in-place) | BA đổi text lỗi SĐT sai định dạng → "Số điện thoại chưa đúng, mời nhập lại". ✅ TC_DANGKYUF.7 (G17), TC_DANGKYUF.8 (G18) cập nhật Expected Result + change note col L; ✅ assertion automation đã đồng bộ (spec.ts + page.ts) |
+| Run automation 2026-05-30 | 2026-05-30 | 28 TC: 17 Pass / 3 Fail / 8 Block | AI_ISC_ecom-pdh_v1.1_TC_v1.0_results_20260530.xlsx | — | sync-tc-results Round 1. ❌ TC.7, TC.8: UI staging chưa deploy text mới (chờ Dev). ❌ TC.12: DEFECT-DANGKYUF-001 (COD trái SC-011, BA xác nhận). ⏸️ Block 8 = 5 TC manual Auto?=N (.1/.18/.20/.21/.22 — chưa test tay) + 3 TC [BLOCKED] (.26 voucher/.27 auth/.28 mobile). Rule: case không chạy trong run = Block + lý do ở Ghi Chú |

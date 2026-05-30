@@ -78,8 +78,8 @@ test.describe('TC_DANGKYUF — Block Thông tin cá nhân: Số điện thoại'
     await checkout.clickTiepTuc();
     await page.waitForTimeout(1000);
 
-    // Staging hiện dùng text "Số điện thoại không hợp lệ." cho cả < 10 số và không bắt đầu 0
-    const errorMsg = page.locator('p').filter({ hasText: /Số điện thoại không hợp lệ/ });
+    // Text lỗi sai định dạng (BA 2026-05-30): "Số điện thoại chưa đúng, mời nhập lại" — dùng cho cả < 10 số và không bắt đầu 0
+    const errorMsg = page.locator('p').filter({ hasText: /Số điện thoại chưa đúng/ });
     await expect(errorMsg).toBeVisible({ timeout: 8000 });
   });
 
@@ -91,7 +91,7 @@ test.describe('TC_DANGKYUF — Block Thông tin cá nhân: Số điện thoại'
     await checkout.clickTiepTuc();
     await page.waitForTimeout(1000);
 
-    const errorMsg = page.locator('p').filter({ hasText: /Số điện thoại không hợp lệ/ });
+    const errorMsg = page.locator('p').filter({ hasText: /Số điện thoại chưa đúng/ });
     await expect(errorMsg).toBeVisible({ timeout: 8000 });
   });
 
