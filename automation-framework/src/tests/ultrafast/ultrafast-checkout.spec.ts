@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { ProductDetailPage } from '../../pages/product-detail.page';
-import { CheckoutUltrafastPage } from '../../pages/checkout-ultrafast.page';
+import { ProductDetailPage } from '../../pages/ultrafast/product-detail.page';
+import { CheckoutUltrafastPage } from '../../pages/ultrafast/checkout-ultrafast.page';
 
 const PRODUCT_URL  = 'https://staging.tongdaiwifi.vn/dich-vu-so/goi-hyperfast-2';
 const CHECKOUT_URL = 'https://staging.fpt.vn/checkout/register/goi-hyperfast-2?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn&sl=1&month=1';

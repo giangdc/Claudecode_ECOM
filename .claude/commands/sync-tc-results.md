@@ -48,7 +48,7 @@ TC_LOGIN.1 — Đăng nhập thành công với tài khoản hợp lệ
 | Input | Cách lấy | Bắt buộc |
 |---|---|---|
 | **Playwright JSON report** | Path tới file `.json` (output của `--reporter=json`) | ✅ |
-| **TC Excel file** | Path tới file `.xlsx` cần điền | ✅ |
+| **TC Excel file** | Path tới file `.xlsx` cần điền — nằm trong `03_test-cases/functional/<module>/` hoặc `03_test-cases/api/<module>/` | ✅ |
 | **Round number** | Số thứ tự round cần điền (mặc định: 1) | Tùy chọn |
 | **Executed By** | Tên người/script chạy test (mặc định: `Auto`) | Tùy chọn |
 | **Overwrite policy** | `backup` (tạo file mới) hoặc `inplace` (sửa trực tiếp) | Tùy chọn |
@@ -207,8 +207,12 @@ reporter: [['json', { outputFile: 'test-results/report.json' }]]
 
 1. **Chính sách backup (mặc định):**
    ```python
-   # Tạo file mới thay vì overwrite
-   output_path = original_path.replace('.xlsx', f'_results_{date}.xlsx')
+   import os
+   # File kết quả gom vào 03_test-cases/_results/ (không để lẫn với TC gốc trong thư mục module)
+   results_dir = os.path.join(<03_test-cases_root>, '_results')
+   os.makedirs(results_dir, exist_ok=True)
+   base = os.path.basename(original_path).replace('.xlsx', f'_results_{date}.xlsx')
+   output_path = os.path.join(results_dir, base)
    workbook.save(output_path)
    ```
 
@@ -227,7 +231,7 @@ In ra báo cáo cuối để user review:
 ║         SYNC TC RESULTS — KẾT QUẢ                   ║
 ╠══════════════════════════════════════════════════════╣
 ║ File report  : test-results/report.json              ║
-║ File Excel   : ecom-pdh/03_test-cases/TC_v1.0.xlsx   ║
+║ File Excel   : 03_test-cases/functional/<module>/...xlsx ║
 ║ Round        : Round 1                               ║
 ║ Thời gian    : 2024-01-15 10:30                      ║
 ╠══════════════════════════════════════════════════════╣
@@ -242,7 +246,7 @@ In ra báo cáo cuối để user review:
 ║   ⚠️  Trong report nhưng ko có trong Excel: [n]      ║
 ║      (TC ID không tìm thấy — kiểm tra convention)    ║
 ╠══════════════════════════════════════════════════════╣
-║ FILE OUTPUT  : TC_v1.0_results_20240115.xlsx         ║
+║ FILE OUTPUT  : _results/...TC_..._results_20240115.xlsx ║
 ╚══════════════════════════════════════════════════════╝
 
 TC FAIL — cần xem lại:

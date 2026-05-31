@@ -69,6 +69,8 @@ Mỗi framework PHẢI bao gồm các thành phần sau (tùy chỉnh theo stack
 
 ### 1. Project Structure (Mandatory)
 - Cấu trúc thư mục rõ ràng, phân tách pages/tests/utils/config
+- **Domain-driven theo module:** `pages/` và `tests/` chia thành 1 folder / module (mirror 1:1 với `03_test-cases/functional/<module>/`), cộng lớp `common/` cho thành phần dùng chung. `fixtures/` và `utils/` là hạ tầng dùng chung — KHÔNG chia theo module.
+- **Cấm import chéo giữa 2 module:** page/test chỉ được import từ `common/` hoặc trong cùng folder module của nó. Logic tái dùng ở nhiều module → đẩy lên `common/`.
 - File README.md hướng dẫn setup + chạy test
 - File .gitignore phù hợp
 
@@ -127,24 +129,30 @@ project-root/
 ├── .gitignore
 ├── README.md
 ├── src/
-│   ├── pages/                  # Page Object classes
-│   │   ├── base.page.ts        # Base page (common methods)
-│   │   ├── login.page.ts
-│   │   └── dashboard.page.ts
-│   ├── fixtures/               # Custom fixtures
+│   ├── pages/                  # Page Object classes — domain-driven theo module
+│   │   ├── common/             # Page DÙNG CHUNG mọi feature
+│   │   │   ├── base.page.ts    # Base page (common methods)
+│   │   │   ├── login.page.ts
+│   │   │   └── dashboard.page.ts
+│   │   └── <module-slug>/      # Page RIÊNG feature (1 folder / module, mirror 03_test-cases)
+│   │       └── *.page.ts
+│   ├── fixtures/               # Custom fixtures (hạ tầng dùng chung — KHÔNG chia theo module)
 │   │   ├── auth.fixture.ts     # Authentication fixture
 │   │   └── base.fixture.ts     # Extended test with all fixtures
-│   ├── utils/                  # Helpers & utilities
+│   ├── utils/                  # Helpers & utilities (dùng chung — KHÔNG chia theo module)
 │   │   ├── test-data.ts        # Data generators
 │   │   ├── env.config.ts       # Environment config reader
 │   │   └── helpers.ts          # Common helper functions
-│   └── tests/                  # Test specs
-│       ├── auth/
-│       │   └── login.spec.ts
-│       └── dashboard/
-│           └── dashboard.spec.ts
+│   └── tests/                  # Test specs — 1 folder / module (mirror 03_test-cases)
+│       ├── common/             # Smoke/login dùng chung
+│       │   ├── login.spec.ts
+│       │   └── dashboard.spec.ts
+│       └── <module-slug>/
+│           └── *.spec.ts
 ├── test-data/                  # External test data (JSON/YAML)
-│   └── users.json
+│   ├── common/                 # Data dùng chung
+│   │   └── users.json
+│   └── <module-slug>/          # Data riêng feature
 └── .github/
     └── workflows/
         └── playwright.yml      # CI pipeline

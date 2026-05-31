@@ -164,9 +164,20 @@ Nếu < 8/10 → refactor trước khi output.
 
 ---
 
+## Output path (BẮT BUỘC)
+Ghi file vào thư mục con theo **đúng tên module** trong `02_analyze-requirements/`:
+```
+03_test-cases/functional/<chucnang_module>/AI_ISC_<project>_<version>_TC_<module>_v<tc_version>.xlsx
+```
+- `<chucnang_module>` = tên thư mục module tương ứng trong `02_analyze-requirements/` (mirror 1:1).
+- Mỗi module = 1 file riêng (không gộp nhiều module vào 1 file). Nếu 1 module có nhiều nhóm chức năng → tách thành nhiều sheet trong cùng file.
+- Nếu thư mục module chưa tồn tại trong `03_test-cases/functional/` → tạo mới.
+
+Ví dụ: `03_test-cases/functional/chucnang_dangkyultraFast/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx`
+
 ## File name
-`AI_ISC_<project_name>_<project_version>_TC_v<tc_version>.xlsx`
-Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_v1.0.xlsx`
+`AI_ISC_<project_name>_<project_version>_TC_<module>_v<tc_version>.xlsx`
+Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_login_v1.0.xlsx`
 
 ## Sheet
 Viết trên cùng 1 sheet. Tên sheet = tên module hoặc tên chức năng.

@@ -1,7 +1,7 @@
 import { test as baseTest } from './base.fixture';
 import { config } from '../utils/env.config';
-import { LoginPage } from '../pages/login.page';
-import { DashboardPage } from '../pages/dashboard.page';
+import { LoginPage } from '../pages/common/login.page';
+import { DashboardPage } from '../pages/common/dashboard.page';
 
 type AuthFixtures = {
   loginAsAdmin: () => Promise<void>;

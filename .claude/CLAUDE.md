@@ -49,10 +49,14 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
 │
 └── <project-name>/                     ← Các project (do init-manual-project tạo)
     ├── 00_input/                       ← URD/BRD/SRS từ BA (có thể tổ chức theo chức năng)
-    ├── 02_analyze-requirements/        ← Output của analyze-requirement
-    ├── 03_test-cases/                  ← File TC xuất ra
+    ├── 02_analyze-requirements/        ← Output của analyze-requirement (mỗi module = 1 thư mục)
+    │   └── <chucnang_module>/
+    ├── 03_test-cases/                  ← File TC xuất ra (mirror 1:1 module của 02)
     │   ├── functional/                 ← TC Web/Mobile
-    │   └── api/                        ← TC API
+    │   │   └── <chucnang_module>/      ←   1 thư mục / module
+    │   ├── api/                        ← TC API
+    │   │   └── <chucnang_module>/
+    │   └── _results/                   ← file *_results_*.xlsx từ sync-tc-results
     ├── 04_test-data/                   ← Dữ liệu test
     │   ├── valid/
     │   └── invalid/
@@ -104,20 +108,20 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
 [BA cung cấp URD] → 00_input/
         │
         ▼
-analyze-requirement  →  02_analyze-requirements/
+analyze-requirement  →  02_analyze-requirements/<module>/
         │                   MEMORY.md, test_scenario_map.md, ...
         ├──────────────────────────────────────┐
         ▼                                      ▼
-gen-testcase-webapp              gen-testcase-api
-03_test-cases/functional/        03_test-cases/api/
-*.xlsx                           *.xlsx
+gen-testcase-webapp                  gen-testcase-api
+03_test-cases/functional/<module>/   03_test-cases/api/<module>/
+*.xlsx (mirror 1:1 với 02)           *.xlsx
         │
         ├── gen-testcase-checkout-service  (dịch vụ Checkout mới)
-        │   03_test-cases/functional/*.xlsx  (sheet mới thêm vào TC_checkout.xlsx)
+        │   03_test-cases/functional/<module>/TC_checkout.xlsx  (thêm sheet mới)
         │
         ▼
 update-testcase  (khi có URD mới)
-03_test-cases/*_TC_v2.0.xlsx, v3.0...
+03_test-cases/functional|api/<module>/*_v2.0.xlsx, v3.0...
         │
         ▼  ── Automation lane (Web UI) ──────────────────────────
         │  [một lần] generate_automation_framework
@@ -140,8 +144,8 @@ generate_data_verify   (nhiều dịch vụ cùng layout, khác data)
         ▼ (sau khi chạy npx playwright test --reporter=json)
 sync-tc-results
   └─ Input: test-results/report.json
-  └─ Input: 03_test-cases/*.xlsx
-  → 03_test-cases/*_results_{date}.xlsx   (Pass/Fail điền vào cột Actual Result)
+  └─ Input: 03_test-cases/functional/<module>/*.xlsx
+  → 03_test-cases/_results/*_results_{date}.xlsx   (Pass/Fail điền vào cột Actual Result)
 ```
 
 **Prerequisite automation lane:**
@@ -161,8 +165,9 @@ Khi skills đọc template, path tương đối được tính từ **root của
 
 ## Naming Conventions (toàn workspace)
 
-- **TC Excel Web/Mobile:** `AI_ISC_[project]_[version]_TC_v[tc_version].xlsx`
-- **TC Excel API:** `AI_ISC_[project]_[version]_TC_API_v[tc_version].xlsx`
+- **TC Excel Web/Mobile:** `03_test-cases/functional/<module>/AI_ISC_[project]_[version]_TC_[module]_v[tc_version].xlsx`
+- **TC Excel API:** `03_test-cases/api/<module>/AI_ISC_[project]_[version]_TC_API_v[tc_version].xlsx`
+- **Rule mirror:** mỗi thư mục module trong `02_analyze-requirements/` phải có thư mục TC tương ứng trong `03_test-cases/functional/` và/hoặc `api/`.
 - **TC ID (web):** `TC_[MODULE].[NNN]` — VD: `TC_LOGIN.1`
 - **TC ID (api):** `API_[NN].[NNN]` — VD: `API_01.3`
 - **Scenario ID:** `SC-[MODULE]-[NNN]`

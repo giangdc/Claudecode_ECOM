@@ -146,9 +146,18 @@ Nếu không xác định được expected result → `[BLOCKED – cần confi
 ---
 # OUTPUT
 
+## Output path (BẮT BUỘC)
+Ghi file version mới **vào đúng thư mục module** của file cũ (mirror 1:1 với `02_analyze-requirements/`):
+```
+03_test-cases/functional/<chucnang_module>/AI_ISC_<project>_<version>_TC_<module>_v<tc_version>.xlsx
+```
+- File TC web/mobile → `03_test-cases/functional/<chucnang_module>/`
+- File TC API → `03_test-cases/api/<chucnang_module>/`
+- Giữ nguyên thư mục module của file cũ, chỉ tăng `<tc_version>`.
+
 ## File name
-`AI_ISC_<project_name>_<project_version>_TC_v<tc_version>.xlsx`
-Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_v1.0.xlsx`
+`AI_ISC_<project_name>_<project_version>_TC_<module>_v<tc_version>.xlsx`
+Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_login_v2.0.xlsx`
 
 ## Sheet
 Viết trên cùng 1 sheet. Tên sheet = tên module hoặc tên chức năng.

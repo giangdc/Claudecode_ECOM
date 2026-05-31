@@ -152,12 +152,19 @@ Nếu < 8/10 → refactor trước khi output.
 
 # OUTPUT
 
+## Output path (BẮT BUỘC)
+Ghi vào thư mục con theo **đúng tên module** trong `02_analyze-requirements/` (mirror 1:1):
+```
+03_test-cases/functional/<chucnang_module>/AI_ISC_<project>_<version>_TC_<module>_v<tc_version>.xlsx
+```
+Mỗi module = 1 file riêng. Thư mục module chưa có thì tạo mới.
+
 ## File name
-`AI_ISC_<project_name>_<project_version>_TC_v<tc_version>.xlsx`
-Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_v1.0.xlsx`
+`AI_ISC_<project_name>_<project_version>_TC_<module>_v<tc_version>.xlsx`
+Ví dụ: `AI_ISC_Ecommerce_v2.1_TC_login_v1.0.xlsx`
 
 ## Sheet
-Viết trên cùng 1 sheet. Tên sheet = tên module hoặc tên chức năng.
+Tên sheet = tên module hoặc tên chức năng. 1 module nhiều nhóm chức năng → nhiều sheet trong cùng file.
 
 ## Columns
 | TC ID | Priority | Test Title | Pre-condition / Test Data | Steps | Expected Result 

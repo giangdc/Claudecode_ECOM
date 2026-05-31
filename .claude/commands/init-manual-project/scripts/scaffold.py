@@ -71,13 +71,13 @@ def template_claude_md(project_name, project_version, test_types, envs, urls):
         "  |       Output: MEMORY.md, test_scenario_map.md,\n"
         "  |               requirement_traceability.md, risk_assessment.md\n"
         "  |\n"
-        "  |-> gen-testcase-webapp  ->  03_test-cases/\n"
+        "  |-> gen-testcase-webapp  ->  03_test-cases/functional/<module>/\n"
         "  |       Output: " + out_webapp + " (Web/Mobile)\n"
         "  |\n"
-        "  |-> gen-testcase-api     ->  03_test-cases/api/\n"
+        "  |-> gen-testcase-api     ->  03_test-cases/api/<module>/\n"
         "  |       Output: " + out_api + " (REST API)\n"
         "  |\n"
-        "  `-> update-testcase  ->  03_test-cases/\n"
+        "  `-> update-testcase  ->  03_test-cases/functional|api/<module>/\n"
         "          Output: " + out_update + "\n"
         "```\n"
         "\n"
@@ -93,8 +93,9 @@ def template_claude_md(project_name, project_version, test_types, envs, urls):
         "|---------|----------|-----------------|\n"
         "| `00_input/` | Tai lieu dau vao: URD, SRS, specs tu BA | analyze-requirement (doc) |\n"
         "| `02_analyze-requirements/` | Output: MEMORY.md, scenario map, traceability, risk | analyze-requirement (ghi) |\n"
-        "| `03_test-cases/` | TC Excel Web/Mobile | gen-testcase-webapp (ghi), update-testcase (doc+ghi) |\n"
-        "| `03_test-cases/api/` | TC Excel API | gen-testcase-api (ghi) |\n"
+        "| `03_test-cases/functional/<module>/` | TC Excel Web/Mobile (1 thu muc / module, mirror 02) | gen-testcase-webapp (ghi), update-testcase (doc+ghi) |\n"
+        "| `03_test-cases/api/<module>/` | TC Excel API (1 thu muc / module, mirror 02) | gen-testcase-api (ghi) |\n"
+        "| `03_test-cases/_results/` | File ket qua *_results_*.xlsx tu sync-tc-results | sync-tc-results (ghi) |\n"
         "| `04_test-data/` | Du lieu test (valid / invalid) | -- |\n"
         "\n"
         "## MEMORY Files\n"
@@ -139,6 +140,10 @@ def main():
         folder = type_folder_map.get(tt)
         if folder:
             mkdir(os.path.join(root, "03_test-cases", folder))
+    # Luu y: ben trong moi folder loai test (functional/api/...) se co subfolder theo
+    # tung module (mirror 1:1 voi 02_analyze-requirements/<module>/).
+    # Cac subfolder module nay do gen-testcase-* tao on-demand khi sinh TC,
+    # khong tao san o buoc init vi chua biet module nao.
 
     # 04_test-data
     mkdir(os.path.join(root, "04_test-data", "valid"))

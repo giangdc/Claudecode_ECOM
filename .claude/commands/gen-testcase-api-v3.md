@@ -163,3 +163,16 @@ Với **mọi TC API**, cột "Các Bước Thực Hiện" (cột F) PHẢI dùn
 - [ ] Có replay/token tampering testcase
 - [ ] Có tối thiểu số lượng auth testcase
 - [ ] Cột "Các Bước Thực Hiện" dùng đúng chuẩn 2 bước
+
+---
+
+## OUTPUT PATH (BẮT BUỘC)
+
+Ghi file vào thư mục con theo **đúng tên module** trong `02_analyze-requirements/` (mirror 1:1):
+
+```text
+03_test-cases/api/<chucnang_module>/AI_ISC_<project>_<version>_TC_API_v<tc_version>.xlsx
+```
+
+`<chucnang_module>` = tên thư mục module tương ứng trong `02_analyze-requirements/`. Chưa có thì tạo mới.
+Ví dụ: `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx`

@@ -152,15 +152,17 @@ export function readServiceData(filePath: string): ServiceData[] {
 > Nếu project chưa có `xlsx` dependency → thêm vào `package.json`:
 > `"xlsx": "^0.18.5"` (hoặc version mới nhất)
 
-#### 3.2 — Test script (`src/tests/service-data-verify.spec.ts`)
+#### 3.2 — Test script (`src/tests/common/service-data-verify.spec.ts`)
+
+> Verify data-driven span nhiều dịch vụ trong 1 file → đặt ở `tests/common/` (cross-service, không thuộc 1 module). Data file → `test-data/common/`.
 
 ```typescript
 import { test, expect } from '@playwright/test';
-import { readServiceData } from '../utils/service-data-reader';
+import { readServiceData } from '../../utils/service-data-reader';
 
 const BASE_URL = process.env.BASE_URL || 'https://staging.tongdaiwifi.vn';
 // Đường dẫn tới file Excel data — relative từ project root
-const DATA_FILE = process.env.DATA_FILE || 'test-data/service_data.xlsx';
+const DATA_FILE = process.env.DATA_FILE || 'test-data/common/service_data.xlsx';
 
 const serviceData = readServiceData(DATA_FILE);
 
@@ -202,7 +204,7 @@ Thêm dependency và script chạy:
 ```json
 {
   "scripts": {
-    "verify:services": "playwright test src/tests/service-data-verify.spec.ts --reporter=html,json"
+    "verify:services": "playwright test src/tests/common/service-data-verify.spec.ts --reporter=html,json"
   },
   "dependencies": {
     "xlsx": "^0.18.5"
@@ -216,7 +218,7 @@ Thêm dependency và script chạy:
 
 1. **Chạy test:**
    ```bash
-   DATA_FILE=test-data/service_data.xlsx npx playwright test service-data-verify --headed
+   DATA_FILE=test-data/common/service_data.xlsx npx playwright test service-data-verify --headed
    ```
 
 2. **Nếu PASS** → chạy lại 1 lần để confirm stability
@@ -248,7 +250,7 @@ Thêm dependency và script chạy:
    - [ ] `waitForLoadState` phù hợp (không để quá dài không cần thiết)
 
 2. **Tạo file mẫu data Excel** nếu user chưa có:
-   - Tạo `test-data/service_data.xlsx` với header row đúng format
+   - Tạo `test-data/common/service_data.xlsx` với header row đúng format
    - Điền sẵn 1-2 dòng mẫu từ data user đã cung cấp
 
 3. **Báo cáo cho user:**
@@ -257,14 +259,14 @@ Thêm dependency và script chạy:
 
    Files:
    - src/utils/service-data-reader.ts
-   - src/tests/service-data-verify.spec.ts
-   - test-data/service_data.xlsx  (data file mẫu)
+   - src/tests/common/service-data-verify.spec.ts
+   - test-data/common/service_data.xlsx  (data file mẫu)
 
    Chạy:
-     DATA_FILE=test-data/service_data.xlsx npm run verify:services
+     DATA_FILE=test-data/common/service_data.xlsx npm run verify:services
 
    Thêm gói mới:
-     → Mở test-data/service_data.xlsx → thêm 1 dòng → chạy lại lệnh trên
+     → Mở test-data/common/service_data.xlsx → thêm 1 dòng → chạy lại lệnh trên
      → KHÔNG cần chạy lại skill này
 
    Locator Map (để QA tham khảo khi locator bị break):
@@ -276,8 +278,8 @@ Thêm dependency và script chạy:
 ## Output
 
 - **`src/utils/service-data-reader.ts`** — utility đọc Excel, typed interface
-- **`src/tests/service-data-verify.spec.ts`** — parameterized test, đọc data tại runtime
-- **`test-data/service_data.xlsx`** — file data mẫu (nếu user chưa có)
+- **`src/tests/common/service-data-verify.spec.ts`** — parameterized test, đọc data tại runtime
+- **`test-data/common/service_data.xlsx`** — file data mẫu (nếu user chưa có)
 - **Locator Map** — bảng primary + fallback locator cho từng field (reference khi locator break)
 - **Hướng dẫn thêm gói mới** — chỉ cần thêm dòng vào Excel
 

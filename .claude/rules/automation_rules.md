@@ -37,6 +37,20 @@
 - Kiểm tra cấu trúc thư mục hiện có trước khi tạo file mới — tránh duplicate.
 - Đặt file đúng thư mục theo kiến trúc project (xem `plan/automation/0_project_architecture`).
 
+### 4.1. Tổ chức theo module (Domain-Driven) — bắt buộc khi scale nhiều chức năng
+
+- **`pages/` và `tests/` chia 1 folder / module** (mirror 1:1 với `03_test-cases/functional/<module>/`), cộng lớp `common/` cho thành phần dùng chung:
+  ```
+  src/pages/common/        # Base, Login, Dashboard… (cross-feature)
+  src/pages/<module-slug>/ # page riêng từng feature
+  src/tests/common/        # smoke/login dùng chung
+  src/tests/<module-slug>/ # spec riêng từng feature
+  test-data/common/ + test-data/<module-slug>/
+  ```
+- **`fixtures/` và `utils/` là hạ tầng dùng chung — KHÔNG chia theo module.**
+- **CẤM import chéo giữa 2 module:** page/test chỉ import từ `common/` hoặc trong cùng folder module. Logic dùng ở ≥ 2 module → đẩy lên `common/`, không copy.
+- **Slug module:** ngắn english (`ultrafast`, `voucher`…). Mapping sang `chucnang_*` của `02/03` ghi trong `CLAUDE.md` (root).
+
 ## 5. Quy Tắc Đặt Tên
 
 ### Java

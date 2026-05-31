@@ -204,9 +204,15 @@ Row 7-8: Column headers (2 dòng merged)
 
 ## File output
 
-**Tên file:** giữ nguyên `TC_checkout.xlsx` — thêm sheet mới vào file hiện tại.
+**Output path (BẮT BUỘC):** Ghi vào thư mục module dịch vụ Checkout trong `03_test-cases/functional/`:
+```
+03_test-cases/functional/<chucnang_checkout_module>/TC_checkout.xlsx
+```
+Tên thư mục `<chucnang_checkout_module>` mirror đúng tên module trong `02_analyze-requirements/`. Chưa có thì tạo mới.
 
-> Nếu không thể mở file Excel → tạo file mới:
+**Tên file:** giữ nguyên `TC_checkout.xlsx` (trong thư mục module) — thêm sheet mới vào file hiện tại.
+
+> Nếu không thể mở file Excel → tạo file mới trong cùng thư mục module:
 > `AI_ISC_ecom-pdh_v1.1_TC_[ServiceName]_v1.0.xlsx`
 
 **Sheet name:** `Checkout [Tên dịch vụ]` — VD: `Checkout AP Internet`

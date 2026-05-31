@@ -15,7 +15,7 @@ Scaffold một manual testing project với 4 thư mục cốt lõi và CLAUDE.m
 ★ init-project ★ → analyze-requirement → gen-testcase-webapp → update-testcase (lặp lại)
      (00_)               (02_)                 (03_)               (03_ update)
                             │                TC v1.0 (Web/Mobile) TC v2.0, v3.0...
-                            └─► gen-testcase-api (03_test-cases/api/)
+                            └─► gen-testcase-api (03_test-cases/api/<module>/)
                                               TC_API v1.0 (REST API)
 ```
 
@@ -23,9 +23,9 @@ Scaffold một manual testing project với 4 thư mục cốt lõi và CLAUDE.m
 |-------|-------|-----------|
 | **Upstream** | (không có — bước đầu tiên) | — |
 | **Downstream** | `analyze-requirement` | Đọc `00_input/`, `CLAUDE.md` → Ghi `02_analyze-requirements/` |
-| **Downstream** | `gen-testcase-webapp` | Đọc `02_analyze-requirements/MEMORY.md` + `test_scenario_map.md` → Ghi `03_test-cases/` |
-| **Downstream** | `gen-testcase-api` | Đọc tài liệu API (cURL/Swagger/Word/Excel) → Ghi `03_test-cases/api/` |
-| **Downstream** | `update-testcase` | Đọc `03_test-cases/*.xlsx` + `00_input/` (URD mới) + `MEMORY.md` → Ghi `03_test-cases/` |
+| **Downstream** | `gen-testcase-webapp` | Đọc `02_analyze-requirements/<module>/MEMORY.md` + `test_scenario_map.md` → Ghi `03_test-cases/functional/<module>/` |
+| **Downstream** | `gen-testcase-api` | Đọc tài liệu API (cURL/Swagger/Word/Excel) → Ghi `03_test-cases/api/<module>/` |
+| **Downstream** | `update-testcase` | Đọc `03_test-cases/functional|api/<module>/*.xlsx` + `00_input/` (URD mới) + `MEMORY.md` → Ghi `03_test-cases/functional|api/<module>/` |
 
 ---
 
@@ -55,7 +55,7 @@ Hỏi: "Những loại kiểm thử nào nằm trong phạm vi? (Có thể chọ
 
 **Câu 5 — Project version**
 Hỏi: "Version hiện tại của dự án là gì? (Ví dụ: v1.0, v2.3 — Enter để dùng v1.0)"
-→ Dùng trong naming convention file TC: `AI_ISC_[project]_[version]_TC_v1.0.xlsx`
+→ Dùng trong naming convention file TC: `AI_ISC_[project]_[version]_TC_[module]_v1.0.xlsx`
 → Default: `v1.0` nếu user bỏ qua
 
 Sau khi thu thập đủ, **tóm tắt và xác nhận** với user trước khi chạy script.
@@ -114,13 +114,11 @@ Sau khi script chạy xong:
 ├── 02_analyze-requirements/     # Output của analyze-requirement skill
 │   └── .gitkeep
 ├── 03_test-cases/               # TC Excel files (output của gen-testcase-webapp / gen-testcase-api)
-│   ├── functional/              # (nếu có trong scope)
-│   ├── regression/              # (nếu có trong scope)
-│   ├── smoke/                   # (nếu có trong scope)
-│   ├── uat/                     # (nếu có trong scope)
-│   ├── exploratory/             # (nếu có trong scope)
-│   ├── performance/             # (nếu có trong scope)
-│   └── api/                     # (nếu có API testing — output của gen-testcase-api)
+│   ├── functional/              # mỗi module = 1 subfolder, mirror 1:1 với 02_analyze-requirements/
+│   │   └── <chucnang_module>/   #   ← gen-testcase-webapp tạo on-demand khi sinh TC
+│   ├── api/                     # mỗi module = 1 subfolder (output của gen-testcase-api)
+│   │   └── <chucnang_module>/
+│   └── _results/                # file *_results_*.xlsx do sync-tc-results sinh ra
 ├── 04_test-data/                # Dữ liệu test
 │   ├── valid/
 │   └── invalid/
@@ -136,9 +134,9 @@ Sau khi script chạy xong:
 | Skill | Reads from | Writes to |
 |-------|-----------|-----------|
 | `analyze-requirement` | `00_input/`, `CLAUDE.md` | `02_analyze-requirements/` (MEMORY.md, test_scenario_map.md, requirement_traceability.md, risk_assessment.md) |
-| `gen-testcase-webapp` | `02_analyze-requirements/MEMORY.md`, `test_scenario_map.md` | `03_test-cases/` (`AI_ISC_*_TC_v1.0.xlsx`) |
-| `gen-testcase-api` | Tài liệu API: cURL / Swagger / Word / Excel (từ `00_input/` hoặc do user cung cấp trực tiếp) | `03_test-cases/api/` (`AI_ISC_*_TC_API_v1.0.xlsx`) |
-| `update-testcase` | `03_test-cases/*.xlsx`, `00_input/` (URD mới), `02_analyze-requirements/MEMORY.md` | `03_test-cases/` (`AI_ISC_*_TC_v2.0.xlsx`, v3.0...) |
+| `gen-testcase-webapp` | `02_analyze-requirements/<module>/MEMORY.md`, `test_scenario_map.md` | `03_test-cases/functional/<module>/` (`AI_ISC_*_TC_<module>_v1.0.xlsx`) |
+| `gen-testcase-api` | Tài liệu API: cURL / Swagger / Word / Excel (từ `00_input/` hoặc do user cung cấp trực tiếp) | `03_test-cases/api/<module>/` (`AI_ISC_*_TC_API_v1.0.xlsx`) |
+| `update-testcase` | `03_test-cases/functional|api/<module>/*.xlsx`, `00_input/` (URD mới), `02_analyze-requirements/<module>/MEMORY.md` | `03_test-cases/functional|api/<module>/` (`AI_ISC_*_TC_<module>_v2.0.xlsx`, v3.0...) |
 
 ---
 

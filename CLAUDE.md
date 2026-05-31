@@ -23,8 +23,9 @@ BA drops URD/spec → ecom-pdh/00_input/
                          MEMORY.md, test_scenario_map.md, requirement_traceability.md,
                          risk_assessment.md, test_data_catalog.md
         ↓                          ↓
-/gen-testcase-webapp       /gen-testcase-api (hoặc gen-testcase-api-v3)
-→ 03_test-cases/*.xlsx     → 03_test-cases/api/*.xlsx
+/gen-testcase-webapp                 /gen-testcase-api (hoặc gen-testcase-api-v3)
+→ 03_test-cases/functional/<module>/   → 03_test-cases/api/<module>/
+  (1 thư mục / module, mirror 1:1 với 02_analyze-requirements/<module>/)
         ↓
 /gen-testcase-checkout-service   (for new Checkout service sheets only)
         ↓
@@ -42,11 +43,17 @@ BA drops URD/spec → ecom-pdh/00_input/
 
 /sync-tc-results                        (sau khi chạy test)
   Input : test-results/report.json      (Playwright --reporter=json)
-  Input : 03_test-cases/*.xlsx
-→ 03_test-cases/*_results_{date}.xlsx  (Pass/Fail điền vào cột Actual Result)
+  Input : 03_test-cases/functional/<module>/*.xlsx
+→ 03_test-cases/_results/*_results_{date}.xlsx  (Pass/Fail điền vào cột Actual Result)
 ```
 
 **Key rule — manual pipeline:** always run `analyze-requirement` before `gen-testcase-*` for a new module. Skills read from `02_analyze-requirements/<module>/MEMORY.md` as their primary input. Skipping analyze → Option B (direct URD read) = lower quality output.
+
+**Key rule — folder mirror (02 ↔ 03):** `03_test-cases/` phản chiếu 1:1 cấu trúc module của `02_analyze-requirements/`, nhưng tách theo loại test:
+- `03_test-cases/functional/<chucnang_module>/` — TC Web/Mobile, mỗi module 1 thư mục đúng tên với `02_analyze-requirements/<chucnang_module>/`.
+- `03_test-cases/api/<chucnang_module>/` — TC API (chỉ module nào có API).
+- `03_test-cases/_results/` — file `*_results_*.xlsx` từ sync-tc-results.
+- Mỗi module = 1 file TC riêng (không gộp nhiều module vào 1 file); 1 module nhiều nhóm chức năng → nhiều sheet trong cùng file.
 
 **Key rule — automation lane:**
 1. `generate_automation_framework` chỉ chạy **một lần** khi chưa có `automation-framework/`.
@@ -92,28 +99,46 @@ npm run allure:generate && npm run allure:open
 
 ## Automation framework architecture
 
+**Tổ chức domain-driven:** `pages/` và `tests/` chia 1 folder / module (mirror 1:1 với `03_test-cases/functional/<module>/`), cộng lớp `common/` cho thành phần dùng chung. `fixtures/` + `utils/` là hạ tầng dùng chung. **Cấm import chéo giữa 2 module** — chỉ import từ `common/` hoặc trong cùng folder module.
+
 ```
 automation-framework/
 ├── src/
 │   ├── pages/              # Page Object classes — extends BasePage
-│   │   ├── base.page.ts    # Abstract base: clickElement, fillInput, navigate
-│   │   ├── login.page.ts
-│   │   ├── product-detail.page.ts   # UltraFast: cycle selector, Mua ngay
-│   │   └── checkout-ultrafast.page.ts  # Phone, PTTT, submit
-│   ├── fixtures/
+│   │   ├── common/         # Page DÙNG CHUNG mọi feature
+│   │   │   ├── base.page.ts    # Abstract base: clickElement, fillInput, navigate
+│   │   │   ├── login.page.ts
+│   │   │   └── dashboard.page.ts
+│   │   └── ultrafast/      # Page RIÊNG feature (mirror module 03)
+│   │       ├── product-detail.page.ts   # cycle selector, Mua ngay
+│   │       └── checkout-ultrafast.page.ts  # Phone, PTTT, submit
+│   ├── fixtures/           # Hạ tầng dùng chung (KHÔNG chia theo module)
 │   │   ├── base.fixture.ts    # Page fixtures (loginPage, dashboardPage)
 │   │   └── auth.fixture.ts    # Auth helper
-│   ├── utils/
+│   ├── utils/              # Hạ tầng dùng chung (KHÔNG chia theo module)
 │   │   ├── env.config.ts      # Reads .env → exports config object
 │   │   ├── test-data.ts       # TestDataGenerator — dynamic email/phone
 │   │   └── helpers.ts
-│   └── tests/
-│       ├── auth/
-│       ├── dashboard/
+│   └── tests/              # 1 folder / module (mirror 03_test-cases)
+│       ├── common/         # smoke/login dùng chung
+│       │   ├── login.spec.ts
+│       │   └── dashboard.spec.ts
 │       └── ultrafast/
 │           └── ultrafast-checkout.spec.ts  (19/20 TCs stable)
-└── test-data/users.json
+└── test-data/
+    └── common/users.json
 ```
+
+**Bảng mapping slug (automation ↔ module 02/03):**
+
+| Module 02/03 (`chucnang_*`) | Slug automation |
+|---|---|
+| chucnang_dangkyultraFast | `ultrafast` |
+| chucnang_Voucher | `voucher` |
+| chucnang_QLnoidunggoiban | `goiban` |
+| chucnang_QLdactinh | `dactinh` |
+| chucnang_manhinhchitietthietbi | `chitietthietbi` |
+| (login / dashboard — cross-cutting) | `common` |
 
 **Pattern:** Test files import custom `test` from `fixtures/base.fixture.ts` (không dùng `@playwright/test` trực tiếp). Page Objects khai báo locators là `readonly` fields, methods không chứa assertions.
 
@@ -127,8 +152,9 @@ automation-framework/
 |---|---|
 | `ecom-pdh/00_input/` | Read-only input — URD, BRD, FCP docs từ BA |
 | `ecom-pdh/02_analyze-requirements/<module>/` | Output của analyze-requirement |
-| `ecom-pdh/03_test-cases/` | Web/Mobile TC Excel |
-| `ecom-pdh/03_test-cases/api/` | API TC Excel |
+| `ecom-pdh/03_test-cases/functional/<module>/` | Web/Mobile TC Excel (1 thư mục / module, mirror 02) |
+| `ecom-pdh/03_test-cases/api/<module>/` | API TC Excel (1 thư mục / module, mirror 02) |
+| `ecom-pdh/03_test-cases/_results/` | File `*_results_*.xlsx` từ sync-tc-results |
 | `ecom-pdh/04_test-data/` | Test data assets |
 
 **Modules đã analyze:**
@@ -138,10 +164,14 @@ automation-framework/
 - `chucnang_Voucher` — Voucher/EVC Checkout (has `test_data_catalog.md`)
 - `chucnang_dangkyultraFast` — Đăng ký dịch vụ UltraFast (automation 19/20 PASS)
 
-**TC files hiện có:**
-- `03_test-cases/AI_ISC_ecom-pdh_v1.1_TC_v1.0.xlsx` — Web/Mobile (includes UltraFast)
-- `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v1.2.xlsx` — API TC Voucher v1.2 (100 TCs)
-- `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx` — API TC Voucher v2.0 từ ECP_API_Documentation_v4 (77 TCs)
+**TC files hiện có (cấu trúc mới — mirror 02 theo module):**
+- `03_test-cases/functional/chucnang_dangkyultraFast/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx` — UltraFast (tách từ TC_v1.0 cũ)
+- `03_test-cases/functional/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_voucher_ui_v1.0.xlsx` — Voucher UI Checkout (tách từ TC_v1.0 cũ)
+- `03_test-cases/functional/chucnang_manhinhchitietthietbi/AI_ISC_ecom-pdh_v1.1_TC_chitietthietbi_v1.0.xlsx`
+- `03_test-cases/functional/chucnang_QLdactinh/AI_ISC_ecom-pdh_v1.1_TC_dactinh_v1.1.xlsx`
+- `03_test-cases/functional/chucnang_QLnoidunggoiban/AI_ISC_ecom-pdh_v1.1_TC_goiban_v2.0.xlsx` (đổi tên từ TC_v2.0)
+- `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v1.2.xlsx` — API TC Voucher v1.2 (100 TCs)
+- `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx` — API TC Voucher v2.0 từ ECP_API_Documentation_v4 (77 TCs)
 
 ---
 

@@ -145,10 +145,13 @@ Nếu user chưa cung cấp đủ → hỏi trước khi bắt đầu.
    - Locator lấy từ Bước 2 (đã verify) — KHÔNG ĐOÁN
    - Return `this` hoặc next page object cho method chaining (nếu phù hợp)
 
-3. **Kiểm tra project structure hiện tại:**
-   - Nếu project đã có pages/ → sinh file vào đúng thư mục
-   - Nếu project mới → tạo structure theo skill `framework_architect`
-   - Không tạo duplicate — kiểm tra page đã tồn tại chưa trước khi tạo mới
+3. **Kiểm tra project structure hiện tại + đặt file đúng folder module (domain-driven):**
+   - **Page riêng feature** → `src/pages/<module-slug>/*.page.ts` (1 folder / module, slug ngắn english tương ứng module trong `03_test-cases/functional/<module>/` — xem bảng mapping trong `CLAUDE.md`).
+   - **Page dùng chung** (Base, Login, Dashboard, header/footer…) → `src/pages/common/`. Nếu một page bị ≥ 2 module dùng → đẩy lên `common/`, KHÔNG copy vào từng module.
+   - **Test spec** → `src/tests/<module-slug>/*.spec.ts`; smoke/login dùng chung → `src/tests/common/`.
+   - **CẤM import chéo giữa 2 module** — chỉ import từ `common/` hoặc trong cùng folder module.
+   - Nếu folder `<module-slug>/` chưa có → tạo mới. Không tạo duplicate — kiểm tra page đã tồn tại (kể cả trong `common/`) trước khi tạo mới.
+   - Nếu project mới → tạo structure theo skill `framework_architect`.
 
 ### Bước 4: Chuẩn bị Dữ liệu (Test Data Strategy)
 
@@ -279,9 +282,9 @@ Nếu user chưa cung cấp đủ → hỏi trước khi bắt đầu.
    | TC03 | Đăng ký tài khoản | ⚠️ SKIP | — | Cần CAPTCHA |
 
    ## Files Created
-   - src/pages/login.page.ts
-   - src/pages/dashboard.page.ts
-   - src/tests/login.spec.ts
+   - src/pages/common/login.page.ts        (dùng chung)
+   - src/pages/<module-slug>/*.page.ts      (riêng feature)
+   - src/tests/<module-slug>/*.spec.ts
    ```
 
 3. **Báo cáo** cho user:

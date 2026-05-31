@@ -29,15 +29,16 @@ File: `CLAUDE.md` (ở root của mỗi project)
   │       Output: MEMORY.md, test_scenario_map.md,
   │               requirement_traceability.md, risk_assessment.md
   │
-  ├─► gen-testcase-webapp  →  03_test-cases/
-  │       Output: AI_ISC_{project_name}_[version]_TC_v1.0.xlsx (Web/Mobile)
+  ├─► gen-testcase-webapp  →  03_test-cases/functional/<module>/
+  │       Output: AI_ISC_{project_name}_[version]_TC_<module>_v1.0.xlsx (Web/Mobile)
+  │               (1 thư mục / module, mirror 1:1 với 02_analyze-requirements/)
   │               (cột H "Auto?" được điền Y/N cho từng TC)
   │
-  ├─► gen-testcase-api     →  03_test-cases/api/
+  ├─► gen-testcase-api     →  03_test-cases/api/<module>/
   │       Output: AI_ISC_{project_name}_[version]_TC_API_v1.0.xlsx (REST API)
   │
-  ├─► update-testcase  →  03_test-cases/
-  │       Output: AI_ISC_{project_name}_[version]_TC_v2.0.xlsx (v3.0...)
+  ├─► update-testcase  →  03_test-cases/functional|api/<module>/
+  │       Output: AI_ISC_{project_name}_[version]_TC_<module>_v2.0.xlsx (v3.0...)
   │
   └─► [Automation — Web UI] ──────────────────────────────────────
       [một lần] generate_automation_framework
@@ -50,7 +51,7 @@ File: `CLAUDE.md` (ở root của mỗi project)
 \`\`\`
 
 ## Naming Conventions
-- **TC Excel:** `AI_ISC_{project_name}_[version]_TC_v[tc_version].xlsx`
+- **TC Excel:** `AI_ISC_{project_name}_[version]_TC_[module]_v[tc_version].xlsx` (đặt trong `functional/<module>/`)
 - **TC ID:** `TC_[MODULE].[NNN]` — ví dụ: TC_LOGIN.1, TC_PAY.3
 - **Scenario ID:** `SC-[MODULE]-[NNN]` — ví dụ: SC-LOGIN-001
 - **Requirement ID:** `REQ-[MODULE]-[NNN]` — ví dụ: REQ-LOGIN-001
@@ -60,8 +61,9 @@ File: `CLAUDE.md` (ở root của mỗi project)
 |---------|----------|----------------|
 | `00_input/` | Tài liệu đầu vào: URD, SRS, specs từ BA | analyze-requirement (đọc) |
 | `02_analyze-requirements/` | Output phân tích: MEMORY.md, scenario map, traceability, risk | analyze-requirement (ghi) |
-| `03_test-cases/` | TC Excel Web/Mobile `AI_ISC_*_TC_v*.xlsx` | gen-testcase-webapp (ghi), update-testcase (đọc+ghi) |
-| `03_test-cases/api/` | TC Excel API `AI_ISC_*_TC_API_v*.xlsx` | gen-testcase-api (ghi) |
+| `03_test-cases/functional/<module>/` | TC Excel Web/Mobile (1 thư mục / module, mirror 02) | gen-testcase-webapp (ghi), update-testcase (đọc+ghi) |
+| `03_test-cases/api/<module>/` | TC Excel API (1 thư mục / module, mirror 02) | gen-testcase-api (ghi) |
+| `03_test-cases/_results/` | File `*_results_*.xlsx` từ sync-tc-results | sync-tc-results (ghi) |
 | `04_test-data/` | Dữ liệu test (valid / invalid) | — |
 
 ## MEMORY Files

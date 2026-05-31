@@ -425,16 +425,18 @@ trước khi generate file.
 
 ## Excel Output
 
-Tên file:
+Output path (BẮT BUỘC) — ghi vào thư mục con theo **đúng tên module** trong `02_analyze-requirements/` (mirror 1:1):
 
 ```text
-AI_ISC_<project>_<version>_TC_API_v<tc_version>.xlsx
+03_test-cases/api/<chucnang_module>/AI_ISC_<project>_<version>_TC_API_v<tc_version>.xlsx
 ```
+
+`<chucnang_module>` = tên thư mục module tương ứng trong `02_analyze-requirements/`. Chưa có thì tạo mới.
 
 Ví dụ:
 
 ```text
-AI_ISC_FoxProject_v1.0_TC_API_v1.0.xlsx
+03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx
 ```
 
 ---

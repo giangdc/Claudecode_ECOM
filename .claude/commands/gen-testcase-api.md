@@ -208,6 +208,12 @@ Cấu trúc template:
 - TC ID auto-gen: `{Mã API}.{số thứ tự}` — đánh số liên tục, bỏ qua dòng group/trống
 
 ## File Output
+- **Output path (BẮT BUỘC)**: Ghi vào thư mục con theo **đúng tên module** trong `02_analyze-requirements/` (mirror 1:1):
+  ```
+  03_test-cases/api/<chucnang_module>/AI_ISC_<project>_<version>_TC_API_v<tc_version>.xlsx
+  ```
+  - `<chucnang_module>` = tên thư mục module tương ứng trong `02_analyze-requirements/`. Chưa có thì tạo mới.
+  - Ví dụ: `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx`
 - **Tên file**: `AI_ISC_<project>_<version>_TC_API_v<tc_version>.xlsx`  
   Ví dụ: `AI_ISC_FoxProject_v1.0_TC_API_v1.0.xlsx`
 - **Sheet**: Mỗi sheet = 1 endpoint. Tên sheet = tên API ngắn gọn (tiếng Việt)

@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from './base.page';
+import { BasePage } from '../common/base.page';
 
 export type PaymentMethod = 'DOMESTIC-Online' | 'COD-COD' | 'MOMO-Online' | 'VIETQR-Online';
 
