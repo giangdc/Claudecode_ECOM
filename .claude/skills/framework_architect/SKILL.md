@@ -170,15 +170,18 @@ project-root/
 ├── src/
 │   ├── main/java/
 │   │   └── com/project/
-│   │       ├── pages/          # Page Object classes
-│   │       │   ├── BasePage.java
-│   │       │   ├── LoginPage.java
-│   │       │   └── DashboardPage.java
-│   │       ├── drivers/        # Driver management
+│   │       ├── pages/          # Page Object classes — domain-driven theo module
+│   │       │   ├── common/     # Page DÙNG CHUNG mọi feature
+│   │       │   │   ├── BasePage.java
+│   │       │   │   ├── LoginPage.java
+│   │       │   │   └── DashboardPage.java
+│   │       │   └── <module>/   # Page RIÊNG feature (1 package / module, mirror 03_test-cases)
+│   │       │       └── *Page.java
+│   │       ├── drivers/        # Driver management (hạ tầng dùng chung)
 │   │       │   └── DriverFactory.java
-│   │       ├── config/         # Configuration
+│   │       ├── config/         # Configuration (dùng chung)
 │   │       │   └── ConfigReader.java
-│   │       └── utils/          # Utilities
+│   │       └── utils/          # Utilities (dùng chung)
 │   │           ├── WaitHelper.java
 │   │           ├── ScreenshotUtil.java
 │   │           └── TestDataGenerator.java
@@ -186,11 +189,16 @@ project-root/
 │       └── com/project/
 │           ├── base/
 │           │   └── BaseTest.java
-│           └── tests/
-│               ├── LoginTest.java
-│               └── DashboardTest.java
+│           └── tests/          # 1 package / module (mirror 03_test-cases)
+│               ├── common/     # Smoke/login dùng chung
+│               │   ├── LoginTest.java
+│               │   └── DashboardTest.java
+│               └── <module>/
+│                   └── *Test.java
 ├── test-data/
-│   └── users.json
+│   ├── common/                 # Data dùng chung
+│   │   └── users.json
+│   └── <module>/               # Data riêng feature
 └── .github/
     └── workflows/
         └── selenium.yml
@@ -208,16 +216,19 @@ project-root/
 ├── src/
 │   ├── main/java/
 │   │   └── com/project/
-│   │       ├── screens/        # Screen Object classes (mobile POM)
-│   │       │   ├── BaseScreen.java
-│   │       │   ├── LoginScreen.java
-│   │       │   └── HomeScreen.java
-│   │       ├── drivers/        # Appium driver management
+│   │       ├── screens/        # Screen Object classes (mobile POM) — domain-driven theo module
+│   │       │   ├── common/     # Screen DÙNG CHUNG mọi feature
+│   │       │   │   ├── BaseScreen.java
+│   │       │   │   ├── LoginScreen.java
+│   │       │   │   └── HomeScreen.java
+│   │       │   └── <module>/   # Screen RIÊNG feature (1 package / module, mirror 03_test-cases)
+│   │       │       └── *Screen.java
+│   │       ├── drivers/        # Appium driver management (hạ tầng dùng chung)
 │   │       │   ├── AppiumDriverFactory.java
 │   │       │   └── CapabilitiesManager.java
-│   │       ├── config/
+│   │       ├── config/         # (dùng chung)
 │   │       │   └── AppConfig.java
-│   │       └── utils/
+│   │       └── utils/          # (dùng chung)
 │   │           ├── MobileGestures.java    # Swipe, scroll, tap
 │   │           ├── ScreenshotUtil.java
 │   │           └── TestDataGenerator.java
@@ -225,13 +236,18 @@ project-root/
 │       └── com/project/
 │           ├── base/
 │           │   └── BaseTest.java
-│           └── tests/
-│               ├── LoginTest.java
-│               └── HomeTest.java
+│           └── tests/          # 1 package / module (mirror 03_test-cases)
+│               ├── common/     # Smoke/login dùng chung
+│               │   ├── LoginTest.java
+│               │   └── HomeTest.java
+│               └── <module>/
+│                   └── *Test.java
 ├── apps/                       # APK/IPA files
 │   └── .gitkeep
 ├── test-data/
-│   └── users.json
+│   ├── common/                 # Data dùng chung
+│   │   └── users.json
+│   └── <module>/               # Data riêng feature
 └── .github/
     └── workflows/
         └── appium.yml
@@ -249,20 +265,28 @@ project-root/
 ├── .gitignore
 ├── README.md
 ├── src/
-│   ├── pages/
-│   │   ├── base_page.py
-│   │   ├── login_page.py
-│   │   └── dashboard_page.py
-│   ├── utils/
+│   ├── pages/                  # domain-driven theo module
+│   │   ├── common/             # Page DÙNG CHUNG mọi feature
+│   │   │   ├── base_page.py
+│   │   │   ├── login_page.py
+│   │   │   └── dashboard_page.py
+│   │   └── <module>/           # Page RIÊNG feature (1 folder / module, mirror 03_test-cases)
+│   │       └── *_page.py
+│   ├── utils/                  # (dùng chung — KHÔNG chia theo module)
 │   │   ├── config.py           # Env config reader
 │   │   ├── test_data.py        # Data generators
 │   │   └── helpers.py
-│   └── tests/
-│       ├── conftest.py         # Test-level fixtures
-│       ├── test_login.py
-│       └── test_dashboard.py
+│   └── tests/                  # 1 folder / module (mirror 03_test-cases)
+│       ├── conftest.py         # Test-level fixtures (dùng chung)
+│       ├── common/             # Smoke/login dùng chung
+│       │   ├── test_login.py
+│       │   └── test_dashboard.py
+│       └── <module>/
+│           └── test_*.py
 ├── test-data/
-│   └── users.json
+│   ├── common/                 # Data dùng chung
+│   │   └── users.json
+│   └── <module>/               # Data riêng feature
 └── .github/
     └── workflows/
         └── playwright.yml

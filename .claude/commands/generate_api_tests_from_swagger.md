@@ -203,52 +203,46 @@ Workflow này giúp agent phân tích Swagger/OpenAPI specification, xác địn
    └── testdata/               # Test data files (JSON/YAML)
    ```
 
+   > **Domain-driven theo resource:** mỗi resource/endpoint group = 1 folder (mirror 1:1 với `03_test-cases/api/<module>/`). Phần dùng chung (base client, fixtures, data generator) → `common/`. **Cấm import chéo giữa 2 resource** — chỉ import từ `common/` hoặc trong cùng folder resource.
+
    **Playwright API (TypeScript):**
    ```
-   tests/
-   ├── api/
-   │   ├── helpers/
-   │   │   ├── base-api.ts     # Base request context, auth
-   │   │   ├── user-api.ts     # API methods per resource
-   │   │   └── test-data.ts    # Data generators
-   │   ├── user.api.spec.ts    # Test file per resource
-   │   └── auth.api.spec.ts
-   └── fixtures/
-       └── api-fixtures.ts     # Shared fixtures (auth tokens, etc.)
+   tests/api/
+   ├── common/                 # DÙNG CHUNG mọi resource
+   │   ├── base-api.ts         # Base request context, auth
+   │   ├── test-data.ts        # Data generators
+   │   └── api-fixtures.ts     # Shared fixtures (auth tokens, etc.)
+   └── <resource>/             # 1 folder / resource (vd: user/, auth/)
+       ├── <resource>-api.ts   # API methods per resource
+       └── <resource>.api.spec.ts
    ```
 
    **Requests + Pytest (Python):**
    ```
-   tests/
-   ├── api/
-   │   ├── conftest.py          # Fixtures: base_url, auth_token, api_client
-   │   ├── helpers/
-   │   │   ├── base_api.py      # Base API client (requests.Session)
-   │   │   ├── user_api.py      # API methods per resource
-   │   │   └── test_data.py     # Data generators
-   │   ├── models/
-   │   │   ├── user_model.py    # Pydantic/dataclass models
-   │   │   └── response_model.py
-   │   ├── test_user_api.py     # Test file per resource
-   │   └── test_auth_api.py
-   └── pytest.ini               # Pytest config
+   tests/api/
+   ├── conftest.py             # Root fixtures: base_url, auth_token, api_client
+   ├── common/                 # DÙNG CHUNG mọi resource
+   │   ├── base_api.py         # Base API client (requests.Session)
+   │   └── test_data.py        # Data generators
+   └── <resource>/             # 1 folder / resource
+       ├── <resource>_model.py # Pydantic/dataclass models
+       ├── <resource>_api.py   # API methods per resource
+       └── test_<resource>_api.py
    ```
 
    **Supertest + Jest (TypeScript):**
    ```
-   tests/
-   ├── api/
-   │   ├── helpers/
-   │   │   ├── base-api.ts      # Supertest agent config
-   │   │   ├── user-api.ts      # API methods per resource
-   │   │   └── test-data.ts     # Data generators
-   │   ├── models/
-   │   │   └── user.model.ts    # TypeScript interfaces
-   │   ├── user.api.test.ts     # Test file per resource
-   │   └── auth.api.test.ts
-   ├── jest.config.ts            # Jest config
-   └── setup.ts                  # Global setup (auth token)
+   tests/api/
+   ├── common/                 # DÙNG CHUNG mọi resource
+   │   ├── base-api.ts         # Supertest agent config
+   │   ├── test-data.ts        # Data generators
+   │   └── setup.ts            # Global setup (auth token)
+   └── <resource>/             # 1 folder / resource
+       ├── <resource>.model.ts # TypeScript interfaces
+       ├── <resource>-api.ts   # API methods per resource
+       └── <resource>.api.test.ts
    ```
+   *(`jest.config.ts` đặt ở project root)*
 
 2. **Sinh code** theo thứ tự:
    - **Base API class** — Config baseURL, default headers, auth interceptor, request/response logging
