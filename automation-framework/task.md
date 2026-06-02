@@ -1,7 +1,7 @@
 # Automation Generation Progress — Đăng ký UltraFast
 
 ## Checklist
-- [x] Bước 1: Phân tích TC (20 TCs Auto=Y từ functional/chucnang_dangkyultraFast/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx — tách từ TC_v1.0.xlsx cũ)
+- [x] Bước 1: Phân tích TC (20 TCs Auto=Y từ functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx — tách từ TC_v1.0.xlsx cũ)
 - [x] Bước 2: UI Recon — staging.tongdaiwifi.vn + staging.fpt.vn/checkout
 - [x] Bước 3: Thiết kế POM
 - [x] Bước 4: Test data

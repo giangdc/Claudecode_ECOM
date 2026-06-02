@@ -33,3 +33,8 @@ desktop.ini
 
 # Logs
 *.log
+
+# Playwright MCP recon snapshots
+.playwright-mcp/
+.ckdump/
+*_snapshot.yml

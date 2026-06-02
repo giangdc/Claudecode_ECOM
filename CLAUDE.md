@@ -133,7 +133,7 @@ automation-framework/
 
 | Module 02/03 (`chucnang_*`) | Slug automation |
 |---|---|
-| chucnang_dangkyultraFast | `ultrafast` |
+| chucnang_checkout (dịch vụ UltraFast) | `ultrafast` |
 | chucnang_Voucher | `voucher` |
 | chucnang_QLnoidunggoiban | `goiban` |
 | chucnang_QLdactinh | `dactinh` |
@@ -162,10 +162,11 @@ automation-framework/
 - `chucnang_QLdactinh` — Quản lý Đặc tính
 - `chucnang_manhinhchitietthietbi` — Chi tiết Thiết bị
 - `chucnang_Voucher` — Voucher/EVC Checkout (has `test_data_catalog.md`)
-- `chucnang_dangkyultraFast` — Đăng ký dịch vụ UltraFast (automation 19/20 PASS)
+- `chucnang_checkout` — Luồng checkout của nhiều dịch vụ (hiện có: đăng ký UltraFast — automation 19/20 PASS)
 
 **TC files hiện có (cấu trúc mới — mirror 02 theo module):**
-- `03_test-cases/functional/chucnang_dangkyultraFast/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx` — UltraFast (tách từ TC_v1.0 cũ)
+- `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx` — Checkout UltraFast (tách từ TC_v1.0 cũ)
+- `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx` — Checkout Common (78 TC) + Internet (18 TC) — 2 sheet, gen 2026-06-01
 - `03_test-cases/functional/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_voucher_ui_v1.0.xlsx` — Voucher UI Checkout (tách từ TC_v1.0 cũ)
 - `03_test-cases/functional/chucnang_manhinhchitietthietbi/AI_ISC_ecom-pdh_v1.1_TC_chitietthietbi_v1.0.xlsx`
 - `03_test-cases/functional/chucnang_QLdactinh/AI_ISC_ecom-pdh_v1.1_TC_dactinh_v1.1.xlsx`
@@ -256,10 +257,11 @@ Chi tiết trong `.claude/rules/`. Key points:
 - **TC API sinh ra:** `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx` (77 TCs)
 - **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_Voucher/MEMORY.md`
 
-### 2026-05-28 — Đăng ký UltraFast
-- **Tài liệu:** `ecom-pdh/00_input/chucnang_dangkyultraFast/dang ky dich ultraFast.xlsx`
-- **Tổng requirement:** 9 | **Tổng scenario:** 24 (P1:13, P2:9, P3:2)
-- **Vùng rủi ro cao:** Luồng thanh toán Online 3rd party (Score 20)
-- **Automation:** 19/20 TCs stable — xem `automation-framework/task.md` cho locator collection và defect log
-- **Defect:** BUG-DANGKYUF-001 — COD hiển thị trong staging dù spec nói không có
-- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_dangkyultraFast/MEMORY.md`
+### 2026-06-01 — Checkout đa dịch vụ (re-baseline, gồm UltraFast)
+- **Tài liệu:** DOC-CK-01 `Chucnangcheckout.xlsx` (Rule common + UltraFast + camera + internet) | DOC-CK-02 `TC_checkout.xlsx` (TC tham chiếu BA) | DOC-CK-03 `camera.png` (mockup). Lưu ý: `dang ky dich ultraFast.xlsx` đã **merge vào DOC-CK-01** và xóa.
+- **Phạm vi đã phân tích:** UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET). **Chưa phân tích:** Camera, Smart Home, Smart Tivi (chờ đủ tài liệu).
+- **Tổng requirement:** 30 active (1 deferred) | **Tổng scenario:** 116 định nghĩa — 111 active (P1:50, P2:47, P3:12), 4 deferred (Chung cư), 1 blocked (voucher)
+- **Vùng rủi ro cao:** CKCOMMON Luồng thanh toán (Score 25); CKCOMMON Phường/Xã + kiểm tra chính sách giá (20); INTERNET B2 trả trước/sau + giá động (20); DANGKYUF Online 3rd party (20); Popup Địa chỉ hành chính cũ (16); Block PTTT (15)
+- **Clarifications:** 8/9 resolved 2026-06-01 (Số nhà max 50; SĐT lỗi = "Số điện thoại không hợp lệ"; Internet không Email; Chung cư deferred; trả trước/sau theo QLCS; session/countdown mọi DV; pre-fill điền toàn bộ +SC-076). Còn **1 pending: CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!")
+- **UltraFast:** giữ nguyên SC-DANGKYUF-001..024 (TC + automation 19/20 đã chạy). Defect BUG-DANGKYUF-001 (COD hiển thị staging) vẫn Open.
+- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`

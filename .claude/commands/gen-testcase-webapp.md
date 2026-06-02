@@ -173,7 +173,7 @@ Ghi file vào thư mục con theo **đúng tên module** trong `02_analyze-requi
 - Mỗi module = 1 file riêng (không gộp nhiều module vào 1 file). Nếu 1 module có nhiều nhóm chức năng → tách thành nhiều sheet trong cùng file.
 - Nếu thư mục module chưa tồn tại trong `03_test-cases/functional/` → tạo mới.
 
-Ví dụ: `03_test-cases/functional/chucnang_dangkyultraFast/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx`
+Ví dụ: `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx`
 
 ## File name
 `AI_ISC_<project_name>_<project_version>_TC_<module>_v<tc_version>.xlsx`
