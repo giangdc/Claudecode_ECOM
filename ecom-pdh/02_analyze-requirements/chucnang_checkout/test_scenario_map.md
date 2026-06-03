@@ -1,17 +1,20 @@
 # Test Scenario Map — Module CHECKOUT (đa dịch vụ)
 
-## Tổng quan: 116 scenarios — active 111 (P1:50 P2:48 P3:13); 4 deferred (Chung cư); 1 blocked (voucher)
+## Tổng quan: 154 scenarios — active 146 (P1:70 P2:61 P3:15); 5 deferred (Chung cư); 3 blocked (voucher)
+> Cập nhật 2026-06-03: phân tích bản revise `Chucnangcheckout_0306.xlsx` → thêm 2 sub-module **CAMERA** (20 SC) + **AP** (18 SC). Field validation của Camera/AP **refer CKCOMMON** (không nhân bản). UltraFast/CKCOMMON/Internet không đổi (Rule common chỉ đổi format STT).
 > Cập nhật 2026-06-01: BA resolve 8/9 clarification → SC-CKCOMMON-037→040 (Chung cư) **Deferred**; thêm **SC-CKCOMMON-076** (pre-fill địa chỉ).
-> Phạm vi hiện tại: **UltraFast (DANGKYUF)** + **Màn checkout chung (CKCOMMON)** + **Internet (INTERNET)**.
-> Camera / Smart Home / Smart Tivi: **chưa phân tích** — chờ đủ tài liệu (xem MEMORY.md §6).
+> Phạm vi hiện tại: **UltraFast (DANGKYUF)** + **Màn checkout chung (CKCOMMON)** + **Internet (INTERNET)** + **Camera (CAMERA)** + **Access Point (AP)**.
+> Smart Home / Smart Tivi: **chưa phân tích** — chờ đủ tài liệu (xem MEMORY.md §6).
 
 | Sub-module | Mô tả | Scenarios | DOC Source |
 |---|---|---|---|
 | DANGKYUF | Checkout UltraFast — online only, chỉ SĐT, 1 bước | 24 (1 blocked) | DOC-CK-01 (sheet Đăng ký UltraFast + Rule common) |
 | CKCOMMON | Màn checkout chung cho dịch vụ có Địa chỉ lắp đặt | 76 (71 active, 4 Chung cư deferred, +SC-076) | DOC-CK-01 (Rule common) + DOC-CK-02 (Thông tin chung) |
 | INTERNET | Đăng ký Internet — 3 bước, trả trước/trả sau, giá động | 16 | DOC-CK-01 (sheet Đăng ký internet) |
+| CAMERA | Đăng ký Camera — có chu kỳ + COD + Địa chỉ lắp đặt, màn 2 bước | 20 (18 active, 1 blocked voucher, 1 Chung cư deferred) | DOC-CK-04 (sheet Đăng ký camera) + DOC-CK-03 (mockup camera.png) |
+| AP | Đăng ký Access Point — chỉ số lượng (không chu kỳ) + COD + Địa chỉ lắp đặt, màn 2 bước | 18 (17 active, 1 blocked voucher) | DOC-CK-04 (sheet Đăng ký AP) |
 
-> **Quan hệ:** CKCOMMON là tập hành vi màn checkout dùng chung cho các dịch vụ có Địa chỉ lắp đặt (Internet, Camera, Smart Home...). INTERNET = CKCOMMON + đặc thù 3 bước/trả trước-sau. UltraFast là biến thể rút gọn (không địa chỉ, không COD) nên giữ bộ SC riêng DANGKYUF.
+> **Quan hệ:** CKCOMMON là tập hành vi màn checkout dùng chung cho các dịch vụ có Địa chỉ lắp đặt (Internet, Camera, AP, Smart Home...). INTERNET = CKCOMMON + đặc thù 3 bước/trả trước-sau. **CAMERA/AP = CKCOMMON + chọn gói (Camera có chu kỳ, AP chỉ số lượng) + COD + màn 2 bước** — field validation tái dùng CKCOMMON, chỉ test phần đặc thù dịch vụ. UltraFast là biến thể rút gọn (không địa chỉ, không COD) nên giữ bộ SC riêng DANGKYUF.
 
 ---
 ---
@@ -304,3 +307,155 @@
 | SC-INTERNET-014 | PTTT = COD → "Chưa thanh toán" | REQ-INTERNET-004 | DOC-CK-01 (Đăng ký internet) R43 | Thanh toán COD | User hoàn tất đặt hàng COD | Màn hoàn tất: "Hoàn tất đơn hàng / Chưa thanh toán" + nội dung "Đơn hàng đã đăng ký thành công. Kỹ thuật viên FPT sẽ liên hệ triển khai dịch vụ trong 8h-12h..." | P1 | Functional |
 | SC-INTERNET-015 | PTTT = Online + thành công → "Đã thanh toán" | REQ-INTERNET-004 | DOC-CK-01 (Đăng ký internet) R45 | Thanh toán Online thành công | User hoàn tất thanh toán Online | Bước Hoàn tất header màu xanh lá; trạng thái "Đã thanh toán" + nội dung thông báo thành công | P1 | Functional |
 | SC-INTERNET-016 | PTTT = Online + thất bại → về màn TT, chỉ sửa PTTT + ưu đãi | REQ-INTERNET-004 | DOC-CK-01 (Đăng ký internet) R44 | Thanh toán Online thất bại | Thanh toán không thành công | Quay về màn TT giữ nguyên thông tin đã chọn; chỉ cho thay đổi PTTT + nhập mã ưu đãi, các trường còn lại disable | P1 | Negative |
+
+
+---
+---
+
+# SUB-MODULE: CAMERA — Đăng ký Camera (Màn hình Checkout 2 bước)
+> Nguồn: DOC-CK-04 sheet "Đăng ký camera" (B1→B3) + DOC-CK-03 mockup `camera.png`.
+> **Quy ước:** các trường Họ tên / SĐT / Tỉnh-Phường-Đường-Số nhà / Ghi chú / Popup địa chỉ cũ / PTTT đều "refer sheet common" → **tái dùng rule & TC của CKCOMMON**, dưới đây chỉ ghi SC đặc thù dịch vụ Camera + 1 SC happy/negative để chốt tích hợp.
+
+### Feature CAM1: B1 — Chọn gói & điều hướng sang Checkout
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-001 | B1 chọn chu kỳ + số lượng → checkout | REQ-CAMERA-001 | DOC-CK-04 (camera) R29-30 | User ở màn Chi tiết gói Camera | Chọn chu kỳ bất kỳ + số lượng, click "Mua ngay" | Điều hướng sang màn Thanh toán; load đúng tên gói, chu kỳ, số lượng, số tiền như đã chọn ở Chi tiết | P1 | Functional |
+| SC-CAMERA-002 | Đổi số lượng → tiền cập nhật đúng | REQ-CAMERA-001 | DOC-CK-04 (camera) R30; mockup camera.png | Ở Chi tiết chọn số lượng > 1 | Sang checkout | Số tiền trên checkout = đơn giá × số lượng theo chu kỳ đã chọn (itemized: Camera + Gói Cloud) | P2 | Functional |
+
+### Feature CAM2: B2 — Block Sản phẩm dịch vụ đã chọn + tiến trình
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-003 | Block Sản phẩm + header 2 bước | REQ-CAMERA-002 | DOC-CK-04 (camera) R31-32; mockup | Đang ở B2 Thanh toán | User quan sát màn | Header 2 bước: "Thanh toán" (xanh dương) → "Hoàn tất đơn hàng" (xám); Block "Sản phẩm dịch vụ đã chọn" load đúng tên gói (vd Camera SE S2), dòng Cloud, chu kỳ, số lượng, số tiền | P1 | Functional |
+
+### Feature CAM3: B2 — Block Thông tin cá nhân (Họ tên + SĐT)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-004 | Họ tên + SĐT hợp lệ | REQ-CAMERA-003 | DOC-CK-04 (camera) R33-35; Rule common R2,R3; mockup | Đang ở B2 | Nhập Họ tên + SĐT hợp lệ | Chấp nhận data; **validation chi tiết refer CKCOMMON C4/C5** (Họ tên ≤100, chỉ chữ; SĐT 10 số bắt đầu 0) | P1 | Functional |
+| SC-CAMERA-005 | Họ tên/SĐT trống hoặc sai định dạng | REQ-CAMERA-003 | Rule common R2,R3; refer SC-CKCOMMON-007→017 | Đang ở B2 | Để trống / nhập sai định dạng rồi blur | Border đỏ + message theo Rule common ("Vui lòng nhập họ tên." / "Số điện thoại không hợp lệ"...) — **dùng lại bộ TC CKCOMMON** | P2 | Negative |
+
+### Feature CAM4: B2 — Block Địa chỉ lắp đặt
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-006 | Block Địa chỉ lắp đặt hiển thị đầy đủ | REQ-CAMERA-004 | DOC-CK-04 (camera) R36-41; mockup | Đang ở B2 | User quan sát Block Địa chỉ lắp đặt | Hiển thị: link "Địa chỉ trước sáp nhập", note "Thời gian giao hàng dự kiến từ 3 đến 7 ngày", Tỉnh/Thành phố*, Phường/Xã*, Tên đường*, radio Nhà riêng/Chung cư, Số nhà*, Ghi chú (placeholder "Gọi cho tôi trước 30 phút nhé!") | P1 | Functional |
+| SC-CAMERA-007 | Link "Địa chỉ trước sáp nhập" → popup | REQ-CAMERA-004 | DOC-CK-04 (camera) R36; refer SC-CKCOMMON-042→047 | Đang ở B2 | Click link "Địa chỉ trước sáp nhập" | Mở popup "Địa chỉ hành chính cũ" (3 cấp → 2 cấp) — **hành vi refer CKCOMMON C13** | P2 | Functional |
+| SC-CAMERA-008 | Phường/Xã → kiểm tra chính sách giá | REQ-CAMERA-004 | DOC-CK-04 (camera); refer SC-CKCOMMON-028→031 | Đang ở B2 | Chọn Phường/Xã không có chính sách | Hiển thị popup "Chưa hỗ trợ chính sách!" + đẩy KHTN — **refer CKCOMMON C8** (nội dung popup chờ CLA-CKCOMMON-007) | P2 | Negative |
+
+### Feature CAM5: B2 — Block Phương thức thanh toán (COD + Online)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-009 | PTTT load COD + Online theo QLCS | REQ-CAMERA-005 | DOC-CK-04 (camera) R42; Rule common R13; mockup | Đang ở B2, gói cấu hình COD + online trên QLCS | User xem Block Phương thức thanh toán | Hiển thị COD "Thanh toán tại nhà" (có CTKM "Giảm trực tiếp 50% giá trị đơn hàng tối đa 200.000 VND") + các PTTT online (VietQR, MoMo, Thẻ quốc tế...) theo QLCS; mỗi PTTT có badge ưu đãi; chỉ chọn 1; "Xem thêm" nếu >4 — **refer CKCOMMON C15** | P2 | Functional |
+
+### Feature CAM6: B2 — Block Thông tin khách hàng
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-010 | Block TTKH auto-load + Thời gian lắp đặt | REQ-CAMERA-006 | DOC-CK-04 (camera) R43; mockup | Đã nhập TTCN + địa chỉ | User xem Block Thông tin khách hàng (cột phải) | Load đúng Họ tên, Số điện thoại, Địa chỉ đã nhập + dòng "Thời gian lắp đặt" (vd "Thứ 2, 02/01/2024 10:00-11:10"). ⚠️ Cơ chế set "Thời gian lắp đặt" chờ CLA-CAMERA-001 | P2 | Functional |
+
+### Feature CAM7: B2 — Block Thông tin thanh toán + Mã ưu đãi + Cần thanh toán
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-011 | Thông tin thanh toán itemized + Cần thanh toán | REQ-CAMERA-007 | DOC-CK-04 (camera) R44-45; mockup | Đang ở B2 | User xem Block Thông tin thanh toán | Itemized đúng (vd "Camera SE S2 - 1 cái: 600.000đ", "Gói Cloud 3D - 6 tháng: 240.000đ"); "Cần thanh toán" = tổng tiền (840.000đ) | P1 | Functional |
+| SC-CAMERA-019 | Áp dụng mã ưu đãi / Chọn ưu đãi | REQ-CAMERA-007 | DOC-CK-04 (camera) R45; mockup ("Nhập mã khuyến mãi" + "Chọn ưu đãi") | Đang ở B2 | Nhập mã ưu đãi / chọn ưu đãi → "Áp dụng" | (Kỳ vọng) trừ tiền vào "Cần thanh toán". 🚫 **Blocked** — voucher chưa implement (CLA-CAMAP-001, như SC-DANGKYUF-015) | P2 | Functional |
+
+### Feature CAM8: B2 — Button Thanh toán (validate + policy)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-012 | Thiếu trường bắt buộc → chặn Thanh toán | REQ-CAMERA-008 | DOC-CK-04 (camera) R46 | B2 còn trường bắt buộc trống | Click "Thanh toán" | Không thực hiện thanh toán; hiển thị lỗi/border đỏ các trường bắt buộc | P2 | Negative |
+| SC-CAMERA-013 | Chính sách không còn active → báo lỗi | REQ-CAMERA-008 | DOC-CK-04 (camera) R46 | Gói/chính sách không còn active trên QLCS | Click "Thanh toán" | Báo lỗi chính sách không còn hiệu lực; không thực hiện thanh toán | P1 | Negative |
+| SC-CAMERA-014 | Tất cả hợp lệ → thực hiện luồng TT | REQ-CAMERA-008 | DOC-CK-04 (camera) R46 | B2 nhập đủ hợp lệ, chính sách active | Click "Thanh toán" | Thực hiện luồng thanh toán theo PTTT đã chọn (COD → B3 luôn; Online → cổng 3rd party) | P1 | Functional |
+
+### Feature CAM9: B2 — Navigation (Điều khoản, Quay lại)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-015 | Link điều khoản + nút Quay lại | REQ-CAMERA-009 | DOC-CK-04 (camera) R47-48; mockup | Đang ở B2 | Click link "điều khoản" / nút "Quay lại" | Link điều khoản → màn điều khoản dịch vụ đang chọn; "Quay lại" → về màn Chi tiết gói | P3 | UI |
+
+### Feature CAM10: B3 — Hoàn tất đơn hàng
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-016 | PTTT = COD → "Chưa thanh toán" | REQ-CAMERA-010 | DOC-CK-04 (camera) R50 | Chọn PTTT = COD, click Thanh toán | Hoàn tất đặt hàng COD | Màn Hoàn tất: trạng thái "Chưa thanh toán" + nội dung "Đơn hàng đã đăng ký thành công. Kỹ thuật viên FPT sẽ liên hệ triển khai dịch vụ trong 8h-12h. Mọi thắc mắc... 1900 6600..." | P1 | Functional |
+| SC-CAMERA-017 | PTTT = Online + thành công → "Đã thanh toán" | REQ-CAMERA-010 | DOC-CK-04 (camera) R52 | Chọn PTTT Online, thanh toán thành công | Hoàn tất thanh toán Online | Bước "Hoàn tất đơn hàng" header màu xanh lá; trạng thái "Đã thanh toán" + nội dung thông báo thành công | P1 | Functional |
+| SC-CAMERA-018 | PTTT = Online + thất bại → giữ data, chỉ sửa PTTT + ưu đãi | REQ-CAMERA-010 | DOC-CK-04 (camera) R51 | Chọn PTTT Online, thanh toán thất bại | Thanh toán không thành công | Quay về màn Thanh toán giữ nguyên thông tin đã chọn; **chỉ cho thay đổi PTTT + nhập mã ưu đãi**, các trường còn lại disable | P1 | Negative |
+
+### Feature CAM4b: B2 — Địa chỉ lắp đặt — Chung cư 🚫 DEFERRED
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-CAMERA-020 | Chọn radio Chung cư → nhập field chung cư | REQ-CAMERA-004 | mockup camera.png (radio Nhà riêng/Chung cư); refer CLA-CKCOMMON-006 | Đang ở B2 | Chọn radio "Chung cư" | (Kỳ vọng) hiển thị field Tên chung cư/Tòa/Tầng/Phòng. 🚫 **Deferred** — Chung cư chưa phát triển ver hiện tại (CLA-CKCOMMON-006), áp dụng chung mọi DV | P2 | — |
+
+---
+---
+
+# SUB-MODULE: AP — Đăng ký Access Point (Màn hình Checkout 2 bước)
+> Nguồn: DOC-CK-04 sheet "Đăng ký AP" (B1→B3). Luồng **giống hệt Camera** trừ: **B1 chỉ chọn số lượng, KHÔNG có chu kỳ**. Không có mockup riêng (tham chiếu mockup Camera cho layout). Field validation đều "refer sheet common" → **tái dùng CKCOMMON**.
+
+### Feature AP1: B1 — Chọn số lượng & điều hướng sang Checkout
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-001 | B1 chọn số lượng → checkout | REQ-AP-001 | DOC-CK-04 (AP) R29-30 | User ở màn Chi tiết gói AP | Chọn số lượng, click "Mua ngay" | Điều hướng sang màn Thanh toán; load đúng tên gói + số lượng + số tiền. ⚠️ AP **không có chu kỳ** (CLA-AP-001) | P1 | Functional |
+| SC-AP-002 | Block Sản phẩm + header 2 bước (không chu kỳ) | REQ-AP-001 | DOC-CK-04 (AP) R31-32 | Đang ở B2 | User quan sát màn | Header 2 bước "Thanh toán"→"Hoàn tất đơn hàng"; Block "Sản phẩm dịch vụ đã chọn" load đúng tên gói, số lượng, số tiền (KHÔNG hiển thị chu kỳ) | P1 | Functional |
+
+### Feature AP2: B2 — Block Thông tin cá nhân (Họ tên + SĐT)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-003 | Họ tên + SĐT hợp lệ | REQ-AP-002 | DOC-CK-04 (AP) R33-35; Rule common R2,R3 | Đang ở B2 | Nhập Họ tên + SĐT hợp lệ | Chấp nhận data; **validation chi tiết refer CKCOMMON C4/C5** | P1 | Functional |
+| SC-AP-004 | Họ tên/SĐT trống hoặc sai định dạng | REQ-AP-002 | Rule common R2,R3; refer SC-CKCOMMON-007→017 | Đang ở B2 | Để trống / nhập sai định dạng | Border đỏ + message theo Rule common — **dùng lại bộ TC CKCOMMON** | P2 | Negative |
+
+### Feature AP3: B2 — Block Địa chỉ lắp đặt
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-005 | Block Địa chỉ lắp đặt hiển thị đầy đủ | REQ-AP-003 | DOC-CK-04 (AP) R36-41 | Đang ở B2 | User quan sát Block Địa chỉ lắp đặt | Hiển thị: link "Địa chỉ trước sáp nhập", Tỉnh/Thành phố*, Phường/Xã*, Tên đường*, radio Nhà riêng/Chung cư, Số nhà*, Ghi chú. ⚠️ note giao hàng/Thời gian lắp đặt chờ CLA-AP-002 | P1 | Functional |
+| SC-AP-006 | Link "Địa chỉ trước sáp nhập" → popup | REQ-AP-003 | DOC-CK-04 (AP) R36; refer SC-CKCOMMON-042→047 | Đang ở B2 | Click link "Địa chỉ trước sáp nhập" | Mở popup "Địa chỉ hành chính cũ" — **hành vi refer CKCOMMON C13** | P2 | Functional |
+| SC-AP-007 | Phường/Xã → kiểm tra chính sách giá | REQ-AP-003 | DOC-CK-04 (AP); refer SC-CKCOMMON-028→031 | Đang ở B2 | Chọn Phường/Xã không có chính sách | Popup "Chưa hỗ trợ chính sách!" + đẩy KHTN — **refer CKCOMMON C8** | P2 | Negative |
+
+### Feature AP4: B2 — Block Phương thức thanh toán (COD + Online)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-008 | PTTT load COD + Online theo QLCS | REQ-AP-004 | DOC-CK-04 (AP) R42; Rule common R13 | Đang ở B2, gói cấu hình COD + online | User xem Block Phương thức thanh toán | Hiển thị COD ("Thanh toán tại nhà") + PTTT online theo QLCS; chỉ chọn 1; "Xem thêm" nếu >4 — **refer CKCOMMON C15** | P2 | Functional |
+
+### Feature AP5: B2 — Block Thông tin khách hàng
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-009 | Block TTKH auto-load | REQ-AP-005 | DOC-CK-04 (AP) R43 | Đã nhập TTCN + địa chỉ | User xem Block Thông tin khách hàng | Load đúng Họ tên, Số điện thoại, Địa chỉ đã nhập tại Thông tin cá nhân + Địa chỉ lắp đặt | P2 | Functional |
+
+### Feature AP6: B2 — Block Thông tin thanh toán + Cần thanh toán + Mã ưu đãi
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-010 | Thông tin thanh toán + Cần thanh toán | REQ-AP-006 | DOC-CK-04 (AP) R44-45 | Đang ở B2 | User xem Block Thông tin thanh toán | Load đúng thông tin tại "Sản phẩm dịch vụ đã chọn"; "Cần thanh toán" = tổng tiền | P1 | Functional |
+| SC-AP-018 | Áp dụng mã ưu đãi | REQ-AP-006 | DOC-CK-04 (AP) R51 | Đang ở B2 | Nhập/áp dụng mã ưu đãi | (Kỳ vọng) trừ tiền. 🚫 **Blocked** — voucher chưa implement (CLA-CAMAP-001) | P2 | Functional |
+
+### Feature AP7: B2 — Button Thanh toán (validate + policy)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-011 | Thiếu trường bắt buộc → chặn Thanh toán | REQ-AP-007 | DOC-CK-04 (AP) R46 | B2 còn trường bắt buộc trống | Click "Thanh toán" | Không thực hiện thanh toán; hiển thị lỗi các trường bắt buộc | P2 | Negative |
+| SC-AP-012 | Chính sách không còn active → báo lỗi | REQ-AP-007 | DOC-CK-04 (AP) R46 | Gói/chính sách không còn active QLCS | Click "Thanh toán" | Báo lỗi chính sách không còn hiệu lực; không thực hiện thanh toán | P1 | Negative |
+| SC-AP-013 | Tất cả hợp lệ → thực hiện luồng TT | REQ-AP-007 | DOC-CK-04 (AP) R46 | B2 nhập đủ hợp lệ, chính sách active | Click "Thanh toán" | Thực hiện luồng thanh toán theo PTTT đã chọn | P1 | Functional |
+
+### Feature AP8: B2 — Navigation (Điều khoản, Quay lại)
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-014 | Link điều khoản + nút Quay lại | REQ-AP-008 | DOC-CK-04 (AP) R47-48 | Đang ở B2 | Click link "điều khoản" / nút "Quay lại" | Link điều khoản → màn điều khoản dịch vụ; "Quay lại" → về màn Chi tiết gói | P3 | UI |
+
+### Feature AP9: B3 — Hoàn tất đơn hàng
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-AP-015 | PTTT = COD → "Chưa thanh toán" | REQ-AP-009 | DOC-CK-04 (AP) R50 | Chọn PTTT = COD | Hoàn tất đặt hàng COD | Màn Hoàn tất: "Chưa thanh toán" + nội dung "Đơn hàng đã đăng ký thành công. Kỹ thuật viên FPT sẽ liên hệ triển khai dịch vụ trong 8h-12h..." | P1 | Functional |
+| SC-AP-016 | PTTT = Online + thành công → "Đã thanh toán" | REQ-AP-009 | DOC-CK-04 (AP) R52 | Chọn PTTT Online, thành công | Hoàn tất thanh toán Online | Header bước Hoàn tất xanh lá; trạng thái "Đã thanh toán" + thông báo thành công | P1 | Functional |
+| SC-AP-017 | PTTT = Online + thất bại → giữ data, chỉ sửa PTTT + ưu đãi | REQ-AP-009 | DOC-CK-04 (AP) R51 | Chọn PTTT Online, thất bại | Thanh toán không thành công | Quay về màn Thanh toán giữ nguyên thông tin; chỉ cho thay đổi PTTT + nhập mã ưu đãi, các trường còn lại disable | P1 | Negative |

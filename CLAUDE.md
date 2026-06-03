@@ -109,9 +109,10 @@ automation-framework/
 │   │   │   ├── base.page.ts    # Abstract base: clickElement, fillInput, navigate
 │   │   │   ├── login.page.ts
 │   │   │   └── dashboard.page.ts
-│   │   └── ultrafast/      # Page RIÊNG feature (mirror module 03)
-│   │       ├── product-detail.page.ts   # cycle selector, Mua ngay
-│   │       └── checkout-ultrafast.page.ts  # Phone, PTTT, submit
+│   │   ├── ultrafast/      # Page RIÊNG feature (mirror module 03)
+│   │   │   ├── product-detail.page.ts   # cycle selector, Mua ngay
+│   │   │   └── checkout-ultrafast.page.ts  # Phone, PTTT, submit
+│   │   └── internet/       # Internet checkout (register, payment, product)
 │   ├── fixtures/           # Hạ tầng dùng chung (KHÔNG chia theo module)
 │   │   ├── base.fixture.ts    # Page fixtures (loginPage, dashboardPage)
 │   │   └── auth.fixture.ts    # Auth helper
@@ -123,8 +124,10 @@ automation-framework/
 │       ├── common/         # smoke/login dùng chung
 │       │   ├── login.spec.ts
 │       │   └── dashboard.spec.ts
-│       └── ultrafast/
-│           └── ultrafast-checkout.spec.ts  (19/20 TCs stable)
+│       ├── ultrafast/
+│       │   └── ultrafast-checkout.spec.ts  (19/20 TCs stable)
+│       └── internet/
+│           └── internet-checkout.spec.ts
 └── test-data/
     └── common/users.json
 ```
@@ -134,6 +137,7 @@ automation-framework/
 | Module 02/03 (`chucnang_*`) | Slug automation |
 |---|---|
 | chucnang_checkout (dịch vụ UltraFast) | `ultrafast` |
+| chucnang_checkout (dịch vụ Internet) | `internet` |
 | chucnang_Voucher | `voucher` |
 | chucnang_QLnoidunggoiban | `goiban` |
 | chucnang_QLdactinh | `dactinh` |
@@ -162,7 +166,7 @@ automation-framework/
 - `chucnang_QLdactinh` — Quản lý Đặc tính
 - `chucnang_manhinhchitietthietbi` — Chi tiết Thiết bị
 - `chucnang_Voucher` — Voucher/EVC Checkout (has `test_data_catalog.md`)
-- `chucnang_checkout` — Luồng checkout của nhiều dịch vụ (hiện có: đăng ký UltraFast — automation 19/20 PASS)
+- `chucnang_checkout` — Luồng checkout đa dịch vụ: UltraFast (automation 19/20 PASS) + CKCOMMON + Internet + **Camera + AP** (phân tích 2026-06-03, TC chưa tạo)
 
 **TC files hiện có (cấu trúc mới — mirror 02 theo module):**
 - `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx` — Checkout UltraFast (tách từ TC_v1.0 cũ)
@@ -181,11 +185,18 @@ automation-framework/
 Tất cả scripts dùng `openpyxl` (không cần install thêm). Chạy từ root hoặc `ecom-pdh/`:
 
 ```powershell
-python gen_tc_voucher_api_v2.py      # Sinh TC API Voucher từ ECP_API_Documentation_v4
+# Gen TC (root)
+python gen_tc_checkout.py            # Sinh TC Web Checkout (common + Internet)
+python gen_tc_checkout_camera.py     # Sinh TC Web Checkout Camera
 python gen_tc_ultrafast.py           # Sinh TC Web UltraFast
+python gen_tc_voucher_api_v2.py      # Sinh TC API Voucher từ ECP_API_Documentation_v4
 python gen_tc_voucher_api_v12.py     # Sinh TC API Voucher v1.2
 python ecom-pdh/build_tc_v2.py       # TC Gói bán
 python ecom-pdh/build_tc_dactinh_v11.py  # TC Đặc tính
+
+# Sync kết quả test (root) — đọc Playwright JSON report → điền Pass/Fail vào TC Excel
+python sync_tc_checkout.py           # Sync kết quả module checkout
+python sync_tc_results.py            # Sync kết quả chung
 ```
 
 ---
@@ -264,4 +275,12 @@ Chi tiết trong `.claude/rules/`. Key points:
 - **Vùng rủi ro cao:** CKCOMMON Luồng thanh toán (Score 25); CKCOMMON Phường/Xã + kiểm tra chính sách giá (20); INTERNET B2 trả trước/sau + giá động (20); DANGKYUF Online 3rd party (20); Popup Địa chỉ hành chính cũ (16); Block PTTT (15)
 - **Clarifications:** 8/9 resolved 2026-06-01 (Số nhà max 50; SĐT lỗi = "Số điện thoại không hợp lệ"; Internet không Email; Chung cư deferred; trả trước/sau theo QLCS; session/countdown mọi DV; pre-fill điền toàn bộ +SC-076). Còn **1 pending: CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!")
 - **UltraFast:** giữ nguyên SC-DANGKYUF-001..024 (TC + automation 19/20 đã chạy). Defect BUG-DANGKYUF-001 (COD hiển thị staging) vẫn Open.
+- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
+
+### 2026-06-03 — Checkout: thêm Camera + AP (bản revise `Chucnangcheckout_0306.xlsx`)
+- **Tài liệu:** DOC-CK-04 `Chucnangcheckout_0306.xlsx` (revise của DOC-CK-01, thêm sheet "Đăng ký AP"; sheet "Đăng ký camera" revise thêm địa chỉ lắp đặt) + DOC-CK-03 mockup `camera.png`. Rule common / UltraFast / Internet **không đổi**.
+- **Phạm vi thêm:** **CAMERA** (20 SC) + **AP** (18 SC). Tổng module checkout: **154 SC định nghĩa** — active 146 (P1:70 P2:61 P3:15), 5 deferred (Chung cư), 3 blocked (voucher).
+- **Đặc thù:** Camera có chu kỳ + COD + địa chỉ lắp đặt + note giao hàng 3-7 ngày + "Thời gian lắp đặt", màn 2 bước; AP chỉ số lượng (không chu kỳ), còn lại như Camera. Field validation **tái dùng CKCOMMON** → khi gen TC chỉ viết phần đặc thù (giống `gen-testcase-checkout-service`).
+- **Vùng rủi ro cao:** CAMERA/AP — Địa chỉ lắp đặt + chính sách giá (20) và B3 Luồng thanh toán COD/Online 3rd party (20).
+- **Clarifications mới:** 3 Pending — CLA-CAMERA-001 ("Thời gian lắp đặt" set ở đâu), CLA-AP-001 (AP không chu kỳ), CLA-AP-002 (note giao hàng/Thời gian lắp đặt AP). Resolved-by-mockup: Block TTCN = Họ tên + SĐT.
 - **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`

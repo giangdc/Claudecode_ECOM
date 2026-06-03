@@ -1,7 +1,8 @@
 # Requirement Traceability Matrix — Module CHECKOUT (đa dịch vụ)
 
-> Phạm vi: UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET).
-> Camera / Smart Home / Smart Tivi: chưa phân tích (chờ đủ tài liệu).
+> Phạm vi: UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET) + Camera (CAMERA) + Access Point (AP).
+> Smart Home / Smart Tivi: chưa phân tích (chờ đủ tài liệu).
+> Cập nhật 2026-06-03: phân tích bản revise `Chucnangcheckout_0306.xlsx` (DOC-CK-04) → thêm CAMERA + AP. Field validation tái dùng CKCOMMON.
 
 ## Tài liệu nguồn
 
@@ -10,7 +11,10 @@
 | DOC-CK-01 | `00_input/chucnang_checkout/Chucnangcheckout.xlsx` — sheets: Rule common, Đăng ký UltraFast, Đăng ký camera, Đăng ký internet | Functional Spec | v hiện tại (merge từ "dang ky dich ultraFast.xlsx" đã xóa) | 2026-06-01 |
 | DOC-CK-02 | `00_input/chucnang_checkout/TC_checkout.xlsx` — sheets: Thông tin chung (TC_01), Checkout Smart Home (TC_05), Checkout Camera (TC_07) | TC tham chiếu (BA/QC) | — | 2026-06-01 |
 | DOC-CK-03 | `00_input/chucnang_checkout/camera.png` | Mockup UI (màn Checkout Camera) | — | 2026-06-01 |
+| DOC-CK-04 | `00_input/chucnang_checkout/Chucnangcheckout_0306.xlsx` — sheets: Rule common, Đăng ký UltraFast, Đăng ký internet, Đăng ký camera, **Đăng ký AP** | Functional Spec (revise của DOC-CK-01, 03/06) | rev 0306 | 2026-06-03 |
 | ~~DOC-UF-01/02~~ | ~~dang ky dich ultraFast.xlsx~~ | Functional Spec | — | **Merged → DOC-CK-01** (sheet Đăng ký UltraFast + Rule common); file gốc đã xóa |
+
+> **Diff DOC-CK-01 → DOC-CK-04 (bản 03/06):** Rule common / Đăng ký UltraFast / Đăng ký internet **không đổi** (Rule common chỉ đổi format STT `1`→`1.0`). Sheet **Đăng ký camera** revise lớn: thêm Block Địa chỉ lắp đặt (Tỉnh/Phường/Đường/Số nhà/Ghi chú), SĐT chuyển "refer common", bỏ checkbox hóa đơn, bỏ trừ voucher ở "Cần thanh toán". Thêm sheet mới **Đăng ký AP** (Access Point) — luồng giống Camera nhưng chỉ chọn số lượng (không chu kỳ). → Phân tích lần này chỉ thêm 2 sub-module **CAMERA + AP**; các sub-module cũ giữ nguyên.
 
 ---
 
@@ -62,6 +66,37 @@
 | REQ-INTERNET-003 | B2 — Thanh toán (trả trước/trả sau, giá động, PTTT, Quay lại) | DOC-CK-01 | Đăng ký internet R35-41 | Integration | SC-INTERNET-008→013 | **High** |
 | REQ-INTERNET-004 | B3 — Hoàn tất (COD / Online thành công / thất bại) | DOC-CK-01 | Đăng ký internet R43-45 | Functional | SC-INTERNET-014,015,016 | Medium |
 
+### CAMERA — Đăng ký Camera (có chu kỳ + COD + Địa chỉ lắp đặt, màn 2 bước)
+
+> Field validation (Họ tên, SĐT, địa chỉ, popup, PTTT) **tái dùng CKCOMMON** — cột Scenarios chỉ ghi SC đặc thù Camera.
+
+| Req ID | Mô tả | DOC Source | Nguồn | Loại | Scenarios | Mức rủi ro |
+|---|---|---|---|---|---|---|
+| REQ-CAMERA-001 | B1 — Chọn chu kỳ + số lượng → điều hướng Checkout, load đúng tiền | DOC-CK-04 | Đăng ký camera R29-30 | Functional | SC-CAMERA-001,002 | Low |
+| REQ-CAMERA-002 | Block Sản phẩm dịch vụ đã chọn + header 2 bước | DOC-CK-04, DOC-CK-03 | Đăng ký camera R31-32; mockup | Functional | SC-CAMERA-003 | Low |
+| REQ-CAMERA-003 | Block Thông tin cá nhân (Họ tên + SĐT) | DOC-CK-04, DOC-CK-03 | Đăng ký camera R33-35; Rule common R2,R3 | Business Rule | SC-CAMERA-004,005 (refer CKCOMMON C4/C5) | Low |
+| REQ-CAMERA-004 | Block Địa chỉ lắp đặt (refer common + radio Nhà riêng/Chung cư + note giao hàng 3-7 ngày + popup ĐCHC cũ) | DOC-CK-04, DOC-CK-03 | Đăng ký camera R36-41; Rule common R4-8,R14 | Integration | SC-CAMERA-006,007,008, ~~020~~ | **High** |
+| REQ-CAMERA-005 | Block Phương thức thanh toán (COD "Thanh toán tại nhà" + online theo QLCS, CTKM) | DOC-CK-04, DOC-CK-03 | Đăng ký camera R42; Rule common R13 | Business Rule | SC-CAMERA-009 (refer CKCOMMON C15) | Medium |
+| REQ-CAMERA-006 | Block Thông tin khách hàng (auto-load + "Thời gian lắp đặt") | DOC-CK-04, DOC-CK-03 | Đăng ký camera R43; mockup | Functional | SC-CAMERA-010 | Low |
+| REQ-CAMERA-007 | Block Thông tin thanh toán (itemized) + Mã ưu đãi + Cần thanh toán | DOC-CK-04, DOC-CK-03 | Đăng ký camera R44-45; mockup | Functional | SC-CAMERA-011, ~~019~~ | Medium |
+| REQ-CAMERA-008 | Button Thanh toán — validate trường bắt buộc + chính sách active QLCS | DOC-CK-04 | Đăng ký camera R46 | Functional | SC-CAMERA-012,013,014 | Medium |
+| REQ-CAMERA-009 | Navigation (điều khoản, Quay lại) | DOC-CK-04 | Đăng ký camera R47-48 | UI | SC-CAMERA-015 | Low |
+| REQ-CAMERA-010 | B3 — Hoàn tất (COD / Online thành công / thất bại) | DOC-CK-04 | Đăng ký camera R50-52 | Integration | SC-CAMERA-016,017,018 | **High** |
+
+### AP — Đăng ký Access Point (chỉ số lượng — không chu kỳ; còn lại giống Camera)
+
+| Req ID | Mô tả | DOC Source | Nguồn | Loại | Scenarios | Mức rủi ro |
+|---|---|---|---|---|---|---|
+| REQ-AP-001 | B1 — Chọn số lượng (không chu kỳ) → Checkout + Block Sản phẩm + header 2 bước | DOC-CK-04 | Đăng ký AP R29-32 | Functional | SC-AP-001,002 | Low |
+| REQ-AP-002 | Block Thông tin cá nhân (Họ tên + SĐT) | DOC-CK-04 | Đăng ký AP R33-35; Rule common R2,R3 | Business Rule | SC-AP-003,004 (refer CKCOMMON C4/C5) | Low |
+| REQ-AP-003 | Block Địa chỉ lắp đặt (refer common + popup ĐCHC cũ) | DOC-CK-04 | Đăng ký AP R36-41; Rule common R4-8,R14 | Integration | SC-AP-005,006,007 | **High** |
+| REQ-AP-004 | Block Phương thức thanh toán (COD + online theo QLCS) | DOC-CK-04 | Đăng ký AP R42; Rule common R13 | Business Rule | SC-AP-008 (refer CKCOMMON C15) | Medium |
+| REQ-AP-005 | Block Thông tin khách hàng (auto-load) | DOC-CK-04 | Đăng ký AP R43 | Functional | SC-AP-009 | Low |
+| REQ-AP-006 | Block Thông tin thanh toán + Cần thanh toán + Mã ưu đãi | DOC-CK-04 | Đăng ký AP R44-45 | Functional | SC-AP-010, ~~018~~ | Medium |
+| REQ-AP-007 | Button Thanh toán — validate + chính sách active QLCS | DOC-CK-04 | Đăng ký AP R46 | Functional | SC-AP-011,012,013 | Medium |
+| REQ-AP-008 | Navigation (điều khoản, Quay lại) | DOC-CK-04 | Đăng ký AP R47-48 | UI | SC-AP-014 | Low |
+| REQ-AP-009 | B3 — Hoàn tất (COD / Online thành công / thất bại) | DOC-CK-04 | Đăng ký AP R50-52 | Integration | SC-AP-015,016,017 | **High** |
+
 ---
 
 ## Clarifications Needed
@@ -77,8 +112,18 @@
 | CLA-CKCOMMON-007 | REQ-CKCOMMON-008 | Thông tin chung R93 | Nội dung đầy đủ popup "Chưa hỗ trợ chính sách!" | **BA bổ sung sau** | ⏳ Pending | SC-CKCOMMON-031 (nội dung popup TBD) |
 | CLA-INTERNET-001 | REQ-INTERNET-003 | Đăng ký internet R35-36 | Phân biệt trả trước/trả sau xác định thế nào? | **Theo tool QLCS quy định (không phải user chọn); trả sau thường 1 tháng** | ✅ Resolved | SC-INTERNET-008,009 |
 | CLA-INTERNET-002 | REQ-CKCOMMON-017 | Thông tin chung R153-154 | Session 20p + countdown ~15p áp dụng Internet? | **Áp dụng tất cả dịch vụ** | ✅ Resolved | SC-CKCOMMON-066,067 (mọi DV) |
+| CLA-CAMERA-001 | REQ-CAMERA-006 | mockup camera.png (Block TTKH có "Thời gian lắp đặt") | "Thời gian lắp đặt" (vd Thứ 2, 02/01/2024 10:00-11:10) được set ở đâu/khi nào? Sheet không mô tả | — | ⏳ 
+=> Load từ hệ thống khác
+**Pending** (BA) | SC-CAMERA-010 (verify nguồn data) |
+| CLA-CAMERA-002 | REQ-CAMERA-004 | mockup camera.png (radio Nhà riêng/Chung cư) | Camera/AP có defer Chung cư như CKCOMMON không? | **Có — defer chung mọi DV** (theo CLA-CKCOMMON-006) | ✅ Resolved (ref) | SC-CAMERA-020 🚫 Deferred |
+| CLA-CAMERA-003 | REQ-CAMERA-003 | Đăng ký camera R34-35 (sheet ghi 2 textbox đều "Số điện thoại") | Block Thông tin cá nhân gồm trường gì? | **Họ tên + Số điện thoại** (mockup camera.png xác nhận; sheet lỗi gõ) | ✅ Resolved (mockup) | SC-CAMERA-004 |
+| CLA-AP-001 | REQ-AP-001 | Đăng ký AP R29 ("Chọn Chọn số lượng") | AP chỉ có số lượng, KHÔNG có chu kỳ — xác nhận đúng? | — | ⏳ **Pending** (BA, low) | SC-AP-001,002 |
+=> Không có chu kỳ
+| CLA-AP-002 | REQ-AP-003 | Đăng ký AP (không có mockup) | AP có note giao hàng 3-7 ngày + "Thời gian lắp đặt" như Camera không? | — | ⏳ **Pending** (BA) | SC-AP-005,009 |
+chỉ camera có thời gia lắp đặt
+| CLA-CAMAP-001 | REQ-CAMERA-007, REQ-AP-006 | mockup + sheet ("Nhập mã khuyến mãi"/"Chọn ưu đãi") | Mã ưu đãi/voucher cho Camera/AP đã implement chưa? | **Chưa implement** (như UltraFast — SC-DANGKYUF-015) | ✅ Resolved (ref) | SC-CAMERA-019, SC-AP-018 🚫 Blocked |
 
-> Còn Pending: **CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!" — BA bổ sung sau).
+> Còn Pending: **CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!"), **CLA-CAMERA-001** ("Thời gian lắp đặt" Camera), **CLA-AP-001** (AP không chu kỳ), **CLA-AP-002** (note giao hàng/Thời gian lắp đặt AP) — BA bổ sung sau.
 ---
 
 ## Clarifications đã resolve (kế thừa UltraFast — bản 2026-05-28/30)

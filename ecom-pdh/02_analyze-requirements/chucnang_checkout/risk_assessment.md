@@ -8,7 +8,8 @@
 | Medium | 8–14 |
 | Low | ≤ 7 |
 
-> Phạm vi: UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET).
+> Phạm vi: UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET) + Camera (CAMERA) + Access Point (AP).
+> Cập nhật 2026-06-03: thêm CAMERA + AP (DOC-CK-04). Field validation tái dùng CKCOMMON nên rủi ro tập trung ở Địa chỉ lắp đặt + Luồng thanh toán (COD/Online 3rd party).
 
 ---
 
@@ -60,6 +61,39 @@
 | B2 — Thanh toán (trả trước/sau, giá động) (REQ-INTERNET-003) | 5 | 4 | **20** | Rủi ro cao: phân biệt trả trước/sau (⚠️ CLA), giá động theo địa chỉ, PTTT có COD |
 | B3 — Hoàn tất (REQ-INTERNET-004) | 4 | 2 | **8** | COD / Online thành công / thất bại (giữ data) |
 
+### CAMERA — Đăng ký Camera
+
+> Field validation tái dùng CKCOMMON → rủi ro field-level đã cover ở CKCOMMON. Dưới đây là rủi ro đặc thù dịch vụ Camera.
+
+| Module/Feature | Business Impact | Complexity | Risk Score | Đề xuất |
+|---|---|---|---|---|
+| B1 — Chọn chu kỳ + số lượng → Checkout (REQ-CAMERA-001) | 3 | 2 | **6** | Verify redirect + load đúng chu kỳ/SL/tiền |
+| Block Sản phẩm + header 2 bước (REQ-CAMERA-002) | 3 | 1 | **3** | Verify display |
+| Block Thông tin cá nhân (REQ-CAMERA-003) | 3 | 2 | **6** | Refer CKCOMMON C4/C5 |
+| Block Địa chỉ lắp đặt + popup + chính sách giá (REQ-CAMERA-004) | 5 | 4 | **20** | Rủi ro cao: refer CKCOMMON C8/C13; radio Nhà riêng/Chung cư (Chung cư deferred); note giao hàng |
+| Block PTTT COD + Online theo QLCS (REQ-CAMERA-005) | 4 | 3 | **12** | Dynamic QLCS, COD "Thanh toán tại nhà" + CTKM, refer CKCOMMON C15 |
+| Block TTKH + "Thời gian lắp đặt" (REQ-CAMERA-006) | 3 | 2 | **6** | Verify auto-load; nguồn "Thời gian lắp đặt" chờ CLA-CAMERA-001 |
+| Block TTTT + Mã ưu đãi (REQ-CAMERA-007) | 4 | 3 | **12** | Itemized + Cần thanh toán; voucher blocked |
+| Button Thanh toán — validate + policy (REQ-CAMERA-008) | 4 | 3 | **12** | required + policy active + happy path |
+| B3 — Hoàn tất (COD/Online success/fail, 3rd party) (REQ-CAMERA-010) | 5 | 4 | **20** | Rủi ro cao: tích hợp 3rd party, giữ data khi fail |
+| Navigation (REQ-CAMERA-009) | 2 | 1 | **2** | Smoke nhanh |
+
+### AP — Đăng ký Access Point
+
+> Giống Camera, trừ B1 chỉ số lượng (không chu kỳ) → complexity B1 thấp hơn.
+
+| Module/Feature | Business Impact | Complexity | Risk Score | Đề xuất |
+|---|---|---|---|---|
+| B1 — Chọn số lượng → Checkout (REQ-AP-001) | 3 | 1 | **3** | Verify redirect + load SL/tiền (không chu kỳ) |
+| Block Thông tin cá nhân (REQ-AP-002) | 3 | 2 | **6** | Refer CKCOMMON C4/C5 |
+| Block Địa chỉ lắp đặt + popup + chính sách giá (REQ-AP-003) | 5 | 4 | **20** | Rủi ro cao: refer CKCOMMON C8/C13 |
+| Block PTTT COD + Online theo QLCS (REQ-AP-004) | 4 | 3 | **12** | Dynamic QLCS, refer CKCOMMON C15 |
+| Block TTKH (REQ-AP-005) | 2 | 2 | **4** | Verify auto-load |
+| Block TTTT + Cần thanh toán + Mã ưu đãi (REQ-AP-006) | 4 | 3 | **12** | Tổng tiền; voucher blocked |
+| Button Thanh toán — validate + policy (REQ-AP-007) | 4 | 3 | **12** | required + policy active + happy path |
+| B3 — Hoàn tất (COD/Online success/fail, 3rd party) (REQ-AP-009) | 5 | 4 | **20** | Rủi ro cao: tích hợp 3rd party, giữ data khi fail |
+| Navigation (REQ-AP-008) | 2 | 1 | **2** | Smoke nhanh |
+
 ---
 
 ## Vùng rủi ro cao (Score ≥ 15)
@@ -85,6 +119,10 @@
 
 7. **DANGKYUF — Block PTTT Online only (Score 15)** — REQ-DANGKYUF-004 (UltraFast tuyệt đối không COD).
 
+8. **CAMERA — Block Địa chỉ lắp đặt + chính sách giá (Score 20)** & **B3 Luồng thanh toán COD/Online 3rd party (Score 20)** — REQ-CAMERA-004, REQ-CAMERA-010 (tái dùng cơ chế CKCOMMON C8/C13/C17).
+
+9. **AP — Block Địa chỉ lắp đặt + chính sách giá (Score 20)** & **B3 Luồng thanh toán COD/Online 3rd party (Score 20)** — REQ-AP-003, REQ-AP-009.
+
 ---
 
 ## Dependencies
@@ -97,6 +135,9 @@
 | INTERNET B2 giá động (INTERNET-003) | Data QLCS theo từng địa chỉ; phân loại trả trước/sau ⚠️CLA-INTERNET-001 | Không xác định được nhánh giá đúng |
 | Popup Địa chỉ hành chính cũ (CKCOMMON-013) | Data ĐCHC 3 cấp + bảng convert 3→2 cấp | Không test được đẩy địa chỉ mới vào form |
 | Màn Hoàn tất — đối soát (CKCOMMON-018) | Quyền truy cập webadmin + inside | Không verify được đơn hàng/HĐ |
+| CAMERA / AP toàn bộ field + popup + PTTT | TC CKCOMMON (C4-C18) đã pass | Nếu CKCOMMON đổi → Camera/AP ảnh hưởng theo (chỉ test phần đặc thù) |
+| CAMERA/AP — Mã ưu đãi (CAMERA-007 / AP-006) | Module voucher implement | SC-CAMERA-019, SC-AP-018 Blocked đến khi voucher xong |
+| CAMERA — "Thời gian lắp đặt" (CAMERA-006) | Nguồn data lịch lắp đặt (CLA-CAMERA-001) | Không verify được giá trị field |
 
 ---
 
@@ -121,5 +162,7 @@
 
 - **PTTT Momo/VietQR/Zalopay:** cần app mobile để test; ATM/Visa test trực tiếp web (theo ghi chú Rule common).
 - **UltraFast vs Internet — khác biệt cốt lõi:** UF online-only (không COD), chỉ SĐT (+Email), 1 bước; Internet đầy đủ COD+Online, có địa chỉ lắp đặt, 3 bước, trả trước/trả sau.
+- **CAMERA / AP — khác biệt:** đều có COD + Online, có Địa chỉ lắp đặt, màn **2 bước** (Thanh toán → Hoàn tất). Camera có **chu kỳ** (vd Cloud 6 tháng) + note giao hàng 3-7 ngày + "Thời gian lắp đặt"; AP **chỉ số lượng**, không chu kỳ. Field-level validation tái dùng CKCOMMON → khi viết TC chỉ cần phần đặc thù (chọn gói + COD/Online + hoàn tất), tham chiếu CKCOMMON cho phần còn lại (giống chiến lược `gen-testcase-checkout-service`).
+- **Camera/AP Chung cư:** mockup Camera có radio Nhà riêng/Chung cư nhưng Chung cư **deferred** (CLA-CKCOMMON-006) — áp dụng chung mọi DV.
 - **Clarifications (2026-06-01):** 8/9 đã resolve — Số nhà max **50**; SĐT lỗi định dạng = **"Số điện thoại không hợp lệ"**; Internet **không** có Email; **Chung cư deferred**; trả trước/sau **do QLCS quy định**; session 20p + countdown ~15p **áp dụng mọi DV**; pre-fill địa chỉ **điền toàn bộ** (+ SC-CKCOMMON-076). Còn **Pending: CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!" — BA bổ sung sau) → SC-CKCOMMON-031 chờ nội dung text.
 - **DEFECT-DANGKYUF-001** (COD hiển thị trong UltraFast trên staging) vẫn Open — chờ Dev fix.
