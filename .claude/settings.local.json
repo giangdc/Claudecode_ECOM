@@ -20,7 +20,16 @@
       "Bash(PYTHONIOENCODING=utf-8 grep -n -iE \"03_test|\\\\.xlsx|output|input|file \\(cũ|name|excel\\)|đọc|ghi\" update-testcase.md)",
       "Bash(PYTHONIOENCODING=utf-8 grep -n -iE \"03_test|\\\\.xlsx|output|sheet mới|file|đặt|thêm vào\" gen-testcase-checkout-service.md)",
       "Bash(PYTHONIOENCODING=utf-8 grep -n -iE \"03_test|input|file excel|output|_results|tìm file|đường dẫn\" sync-tc-results.md)",
-      "Bash(PYTHONIOENCODING=utf-8 grep -rn --include=*.ts --include=*.json --include=*.md \"AI_ISC_ecom-pdh_v1.1_TC_v1.0\" automation-framework/)"
+      "Bash(PYTHONIOENCODING=utf-8 grep -rn --include=*.ts --include=*.json --include=*.md \"AI_ISC_ecom-pdh_v1.1_TC_v1.0\" automation-framework/)",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(PYTHONUTF8=1 python -c ' *)",
+      "Bash(ls _tmp_camera_ap.md)",
+      "Bash(PYTHONUTF8=1 PYTHONIOENCODING=utf-8 python gen_tc_camera_ap.py)",
+      "Bash(git rev-list *)",
+      "Bash(cat .gitignore)",
+      "Bash(cat ecom-pdh/05_automation/.gitignore)",
+      "Bash(git check-ignore *)",
+      "Bash(grep -vE '^\\(node_modules|\\\\.|\\\\.\\\\.\\)$')"
     ]
   },
   "enabledMcpjsonServers": [

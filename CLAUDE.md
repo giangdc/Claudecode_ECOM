@@ -8,7 +8,7 @@ This is a **QA Manual Testing workspace** for FPT Telecom's ecom platform (ISC/E
 - AI-driven skills (custom slash commands) for the full QA pipeline
 - Templates and rules for generating standardized test case Excel files
 - Project `ecom-pdh/` — the active QA project (v1.1, Sprint 2)
-- `automation-framework/` — Playwright TypeScript E2E framework (sibling to `ecom-pdh/`)
+- `ecom-pdh/05_automation/` — Playwright TypeScript E2E framework (lives inside the project, was moved from a root-level `automation-framework/` in 2026-06)
 
 The full skill reference is in `.claude/CLAUDE.md`. This root file covers architecture, conventions, and tooling.
 
@@ -33,13 +33,13 @@ BA drops URD/spec → ecom-pdh/00_input/
         ↓
 ── Automation lane (Web UI only) ──────────────────────────────────
 [one-time] /generate_automation_framework
-→ automation-framework/   (outside ecom-pdh/, sibling folder)
+→ ecom-pdh/05_automation/   (inside the ecom-pdh project)
 
 /generate_automation_from_testcases
   Input : 03_test-cases/*.xlsx  (chỉ các TC có cột Auto? = Y)
   Input : URL ứng dụng (phải accessible — không sau VPN)
-→ automation-framework/src/pages/*.ts   (Page Object classes)
-→ automation-framework/src/tests/*.spec.ts  (Test scripts)
+→ ecom-pdh/05_automation/src/pages/*.ts   (Page Object classes)
+→ ecom-pdh/05_automation/src/tests/*.spec.ts  (Test scripts)
 
 /sync-tc-results                        (sau khi chạy test)
   Input : test-results/report.json      (Playwright --reporter=json)
@@ -56,7 +56,7 @@ BA drops URD/spec → ecom-pdh/00_input/
 - Mỗi module = 1 file TC riêng (không gộp nhiều module vào 1 file); 1 module nhiều nhóm chức năng → nhiều sheet trong cùng file.
 
 **Key rule — automation lane:**
-1. `generate_automation_framework` chỉ chạy **một lần** khi chưa có `automation-framework/`.
+1. `generate_automation_framework` chỉ chạy **một lần** khi chưa có `ecom-pdh/05_automation/`.
 2. `generate_automation_from_testcases` chỉ đọc TC có `Auto? = Y` trong cột H của Excel.
 3. App URL phải accessible trực tiếp (không qua VPN). Nếu không → agent block tại Bước 2 (MCP DOM Recon).
 
@@ -64,7 +64,7 @@ BA drops URD/spec → ecom-pdh/00_input/
 
 ## Automation framework commands
 
-Tất cả lệnh chạy từ thư mục `automation-framework/`:
+Tất cả lệnh chạy từ thư mục `ecom-pdh/05_automation/`:
 
 ```powershell
 # Setup (lần đầu)
@@ -93,7 +93,7 @@ npm run test:report            # Playwright HTML report
 npm run allure:generate && npm run allure:open
 ```
 
-**Env vars** (`automation-framework/.env`): `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `VIEWER_EMAIL`, `VIEWER_PASSWORD`.
+**Env vars** (`ecom-pdh/05_automation/.env`): `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `VIEWER_EMAIL`, `VIEWER_PASSWORD`.
 
 ---
 
@@ -102,7 +102,7 @@ npm run allure:generate && npm run allure:open
 **Tổ chức domain-driven:** `pages/` và `tests/` chia 1 folder / module (mirror 1:1 với `03_test-cases/functional/<module>/`), cộng lớp `common/` cho thành phần dùng chung. `fixtures/` + `utils/` là hạ tầng dùng chung. **Cấm import chéo giữa 2 module** — chỉ import từ `common/` hoặc trong cùng folder module.
 
 ```
-automation-framework/
+ecom-pdh/05_automation/
 ├── src/
 │   ├── pages/              # Page Object classes — extends BasePage
 │   │   ├── common/         # Page DÙNG CHUNG mọi feature
@@ -160,6 +160,7 @@ automation-framework/
 | `ecom-pdh/03_test-cases/api/<module>/` | API TC Excel (1 thư mục / module, mirror 02) |
 | `ecom-pdh/03_test-cases/_results/` | File `*_results_*.xlsx` từ sync-tc-results |
 | `ecom-pdh/04_test-data/` | Test data assets |
+| `ecom-pdh/05_automation/` | Playwright TS automation framework (moved here from root-level `automation-framework/`) |
 
 **Modules đã analyze:**
 - `chucnang_QLnoidunggoiban` — Quản lý Nội dung Gói bán
