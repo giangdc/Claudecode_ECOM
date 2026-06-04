@@ -60,6 +60,11 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
     ├── 04_test-data/                   ← Dữ liệu test
     │   ├── valid/
     │   └── invalid/
+    ├── 05_automation/                  ← Playwright TS framework (NẰM TRONG project)
+    │   ├── src/pages/<module>/         ← Page Objects (mirror 03_test-cases/functional)
+    │   ├── src/tests/<module>/         ← Test scripts *.spec.ts
+    │   ├── src/fixtures/ + src/utils/  ← Hạ tầng dùng chung
+    │   └── test-data/
     └── CLAUDE.md                       ← Context riêng của project
 ```
 
@@ -86,7 +91,7 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
 |-------|-------------|
 | `framework_architect` | Thiết kế kiến trúc automation framework |
 | `qa_automation_engineer` | Viết automation test code |
-| `generate_automation_framework` | **[Một lần]** Scaffold automation framework (Playwright TS mặc định) vào `automation-framework/` |
+| `generate_automation_framework` | **[Một lần]** Scaffold automation framework (Playwright TS mặc định) vào `<project>/05_automation/` |
 | `generate_automation_from_testcases` | Convert TC Excel Web (cột `Auto?=Y`) thành Page Objects + Test scripts |
 | `generate_locator` | Sinh locator ổn định cho 1 element cụ thể (dùng khi locator bị break) |
 | `generate_data_verify` | Sinh script verify data live web vs Excel data file — nhiều dịch vụ cùng layout, thêm gói chỉ cần thêm dòng Excel |
@@ -125,20 +130,20 @@ update-testcase  (khi có URD mới)
         │
         ▼  ── Automation lane (Web UI) ──────────────────────────
         │  [một lần] generate_automation_framework
-        │  → automation-framework/  (ngang hàng với <project>/, ngoài project folder)
+        │  → <project>/05_automation/  (NẰM TRONG project folder)
         │
         ▼
 generate_automation_from_testcases
   └─ Input: 03_test-cases/*.xlsx  (chỉ TC có cột H "Auto?" = Y)
   └─ Input: URL ứng dụng (phải accessible, không sau VPN)
-  → automation-framework/src/pages/*.ts    (Page Object classes)
-  → automation-framework/src/tests/*.spec.ts  (Test scripts, đã chạy PASS)
+  → 05_automation/src/pages/<module>/*.ts    (Page Object classes)
+  → 05_automation/src/tests/<module>/*.spec.ts  (Test scripts, đã chạy PASS)
 
 generate_data_verify   (nhiều dịch vụ cùng layout, khác data)
   └─ Input: test-data/service_data.xlsx    (mỗi gói/dịch vụ = 1 dòng)
   └─ Input: Base URL
-  → automation-framework/src/utils/service-data-reader.ts
-  → automation-framework/src/tests/service-data-verify.spec.ts
+  → 05_automation/src/utils/service-data-reader.ts
+  → 05_automation/src/tests/service-data-verify.spec.ts
   [thêm gói mới: chỉ thêm dòng vào Excel, không chạy lại skill]
         │
         ▼ (sau khi chạy npx playwright test --reporter=json)
@@ -149,7 +154,7 @@ sync-tc-results
 ```
 
 **Prerequisite automation lane:**
-- `automation-framework/` chưa tồn tại → chạy `generate_automation_framework` trước
+- `<project>/05_automation/` chưa tồn tại → chạy `generate_automation_framework` trước
 - App URL accessible trực tiếp từ máy (MCP browser tool cần inspect DOM thực tế)
 - TC Excel đã được đánh dấu cột H `Auto? = Y/N`
 
