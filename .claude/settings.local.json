@@ -29,7 +29,10 @@
       "Bash(cat .gitignore)",
       "Bash(cat ecom-pdh/05_automation/.gitignore)",
       "Bash(git check-ignore *)",
-      "Bash(grep -vE '^\\(node_modules|\\\\.|\\\\.\\\\.\\)$')"
+      "Bash(grep -vE '^\\(node_modules|\\\\.|\\\\.\\\\.\\)$')",
+      "PowerShell(Set-Content *)",
+      "PowerShell(& \\([System.Environment]::GetFolderPath\\(\"UserProfile\"\\) + \"\\\\.claude\\\\hooks\\\\fkit-reporter.ps1\"\\) --flush)",
+      "PowerShell(& \\([System.Environment]::GetFolderPath\\(\"UserProfile\"\\) + \"\\\\.claude\\\\hooks\\\\fkit-reporter.ps1\"\\) --flush; Write-Host \"---STATUS---\"; & \\([System.Environment]::GetFolderPath\\(\"UserProfile\"\\) + \"\\\\.claude\\\\hooks\\\\fkit-reporter.ps1\"\\) --status)"
     ]
   },
   "enabledMcpjsonServers": [

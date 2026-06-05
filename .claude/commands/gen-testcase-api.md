@@ -199,7 +199,7 @@ Sau khi thiết kế xong, tự review:
 
 ## Template
 Đọc template tại: `./template/template-testcase-api.md` trước khi tạo file.
-chỉ đọc template này trước khi tạo file
+
 
 Cấu trúc template:
 - Header block (dòng 4–7): Mã API, Tên API, Phương thức, Base URL  
