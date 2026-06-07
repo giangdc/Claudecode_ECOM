@@ -1,6 +1,7 @@
 # Test Scenario Map — Module CHECKOUT (đa dịch vụ)
 
-## Tổng quan: 154 scenarios — active 146 (P1:70 P2:61 P3:15); 5 deferred (Chung cư); 3 blocked (voucher)
+## Tổng quan: 155 scenarios — active 147 (P1:70 P2:62 P3:15); 5 deferred (Chung cư); 3 blocked (voucher)
+> Cập nhật 2026-06-06: phân tích DOC-CK-05 (`Mô tả luồng checkout tongdaiwifi 0606.xlsx`) → thêm **SC-AP-019** (label giao hàng 3-7 ngày cố định trong AP). Cập nhật SC-CKCOMMON-008 text "họ tên" (bỏ "và"); SC-CKCOMMON-044 bổ sung case convert thất bại. CLA-AP-002 Partially Resolved.
 > Cập nhật 2026-06-03: phân tích bản revise `Chucnangcheckout_0306.xlsx` → thêm 2 sub-module **CAMERA** (20 SC) + **AP** (18 SC). Field validation của Camera/AP **refer CKCOMMON** (không nhân bản). UltraFast/CKCOMMON/Internet không đổi (Rule common chỉ đổi format STT).
 > Cập nhật 2026-06-01: BA resolve 8/9 clarification → SC-CKCOMMON-037→040 (Chung cư) **Deferred**; thêm **SC-CKCOMMON-076** (pre-fill địa chỉ).
 > Phạm vi hiện tại: **UltraFast (DANGKYUF)** + **Màn checkout chung (CKCOMMON)** + **Internet (INTERNET)** + **Camera (CAMERA)** + **Access Point (AP)**.
@@ -124,7 +125,7 @@
 | Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
 |---|---|---|---|---|---|---|---|---|
 | SC-CKCOMMON-007 | Họ tên hợp lệ (kể cả khoảng trắng đầu/cuối → trim) → pass | REQ-CKCOMMON-004 | DOC-CK-01 (Rule common) R2; DOC-CK-02 R32 | Đang ở Checkout dịch vụ có trường Họ tên | User nhập Họ tên hợp lệ (chỉ chữ + khoảng trắng), có thể có khoảng trắng đầu/cuối | Chấp nhận, không lỗi; khi submit hệ thống trim khoảng trắng đầu/cuối | P1 | Functional |
-| SC-CKCOMMON-008 | Họ tên trống / chỉ khoảng trắng → required | REQ-CKCOMMON-004 | DOC-CK-01 (Rule common) R2; DOC-CK-02 R30-31 | Đang ở Checkout, trường Họ tên trống | User để trống hoặc nhập khoảng trắng rồi click ra ngoài | Border đỏ + thông báo "Vui lòng nhập họ và tên." | P1 | Negative |
+| SC-CKCOMMON-008 | Họ tên trống / chỉ khoảng trắng → required | REQ-CKCOMMON-004 | DOC-CK-01 (Rule common) R2; DOC-CK-02 R30-31; DOC-CK-05 | Đang ở Checkout, trường Họ tên trống | User để trống hoặc nhập khoảng trắng rồi click ra ngoài | Border đỏ + thông báo "Vui lòng nhập họ tên." | P1 | Negative |
 | SC-CKCOMMON-009 | Họ tên có số / ký tự đặc biệt → invalid | REQ-CKCOMMON-004 | DOC-CK-01 (Rule common) R2; DOC-CK-02 R33 | Đang ở Checkout | User nhập/paste Họ tên có số hoặc ký tự đặc biệt | Hiển thị "Họ tên không hợp lệ." (chỉ cho phép chữ + khoảng trắng) | P2 | Negative |
 | SC-CKCOMMON-010 | Họ tên > 100 ký tự → chỉ nhận 100 | REQ-CKCOMMON-004 | DOC-CK-01 (Rule common) R2; DOC-CK-02 R34 | Đang ở Checkout | User nhập/paste Họ tên > 100 ký tự | Chỉ cho nhập và hiển thị tối đa 100 ký tự | P2 | Boundary |
 | SC-CKCOMMON-011 | Icon X hiển thị & xóa data Họ tên | REQ-CKCOMMON-004 | DOC-CK-02 R28-29 | User đã nhập ký tự bất kỳ vào Họ tên | User quan sát icon X rồi click X | Icon X hiện khi có data; click X xóa toàn bộ và ẩn icon | P3 | UI |
@@ -208,7 +209,7 @@
 |---|---|---|---|---|---|---|---|---|
 | SC-CKCOMMON-042 | UI popup Địa chỉ hành chính cũ | REQ-CKCOMMON-013 | DOC-CK-01 (Rule common) R14; DOC-CK-02 R97 | Block Địa chỉ lắp đặt | User click link "Địa chỉ trước sáp nhập" | Popup hiển thị: Title "Địa chỉ hành chính cũ", label hướng dẫn, 4 dropdown (Tỉnh/TP, Quận/Huyện, Phường/Xã, Tên đường), icon X, btn Xác nhận | P2 | UI |
 | SC-CKCOMMON-043 | Load phân cấp + tìm kiếm (contains, không trim) | REQ-CKCOMMON-013 | DOC-CK-02 R98-114 | Popup đang mở | User chọn Tỉnh → Quận/Huyện → Phường/Xã → Tên đường, tìm kiếm từng cấp | 63 tỉnh ĐCHC 3 cấp; mỗi cấp load theo cấp trên; tìm kiếm contains, không trim | P2 | Functional |
-| SC-CKCOMMON-044 | Btn Xác nhận disable khi chưa đủ 4 cấp | REQ-CKCOMMON-013 | DOC-CK-02 R99,104,108,111 | Popup đang mở | User để trống bất kỳ cấp nào | Btn Xác nhận disable | P2 | Negative |
+| SC-CKCOMMON-044 | Btn Xác nhận disable khi chưa đủ 4 cấp **hoặc convert thất bại** | REQ-CKCOMMON-013 | DOC-CK-02 R99,104,108,111; **DOC-CK-05** | Popup đang mở | (a) User để trống bất kỳ cấp nào; (b) User chọn đủ 4 cấp nhưng hệ thống convert địa chỉ thất bại (3 cấp → 2 cấp không thành công) | Btn Xác nhận vẫn disable ở cả 2 trường hợp | P2 | Negative |
 | SC-CKCOMMON-045 | Chọn đủ → hiển thị Địa chỉ hành chính mới + enable Xác nhận | REQ-CKCOMMON-013 | DOC-CK-01 (Rule common) R14; DOC-CK-02 R115 | Popup đang mở | User chọn đủ Tỉnh + Quận/Huyện + Phường/Xã + Tên đường | Hiển thị field "Địa chỉ hành chính mới" (convert 3 cấp → 2 cấp); enable btn Xác nhận (disable nếu convert thất bại) | P1 | Functional |
 | SC-CKCOMMON-046 | Click icon X → không cập nhật, về form | REQ-CKCOMMON-013 | DOC-CK-02 R116 | Popup có dữ liệu đã chọn | User click icon X | Không cập nhật địa chỉ mới; đóng popup, về form đăng ký | P2 | Functional |
 | SC-CKCOMMON-047 | Click Xác nhận → đẩy địa chỉ 2 cấp vào form | REQ-CKCOMMON-013 | DOC-CK-01 (Rule common) R14; DOC-CK-02 R117-118 | Popup đã chọn đủ, btn Xác nhận enable | User click Xác nhận | Đẩy Tỉnh/TP, Phường/Xã, Tên đường (2 cấp) vào dropdown form; đóng popup | P1 | Functional |
@@ -450,7 +451,8 @@
 
 | Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
 |---|---|---|---|---|---|---|---|---|
-| SC-AP-014 | Link điều khoản + nút Quay lại | REQ-AP-008 | DOC-CK-04 (AP) R47-48 | Đang ở B2 | Click link "điều khoản" / nút "Quay lại" | Link điều khoản → màn điều khoản dịch vụ; "Quay lại" → về màn Chi tiết gói | P3 | UI |
+| SC-AP-014 | Link điều khoản + nút Quay lại | REQ-AP-008 | DOC-CK-04 (AP) R47-48; DOC-CK-05 | Đang ở B2 | Click link "điều khoản" / nút "Quay lại" | Link điều khoản → màn điều khoản dịch vụ; "Quay lại" → về màn Chi tiết gói | P3 | UI |
+| SC-AP-019 | Label "Thời gian giao hàng dự kiến từ 3 đến 7 ngày" hiển thị cố định | REQ-AP-003 | **DOC-CK-05** (Đăng ký AP — Block Địa chỉ lắp đặt) | Đang ở màn Thanh toán AP (B2), Block Địa chỉ lắp đặt đang hiển thị | User quan sát Block Địa chỉ lắp đặt | Label **cố định** "Thời gian giao hàng dự kiến từ 3 đến 7 ngày." hiển thị trong Block Địa chỉ lắp đặt; text không thay đổi theo điều kiện nào | P2 | Functional |
 
 ### Feature AP9: B3 — Hoàn tất đơn hàng
 

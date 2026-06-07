@@ -2,6 +2,7 @@
 
 > Phạm vi: UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET) + Camera (CAMERA) + Access Point (AP).
 > Smart Home / Smart Tivi: chưa phân tích (chờ đủ tài liệu).
+> Cập nhật 2026-06-06: phân tích `Mô tả luồng checkout tongdaiwifi 0606.xlsx` (DOC-CK-05) → (1) confirm format validation Họ tên trong Rule common; (2) làm rõ popup ĐCHC cũ (case convert thất bại); (3) xác nhận label "Thời gian giao hàng 3-7 ngày" cố định trong AP → thêm SC-AP-019; resolve CLA-AP-002.
 > Cập nhật 2026-06-03: phân tích bản revise `Chucnangcheckout_0306.xlsx` (DOC-CK-04) → thêm CAMERA + AP. Field validation tái dùng CKCOMMON.
 
 ## Tài liệu nguồn
@@ -12,6 +13,7 @@
 | DOC-CK-02 | `00_input/chucnang_checkout/TC_checkout.xlsx` — sheets: Thông tin chung (TC_01), Checkout Smart Home (TC_05), Checkout Camera (TC_07) | TC tham chiếu (BA/QC) | — | 2026-06-01 |
 | DOC-CK-03 | `00_input/chucnang_checkout/camera.png` | Mockup UI (màn Checkout Camera) | — | 2026-06-01 |
 | DOC-CK-04 | `00_input/chucnang_checkout/Chucnangcheckout_0306.xlsx` — sheets: Rule common, Đăng ký UltraFast, Đăng ký internet, Đăng ký camera, **Đăng ký AP** | Functional Spec (revise của DOC-CK-01, 03/06) | rev 0306 | 2026-06-03 |
+| DOC-CK-05 | `00_input/chucnang_checkout/Mô tả luồng checkout tongdaiwifi 0606.xlsx` — sheets: Rule common, Đăng ký UltraFast, Đăng ký internet, Đăng ký AP, Đăng ký camera | Functional Spec (update 06/06 — confirm + bổ sung rule) | rev 0606 | 2026-06-06 |
 | ~~DOC-UF-01/02~~ | ~~dang ky dich ultraFast.xlsx~~ | Functional Spec | — | **Merged → DOC-CK-01** (sheet Đăng ký UltraFast + Rule common); file gốc đã xóa |
 
 > **Diff DOC-CK-01 → DOC-CK-04 (bản 03/06):** Rule common / Đăng ký UltraFast / Đăng ký internet **không đổi** (Rule common chỉ đổi format STT `1`→`1.0`). Sheet **Đăng ký camera** revise lớn: thêm Block Địa chỉ lắp đặt (Tỉnh/Phường/Đường/Số nhà/Ghi chú), SĐT chuyển "refer common", bỏ checkbox hóa đơn, bỏ trừ voucher ở "Cần thanh toán". Thêm sheet mới **Đăng ký AP** (Access Point) — luồng giống Camera nhưng chỉ chọn số lượng (không chu kỳ). → Phân tích lần này chỉ thêm 2 sub-module **CAMERA + AP**; các sub-module cũ giữ nguyên.
@@ -41,7 +43,7 @@
 | REQ-CKCOMMON-001 | Header & điều hướng (Logo, back) | DOC-CK-02 | Thông tin chung R12-14 | UI | SC-CKCOMMON-001,002,003 | Low |
 | REQ-CKCOMMON-002 | Tiến trình các bước (màu, click bước) | DOC-CK-02 | Thông tin chung R16-18 | UI | SC-CKCOMMON-004,005 | Low |
 | REQ-CKCOMMON-003 | Block Sản phẩm dịch vụ đã chọn | DOC-CK-02 | Thông tin chung R20-24 | Functional | SC-CKCOMMON-006 | Low |
-| REQ-CKCOMMON-004 | Họ tên — validation | DOC-CK-01, DOC-CK-02 | Rule common R2; Thông tin chung R27-34 | Business Rule | SC-CKCOMMON-007→011 | Medium |
+| REQ-CKCOMMON-004 | Họ tên — validation (bắt buộc; chỉ chữ, không số/ký tự đặc biệt; max 100; icon X) | DOC-CK-01, DOC-CK-02, **DOC-CK-05** | Rule common R2 (DOC-CK-05 confirm format validation); Thông tin chung R27-34 | Business Rule | SC-CKCOMMON-007→011 | Medium |
 | REQ-CKCOMMON-005 | Số điện thoại — validation | DOC-CK-01, DOC-CK-02 | Rule common R3; Thông tin chung R36-41 | Business Rule | SC-CKCOMMON-012→017 | Medium |
 | REQ-CKCOMMON-006 | Email — validation (Hyperfast/UltraFast) | DOC-CK-02 | Thông tin chung R43-49 | Business Rule | SC-CKCOMMON-018→021 | Low |
 | REQ-CKCOMMON-007 | Địa chỉ — Tỉnh/Thành phố + pre-fill "Địa chỉ trước sáp nhập" | DOC-CK-01, DOC-CK-02 | Rule common R4; Thông tin chung R52-59; Camera R21 | Functional | SC-CKCOMMON-022→027, 076 | Medium |
@@ -50,7 +52,7 @@
 | REQ-CKCOMMON-010 | Địa chỉ — Nhà riêng / Số nhà | DOC-CK-01, DOC-CK-02 | Rule common R7; Thông tin chung R72-75 | Business Rule | SC-CKCOMMON-034,035,036 | Medium |
 | ~~REQ-CKCOMMON-011~~ | ~~Địa chỉ — Chung cư (Tên CC/Tòa nhà/Tầng/Phòng)~~ | DOC-CK-02 | Thông tin chung R77-88 | Business Rule | ~~SC-CKCOMMON-037→040~~ 🚫 Deferred | — |
 | REQ-CKCOMMON-012 | Địa chỉ — Ghi chú | DOC-CK-01, DOC-CK-02 | Rule common R8; Thông tin chung R90-92 | Functional | SC-CKCOMMON-041 | Low |
-| REQ-CKCOMMON-013 | Popup Địa chỉ hành chính cũ (3 cấp → 2 cấp) | DOC-CK-01, DOC-CK-02 | Rule common R14; Thông tin chung R97-118 | Integration | SC-CKCOMMON-042→047 | **High** |
+| REQ-CKCOMMON-013 | Popup Địa chỉ hành chính cũ (3 cấp → 2 cấp; field "Địa chỉ hành chính mới"; Xác nhận enable khi convert OK, disable khi convert thất bại dù đủ 4 cấp) | DOC-CK-01, DOC-CK-02, **DOC-CK-05** | Rule common R14 (DOC-CK-05 làm rõ convert logic); Thông tin chung R97-118 | Integration | SC-CKCOMMON-042→047 | **High** |
 | REQ-CKCOMMON-014 | Block Thông tin khách hàng (collapse, format, read-only) | DOC-CK-02 | Thông tin chung R120-124 | Functional | SC-CKCOMMON-048,049,050 | Low |
 | REQ-CKCOMMON-015 | Block Phương thức thanh toán | DOC-CK-01, DOC-CK-02 | Rule common R13; Thông tin chung R126-135 | Business Rule | SC-CKCOMMON-051→055 | **High** |
 | REQ-CKCOMMON-016 | Block Thông tin thanh toán + Mã ưu đãi | DOC-CK-02 | Thông tin chung R137-147 | Functional | SC-CKCOMMON-056→061 | Medium |
@@ -89,7 +91,7 @@
 |---|---|---|---|---|---|---|
 | REQ-AP-001 | B1 — Chọn số lượng (không chu kỳ) → Checkout + Block Sản phẩm + header 2 bước | DOC-CK-04 | Đăng ký AP R29-32 | Functional | SC-AP-001,002 | Low |
 | REQ-AP-002 | Block Thông tin cá nhân (Họ tên + SĐT) | DOC-CK-04 | Đăng ký AP R33-35; Rule common R2,R3 | Business Rule | SC-AP-003,004 (refer CKCOMMON C4/C5) | Low |
-| REQ-AP-003 | Block Địa chỉ lắp đặt (refer common + popup ĐCHC cũ) | DOC-CK-04 | Đăng ký AP R36-41; Rule common R4-8,R14 | Integration | SC-AP-005,006,007 | **High** |
+| REQ-AP-003 | Block Địa chỉ lắp đặt (refer common + popup ĐCHC cũ + **label cố định "Thời gian giao hàng dự kiến từ 3 đến 7 ngày"**) | DOC-CK-04, **DOC-CK-05** | Đăng ký AP R36-41; Rule common R4-8,R14; DOC-CK-05 (label giao hàng) | Integration | SC-AP-005,006,007,**019** | **High** |
 | REQ-AP-004 | Block Phương thức thanh toán (COD + online theo QLCS) | DOC-CK-04 | Đăng ký AP R42; Rule common R13 | Business Rule | SC-AP-008 (refer CKCOMMON C15) | Medium |
 | REQ-AP-005 | Block Thông tin khách hàng (auto-load) | DOC-CK-04 | Đăng ký AP R43 | Functional | SC-AP-009 | Low |
 | REQ-AP-006 | Block Thông tin thanh toán + Cần thanh toán + Mã ưu đãi | DOC-CK-04 | Đăng ký AP R44-45 | Functional | SC-AP-010, ~~018~~ | Medium |
@@ -119,11 +121,10 @@
 | CLA-CAMERA-003 | REQ-CAMERA-003 | Đăng ký camera R34-35 (sheet ghi 2 textbox đều "Số điện thoại") | Block Thông tin cá nhân gồm trường gì? | **Họ tên + Số điện thoại** (mockup camera.png xác nhận; sheet lỗi gõ) | ✅ Resolved (mockup) | SC-CAMERA-004 |
 | CLA-AP-001 | REQ-AP-001 | Đăng ký AP R29 ("Chọn Chọn số lượng") | AP chỉ có số lượng, KHÔNG có chu kỳ — xác nhận đúng? | — | ⏳ **Pending** (BA, low) | SC-AP-001,002 |
 => Không có chu kỳ
-| CLA-AP-002 | REQ-AP-003 | Đăng ký AP (không có mockup) | AP có note giao hàng 3-7 ngày + "Thời gian lắp đặt" như Camera không? | — | ⏳ **Pending** (BA) | SC-AP-005,009 |
-chỉ camera có thời gia lắp đặt
+| CLA-AP-002 | REQ-AP-003 | Đăng ký AP (không có mockup) | AP có note giao hàng 3-7 ngày + "Thời gian lắp đặt" như Camera không? | **AP có label cố định "Thời gian giao hàng dự kiến từ 3 đến 7 ngày" trong Block Địa chỉ lắp đặt. AP KHÔNG có "Thời gian lắp đặt" (chỉ Camera có).** | ✅ **Partially Resolved** (DOC-CK-05, 2026-06-06) | SC-AP-019 (label giao hàng) thêm mới; SC-AP-009 giữ nguyên (TTKH auto-load, không có Thời gian lắp đặt) |
 | CLA-CAMAP-001 | REQ-CAMERA-007, REQ-AP-006 | mockup + sheet ("Nhập mã khuyến mãi"/"Chọn ưu đãi") | Mã ưu đãi/voucher cho Camera/AP đã implement chưa? | **Chưa implement** (như UltraFast — SC-DANGKYUF-015) | ✅ Resolved (ref) | SC-CAMERA-019, SC-AP-018 🚫 Blocked |
 
-> Còn Pending: **CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!"), **CLA-CAMERA-001** ("Thời gian lắp đặt" Camera), **CLA-AP-001** (AP không chu kỳ), **CLA-AP-002** (note giao hàng/Thời gian lắp đặt AP) — BA bổ sung sau.
+> Còn Pending: **CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!"), **CLA-CAMERA-001** ("Thời gian lắp đặt" Camera nguồn data từ đâu), **CLA-AP-001** (xác nhận AP không chu kỳ). CLA-AP-002 Partially Resolved 2026-06-06 (AP có label giao hàng 3-7 ngày, không có Thời gian lắp đặt).
 ---
 
 ## Clarifications đã resolve (kế thừa UltraFast — bản 2026-05-28/30)

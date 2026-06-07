@@ -28,7 +28,7 @@ import os
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
-FILE      = r"E:\AI\Ecom\ecom-pdh\00_input\chucnang_checkout\TC_checkout.xlsx"
+FILE      = "ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx"
 SHEET     = "Checkout Camera"
 FUNC_ID   = "TC_07"
 FUNC_NAME = "Checkout Camera"

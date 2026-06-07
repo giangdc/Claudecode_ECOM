@@ -62,11 +62,11 @@ TC_LOGIN.1 — Đăng nhập thành công với tài khoản hợp lệ
 User cần chạy test với flag `--reporter=json`:
 
 ```bash
-# Chạy và xuất JSON report
-npx playwright test --reporter=json > test-results/report.json
+# Chạy và xuất JSON report (tự động ghi vào 06_report/ theo playwright.config.ts)
+npx playwright test
 
-# Hoặc config trong playwright.config.ts
-reporter: [['json', { outputFile: 'test-results/report.json' }]]
+# Hoặc config thủ công trong playwright.config.ts
+reporter: [['json', { outputFile: '../../06_report/report.json' }]]
 ```
 
 ---
@@ -208,8 +208,8 @@ reporter: [['json', { outputFile: 'test-results/report.json' }]]
 1. **Chính sách backup (mặc định):**
    ```python
    import os
-   # File kết quả gom vào 03_test-cases/_results/ (không để lẫn với TC gốc trong thư mục module)
-   results_dir = os.path.join(<03_test-cases_root>, '_results')
+   # File kết quả gom vào 06_report/ (tập trung toàn bộ output sau khi chạy test)
+   results_dir = os.path.join(<project_root>, '06_report')
    os.makedirs(results_dir, exist_ok=True)
    base = os.path.basename(original_path).replace('.xlsx', f'_results_{date}.xlsx')
    output_path = os.path.join(results_dir, base)
@@ -230,7 +230,7 @@ In ra báo cáo cuối để user review:
 ╔══════════════════════════════════════════════════════╗
 ║         SYNC TC RESULTS — KẾT QUẢ                   ║
 ╠══════════════════════════════════════════════════════╣
-║ File report  : test-results/report.json              ║
+║ File report  : 06_report/report.json                 ║
 ║ File Excel   : 03_test-cases/functional/<module>/...xlsx ║
 ║ Round        : Round 1                               ║
 ║ Thời gian    : 2024-01-15 10:30                      ║
@@ -246,7 +246,7 @@ In ra báo cáo cuối để user review:
 ║   ⚠️  Trong report nhưng ko có trong Excel: [n]      ║
 ║      (TC ID không tìm thấy — kiểm tra convention)    ║
 ╠══════════════════════════════════════════════════════╣
-║ FILE OUTPUT  : _results/...TC_..._results_20240115.xlsx ║
+║ FILE OUTPUT  : 06_report/...TC_..._results_20240115.xlsx║
 ╚══════════════════════════════════════════════════════╝
 
 TC FAIL — cần xem lại:
@@ -274,8 +274,8 @@ TC FAIL — cần xem lại:
 ## Cách chạy
 
 ```bash
-# Bước 1: Chạy test và xuất JSON report
-npx playwright test --reporter=json > test-results/report.json
+# Bước 1: Chạy test (JSON report tự xuất vào 06_report/report.json)
+npx playwright test
 
 # Bước 2: Sync kết quả vào Excel
 # (Gọi skill sync-tc-results và cung cấp 2 paths trên)

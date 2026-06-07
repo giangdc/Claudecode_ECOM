@@ -238,7 +238,7 @@ test.describe('TC_CKCOMMON — Popup Địa chỉ hành chính cũ', () => {
     await expect(reg.oldAddrConfirmButton).toBeDisabled();
   });
 
-  test('TC_CKCOMMON.45 — Kiểm tra click Close đóng popup', async ({ page }) => {
+  test('TC_CKCOMMON.47 — Kiểm tra click Close đóng popup', async ({ page }) => {
     const reg = await openB1(page);
     await reg.openOldAddressPopup();
     await reg.oldAddrCloseButton.click();
@@ -253,7 +253,7 @@ test.describe('TC_INTERNET — Bước 2 Thanh toán', () => {
     const pay = await goToB2(page);
     await expect(page.getByText(VALID_NAME)).toBeVisible();
     await expect(page.getByText(VALID_PHONE)).toBeVisible();
-    await expect(page.getByText(/Phường Bến Thành/)).toBeVisible();
+    await expect(page.getByText(/Phường Bến Thành/).first()).toBeVisible();
   });
 
   test('TC_INTERNET.9 — Kiểm tra gói trả sau: Cần thanh toán = Phí lắp đặt', async ({ page }) => {
@@ -289,13 +289,13 @@ test.describe('TC_INTERNET — Bước 2 Thanh toán', () => {
 // ════════════════════════ TC_CKCOMMON — PTTT & Luồng thanh toán (B2) ════════════════════════
 test.describe('TC_CKCOMMON — Phương thức thanh toán & Luồng thanh toán', () => {
 
-  test('TC_CKCOMMON.50 — Kiểm tra hiển thị UI block Phương thức thanh toán', async ({ page }) => {
+  test('TC_CKCOMMON.52 — Kiểm tra hiển thị UI block Phương thức thanh toán', async ({ page }) => {
     const pay = await goToB2(page);
     const ids = await pay.getAllPaymentMethodIds();
     expect(ids.length).toBeGreaterThan(0);
   });
 
-  test('TC_CKCOMMON.52 — Kiểm tra > 4 PTTT có button Xem thêm', async ({ page }) => {
+  test('TC_CKCOMMON.54 — Kiểm tra > 4 PTTT có button Xem thêm', async ({ page }) => {
     const pay = await goToB2(page);
     await expect(pay.xemThemButton).toBeVisible();
     await pay.clickXemThem();
@@ -303,7 +303,7 @@ test.describe('TC_CKCOMMON — Phương thức thanh toán & Luồng thanh toán
     expect(ids.length).toBeGreaterThan(4);
   });
 
-  test('TC_CKCOMMON.54 — Kiểm tra chỉ chọn được 1 PTTT', async ({ page }) => {
+  test('TC_CKCOMMON.56 — Kiểm tra chỉ chọn được 1 PTTT', async ({ page }) => {
     const pay = await goToB2(page);
     await pay.selectPaymentMethod('COD-COD');
     await expect(pay.paymentMethodRadio('COD-COD')).toBeChecked();
@@ -312,14 +312,14 @@ test.describe('TC_CKCOMMON — Phương thức thanh toán & Luồng thanh toán
     await expect(pay.paymentMethodRadio('COD-COD')).not.toBeChecked();
   });
 
-  test('TC_CKCOMMON.62 / TC_INTERNET.15 — Kiểm tra thanh toán COD điều hướng màn Hoàn tất', async ({ page }) => {
+  test('TC_CKCOMMON.64 / TC_INTERNET.15 — Kiểm tra thanh toán COD điều hướng màn Hoàn tất', async ({ page }) => {
     const pay = await goToB2(page);
     await pay.selectPaymentMethod('COD-COD');
     await pay.clickThanhToan();
     await expect(page).not.toHaveURL(/\/payment/, { timeout: 20000 });
   });
 
-  test('TC_CKCOMMON.63 — Kiểm tra thanh toán Online điều hướng cổng 3rd party', async ({ page }) => {
+  test('TC_CKCOMMON.65 — Kiểm tra thanh toán Online điều hướng cổng 3rd party', async ({ page }) => {
     const pay = await goToB2(page);
     await pay.selectPaymentMethod('DOMESTIC-Online');
     await pay.clickThanhToan();
@@ -337,7 +337,7 @@ test.describe('TC_CKCOMMON — Navigation', () => {
     expect(href).toMatch(/tongdaiwifi\.vn|fpt\.vn/i);
   });
 
-  test('TC_CKCOMMON.55 — Kiểm tra hyperlink điều khoản tại Bước 2', async ({ page }) => {
+  test('TC_CKCOMMON.57 — Kiểm tra hyperlink điều khoản tại Bước 2', async ({ page }) => {
     const pay = await goToB2(page);
     await expect(pay.termsLink).toBeVisible();
     const href = await pay.termsLink.getAttribute('href');

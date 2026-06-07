@@ -40,6 +40,7 @@
 | `03_test-cases/` | TC Excel Web/Mobile | gen-testcase-webapp (ghi), update-testcase (doc+ghi) |
 | `03_test-cases/api/` | TC Excel API | gen-testcase-api (ghi) |
 | `04_test-data/` | Du lieu test (valid / invalid) | -- |
+| `06_report/` | Output sau khi chay test: `*_results_*.xlsx`, `report.json`, `playwright-report/`, `allure-results/`, `allure-report/`, `test-artifacts/` | sync-tc-results (ghi) |
 
 ## MEMORY Files
 - `02_analyze-requirements/MEMORY.md` -- bridge file cho module Goi ban

@@ -681,7 +681,7 @@ def build_sheet(ws, api_info):
 
 
 def main():
-    out_dir = r"E:\AI\Ecom\ecom-pdh\03_test-cases\api"
+    out_dir = "ecom-pdh/03_test-cases/api/chucnang_Voucher"
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx")
 

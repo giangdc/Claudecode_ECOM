@@ -8,7 +8,7 @@ from openpyxl.styles import (
 )
 from openpyxl.utils import get_column_letter
 
-TC_FILE = "ecom-pdh/03_test-cases/AI_ISC_ecom-pdh_v1.1_TC_v1.0.xlsx"
+TC_FILE = "ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx"
 SHEET_NAME = "DangKy_UltraFast"
 FUNC_ID    = "TC_DANGKYUF"
 FUNC_NAME  = "Đăng ký dịch vụ UltraFast — Màn hình Thanh toán"

@@ -56,7 +56,6 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
     │   │   └── <chucnang_module>/      ←   1 thư mục / module
     │   ├── api/                        ← TC API
     │   │   └── <chucnang_module>/
-    │   └── _results/                   ← file *_results_*.xlsx từ sync-tc-results
     ├── 04_test-data/                   ← Dữ liệu test
     │   ├── valid/
     │   └── invalid/
@@ -65,6 +64,13 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
     │   ├── src/tests/<module>/         ← Test scripts *.spec.ts
     │   ├── src/fixtures/ + src/utils/  ← Hạ tầng dùng chung
     │   └── test-data/
+    ├── 06_report/                      ← Toàn bộ output sau khi chạy test auto
+    │   ├── *_results_*.xlsx            ←   TC results Excel (sync-tc-results)
+    │   ├── report.json                 ←   Playwright JSON report
+    │   ├── playwright-report/          ←   Playwright HTML report
+    │   ├── allure-results/             ←   Allure raw data
+    │   ├── allure-report/              ←   Allure HTML report
+    │   └── test-artifacts/             ←   Screenshots/traces on failure
     └── CLAUDE.md                       ← Context riêng của project
 ```
 
@@ -148,9 +154,9 @@ generate_data_verify   (nhiều dịch vụ cùng layout, khác data)
         │
         ▼ (sau khi chạy npx playwright test --reporter=json)
 sync-tc-results
-  └─ Input: test-results/report.json
+  └─ Input: 06_report/report.json        (tự ghi theo playwright.config.ts)
   └─ Input: 03_test-cases/functional/<module>/*.xlsx
-  → 03_test-cases/_results/*_results_{date}.xlsx   (Pass/Fail điền vào cột Actual Result)
+  → 06_report/*_results_{date}.xlsx                (Pass/Fail điền vào cột Actual Result)
 ```
 
 **Prerequisite automation lane:**

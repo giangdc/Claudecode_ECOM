@@ -42,9 +42,9 @@ BA drops URD/spec → ecom-pdh/00_input/
 → ecom-pdh/05_automation/src/tests/*.spec.ts  (Test scripts)
 
 /sync-tc-results                        (sau khi chạy test)
-  Input : test-results/report.json      (Playwright --reporter=json)
+  Input : 06_report/report.json         (Playwright JSON — tự ghi theo playwright.config.ts)
   Input : 03_test-cases/functional/<module>/*.xlsx
-→ 03_test-cases/_results/*_results_{date}.xlsx  (Pass/Fail điền vào cột Actual Result)
+→ 06_report/*_results_{date}.xlsx       (Pass/Fail điền vào cột Actual Result)
 ```
 
 **Key rule — manual pipeline:** always run `analyze-requirement` before `gen-testcase-*` for a new module. Skills read from `02_analyze-requirements/<module>/MEMORY.md` as their primary input. Skipping analyze → Option B (direct URD read) = lower quality output.
@@ -52,7 +52,6 @@ BA drops URD/spec → ecom-pdh/00_input/
 **Key rule — folder mirror (02 ↔ 03):** `03_test-cases/` phản chiếu 1:1 cấu trúc module của `02_analyze-requirements/`, nhưng tách theo loại test:
 - `03_test-cases/functional/<chucnang_module>/` — TC Web/Mobile, mỗi module 1 thư mục đúng tên với `02_analyze-requirements/<chucnang_module>/`.
 - `03_test-cases/api/<chucnang_module>/` — TC API (chỉ module nào có API).
-- `03_test-cases/_results/` — file `*_results_*.xlsx` từ sync-tc-results.
 - Mỗi module = 1 file TC riêng (không gộp nhiều module vào 1 file); 1 module nhiều nhóm chức năng → nhiều sheet trong cùng file.
 
 **Key rule — automation lane:**
@@ -82,15 +81,15 @@ npm run test:debug             # step-by-step debug
 npx playwright test src/tests/ultrafast/ultrafast-checkout.spec.ts
 npx playwright test -g "TC_DANGKYUF.5"
 
-# Sinh JSON report cho sync-tc-results
-npx playwright test --reporter=json > test-results/report.json
+# Chạy test — report tự ghi vào 06_report/
+npx playwright test            # JSON + HTML + Allure đều xuất vào 06_report/
 
 # Kiểm tra TypeScript
 npm run lint
 
 # Xem report
-npm run test:report            # Playwright HTML report
-npm run allure:generate && npm run allure:open
+npm run test:report            # Playwright HTML report (06_report/playwright-report/)
+npm run allure:generate && npm run allure:open  # Allure (06_report/allure-report/)
 ```
 
 **Env vars** (`ecom-pdh/05_automation/.env`): `BASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `VIEWER_EMAIL`, `VIEWER_PASSWORD`.
@@ -158,9 +157,9 @@ ecom-pdh/05_automation/
 | `ecom-pdh/02_analyze-requirements/<module>/` | Output của analyze-requirement |
 | `ecom-pdh/03_test-cases/functional/<module>/` | Web/Mobile TC Excel (1 thư mục / module, mirror 02) |
 | `ecom-pdh/03_test-cases/api/<module>/` | API TC Excel (1 thư mục / module, mirror 02) |
-| `ecom-pdh/03_test-cases/_results/` | File `*_results_*.xlsx` từ sync-tc-results |
 | `ecom-pdh/04_test-data/` | Test data assets |
 | `ecom-pdh/05_automation/` | Playwright TS automation framework (moved here from root-level `automation-framework/`) |
+| `ecom-pdh/06_report/` | Toàn bộ output sau khi chạy test: `*_results_*.xlsx`, `report.json`, `playwright-report/`, `allure-results/`, `allure-report/`, `test-artifacts/` |
 
 **Modules đã analyze:**
 - `chucnang_QLnoidunggoiban` — Quản lý Nội dung Gói bán
@@ -276,6 +275,14 @@ Chi tiết trong `.claude/rules/`. Key points:
 - **Vùng rủi ro cao:** CKCOMMON Luồng thanh toán (Score 25); CKCOMMON Phường/Xã + kiểm tra chính sách giá (20); INTERNET B2 trả trước/sau + giá động (20); DANGKYUF Online 3rd party (20); Popup Địa chỉ hành chính cũ (16); Block PTTT (15)
 - **Clarifications:** 8/9 resolved 2026-06-01 (Số nhà max 50; SĐT lỗi = "Số điện thoại không hợp lệ"; Internet không Email; Chung cư deferred; trả trước/sau theo QLCS; session/countdown mọi DV; pre-fill điền toàn bộ +SC-076). Còn **1 pending: CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!")
 - **UltraFast:** giữ nguyên SC-DANGKYUF-001..024 (TC + automation 19/20 đã chạy). Defect BUG-DANGKYUF-001 (COD hiển thị staging) vẫn Open.
+- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
+
+### 2026-06-06 — Checkout: update DOC-CK-05 (`Mô tả luồng checkout tongdaiwifi 0606.xlsx`)
+- **Tài liệu:** DOC-CK-05 `Mô tả luồng checkout tongdaiwifi 0606.xlsx` (update 06/06 — confirm + bổ sung rule). Rule common / UltraFast / Internet / Camera **không đổi về scenario**. AP thêm 1 SC mới.
+- **Thay đổi:** (1) Confirm format validation Họ tên trong Rule common → đồng bộ SC-CKCOMMON-008 text "họ tên" (bỏ "và"); (2) Popup ĐCHC cũ làm rõ case convert thất bại → SC-CKCOMMON-044 update; (3) AP có label cố định "Thời gian giao hàng dự kiến từ 3 đến 7 ngày" → thêm **SC-AP-019**. CLA-AP-002 Partially Resolved.
+- **Tổng module checkout:** **155 SC định nghĩa** — active 147 (P1:70 P2:62 P3:15), 5 deferred (Chung cư), 3 blocked (voucher).
+- **Pending còn lại:** CLA-CKCOMMON-007 (nội dung popup "Chưa hỗ trợ chính sách!"), CLA-CAMERA-001 ("Thời gian lắp đặt" Camera nguồn data từ đâu), CLA-AP-001 (xác nhận AP không chu kỳ).
+- **Action cần làm:** Chạy `update-testcase` cho sheet Checkout_AP để thêm TC_AP cho SC-AP-019.
 - **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
 
 ### 2026-06-03 — Checkout: thêm Camera + AP (bản revise `Chucnangcheckout_0306.xlsx`)

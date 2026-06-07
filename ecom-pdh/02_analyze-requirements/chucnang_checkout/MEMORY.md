@@ -1,5 +1,6 @@
 # MEMORY — Analyze Requirements Output (Module CHECKOUT)
-> Cập nhật lần cuối: 2026-06-03 — Phân tích bản revise `Chucnangcheckout_0306.xlsx` (DOC-CK-04): thêm 2 sub-module **CAMERA** (20 SC) + **AP** (18 SC). UltraFast/CKCOMMON/Internet **không đổi** (Rule common chỉ đổi format STT). Field validation Camera/AP **tái dùng CKCOMMON** (chỉ test phần đặc thù dịch vụ). 3 clarification Pending mới: CLA-CAMERA-001, CLA-AP-001, CLA-AP-002.
+> Cập nhật lần cuối: 2026-06-06 — Phân tích DOC-CK-05 `Mô tả luồng checkout tongdaiwifi 0606.xlsx`: (1) confirm format validation Họ tên trong Rule common (đồng bộ SC-CKCOMMON-008 text "họ tên"); (2) làm rõ popup ĐCHC cũ — case convert thất bại (SC-CKCOMMON-044 update); (3) AP có label cố định "Thời gian giao hàng 3-7 ngày" → thêm SC-AP-019, CLA-AP-002 Partially Resolved. Tổng SC: 154→155 (active 146→147).
+> 2026-06-03 — Phân tích bản revise `Chucnangcheckout_0306.xlsx` (DOC-CK-04): thêm 2 sub-module **CAMERA** (20 SC) + **AP** (18 SC). UltraFast/CKCOMMON/Internet **không đổi** (Rule common chỉ đổi format STT). Field validation Camera/AP **tái dùng CKCOMMON** (chỉ test phần đặc thù dịch vụ). 3 clarification Pending mới: CLA-CAMERA-001, CLA-AP-001, CLA-AP-002.
 > 2026-06-01 (lần 2) — BA resolve 8/9 clarification: Số nhà max 50; text lỗi SĐT = "Số điện thoại không hợp lệ"; Internet không có Email; **Chung cư Deferred**; trả trước/sau do QLCS; session/countdown áp dụng mọi DV; pre-fill địa chỉ điền toàn bộ (+SC-CKCOMMON-076). Còn Pending: CLA-CKCOMMON-007 (nội dung popup).
 > 2026-06-01 (lần 1) — Re-baseline: module checkout đa dịch vụ. Tài liệu UltraFast cũ đã merge vào `Chucnangcheckout.xlsx`. Thêm sub-module CKCOMMON + INTERNET. Giữ nguyên SC-DANGKYUF (TC + automation đã chạy).
 
@@ -24,6 +25,7 @@
 | DOC-CK-02 | TC_checkout.xlsx (sheets: Thông tin chung, Checkout Smart Home, Checkout Camera) | TC tham chiếu (BA/QC) | 2026-06-01 | Analyzed (Thông tin chung → CKCOMMON); Smart Home/Camera tham khảo | CKCOMMON |
 | DOC-CK-03 | camera.png | Mockup UI (màn Checkout Camera) | 2026-06-03 | **Analyzed** (ground UI cho CAMERA) | CAMERA |
 | DOC-CK-04 | Chucnangcheckout_0306.xlsx (sheets: Rule common, UltraFast, internet, camera, **AP**) | Functional Spec (revise DOC-CK-01, 03/06) | 2026-06-03 | Analyzed (CAMERA, AP); UltraFast/CKCOMMON/Internet không đổi | CAMERA, AP |
+| DOC-CK-05 | Mô tả luồng checkout tongdaiwifi 0606.xlsx (sheets: Rule common, UltraFast, internet, AP, camera) | Functional Spec (update 06/06) | 2026-06-06 | Analyzed — confirm format validation Họ tên; làm rõ popup ĐCHC cũ; xác nhận label giao hàng AP | CKCOMMON, AP |
 | ~~DOC-UF-01/02~~ | ~~dang ky dich ultraFast.xlsx~~ | Functional Spec | 2026-05-28 | **Merged → DOC-CK-01** (file gốc đã xóa) | DANGKYUF |
 
 ---
@@ -38,11 +40,11 @@
 | CKCOMMON — Màn checkout chung | DOC-CK-01, DOC-CK-02 | 18 (1 deferred) | 76 (4 deferred, +SC-076) | 25 | 41 | 10 | High |
 | INTERNET — Đăng ký Internet | DOC-CK-01 | 4 | 16 | 12 | 3 | 1 | High |
 | CAMERA — Đăng ký Camera | DOC-CK-04, DOC-CK-03 | 10 | 20 (1 blocked, 1 deferred) | 10 | 9 | 1 | High |
-| AP — Đăng ký Access Point | DOC-CK-04 | 9 | 18 (1 blocked) | 10 | 7 | 1 | High |
-| **TOTAL** | | **50** | **154** | **70** | **69** | **15** | |
+| AP — Đăng ký Access Point | DOC-CK-04, DOC-CK-05 | 9 | 19 (1 blocked, +SC-AP-019) | 10 | 8 | 1 | High |
+| **TOTAL** | | **50** | **155** | **70** | **70** | **15** | |
 
-> **Active = 146** (P1:70, P2:61, P3:15). Trừ đi: **5 deferred** (SC-CKCOMMON-037→040 + SC-CAMERA-020 Chung cư — CLA-CKCOMMON-006, đều P2) + **3 blocked** (SC-DANGKYUF-015 + SC-CAMERA-019 + SC-AP-018 voucher, đều P2). REQ-CKCOMMON-011 (Chung cư) deferred.
-> Lưu ý cột P1/P2/P3 ở dòng TOTAL là **scenario định nghĩa** (gồm cả deferred/blocked P2): P1=70, P2=69, P3=15 → tổng 154. Active P2=61 (trừ 8 deferred+blocked P2).
+> **Active = 147** (P1:70, P2:62, P3:15). Trừ đi: **5 deferred** (SC-CKCOMMON-037→040 + SC-CAMERA-020 Chung cư — CLA-CKCOMMON-006, đều P2) + **3 blocked** (SC-DANGKYUF-015 + SC-CAMERA-019 + SC-AP-018 voucher, đều P2). REQ-CKCOMMON-011 (Chung cư) deferred.
+> Lưu ý cột P1/P2/P3 ở dòng TOTAL là **scenario định nghĩa** (gồm cả deferred/blocked P2): P1=70, P2=70, P3=15 → tổng 155. Active P2=62 (trừ 8 deferred+blocked P2).
 
 ---
 
@@ -135,11 +137,12 @@
 | SC-AP-003→004 | AP2 Họ tên + SĐT (refer CKCOMMON) | 2 | P1,P2 | Functional/Negative | ✅ Đã tạo 2026-06-03 |
 | SC-AP-005→007 | AP3 Địa chỉ lắp đặt + popup + chính sách giá | 3 | P1,P2 | Functional/Negative | ✅ Đã tạo 2026-06-03 |
 | SC-AP-008 | AP4 PTTT COD + Online theo QLCS | 1 | P2 | Functional | ✅ Đã tạo 2026-06-03 |
-| SC-AP-009 | AP5 Block TTKH auto-load | 1 | P2 | Functional | ✅ Đã tạo 2026-06-03 |
+| SC-AP-009 | AP5 Block TTKH auto-load (không có Thời gian lắp đặt — CLA-AP-002 resolved) | 1 | P2 | Functional | ✅ Đã tạo 2026-06-03 |
 | SC-AP-010, 018 | AP6 TTTT + Cần thanh toán (+mã ưu đãi blocked) | 2 | P1,P2 | Functional | ✅ Đã tạo 2026-06-03 (018 🚫 Blocked voucher) |
 | SC-AP-011→013 | AP7 Button Thanh toán (validate + policy) | 3 | P1,P2 | Functional/Negative | ✅ Đã tạo 2026-06-03 |
 | SC-AP-014 | AP8 Navigation (điều khoản, Quay lại) | 1 | P3 | UI | ✅ Đã tạo 2026-06-03 |
 | SC-AP-015→017 | AP9 B3 Hoàn tất (COD/Online success/fail) | 3 | P1 | Functional/Negative | ✅ Đã tạo 2026-06-03 |
+| SC-AP-019 | AP3b Label "Thời gian giao hàng dự kiến từ 3 đến 7 ngày" cố định | 1 | P2 | Functional | ⏳ Chưa tạo TC (DOC-CK-05, 2026-06-06) |
 
 > TC Status: ✅ Đã tạo 2026-06-03 / ✅ Đã tạo / 🔄 Cần update / 🚫 Blocked
 > Chi tiết Given/When/Then của CKCOMMON + INTERNET + CAMERA + AP → xem `test_scenario_map.md`.
@@ -179,7 +182,7 @@ Key data cần chuẩn bị khi execute:
 | CLA-CAMERA-002 | REQ-CAMERA-004 | mockup camera.png | Camera/AP defer Chung cư như CKCOMMON? | **Có — defer chung mọi DV** | ✅ Resolved (ref CLA-CKCOMMON-006) | SC-CAMERA-020 🚫 Deferred |
 | CLA-CAMERA-003 | REQ-CAMERA-003 | Đăng ký camera R34-35 | Block TTCN gồm trường gì (sheet ghi 2 textbox đều "SĐT")? | **Họ tên + SĐT** (mockup xác nhận) | ✅ Resolved (mockup) | SC-CAMERA-004 |
 | CLA-AP-001 | REQ-AP-001 | Đăng ký AP R29 | AP chỉ số lượng, không chu kỳ — xác nhận? | — | ⏳ **Pending** (low) | SC-AP-001,002 |
-| CLA-AP-002 | REQ-AP-003 | Đăng ký AP (không mockup) | AP có note giao hàng 3-7 ngày + "Thời gian lắp đặt" như Camera? | — | ⏳ **Pending** | SC-AP-005,009 |
+| CLA-AP-002 | REQ-AP-003 | DOC-CK-05 (Đăng ký AP) | AP có note giao hàng 3-7 ngày + "Thời gian lắp đặt" như Camera? | **AP có label cố định "Thời gian giao hàng dự kiến từ 3 đến 7 ngày." AP KHÔNG có "Thời gian lắp đặt" (chỉ Camera).** | ✅ **Partially Resolved** (2026-06-06) | SC-AP-019 mới (label giao hàng); SC-AP-009 giữ nguyên không có Thời gian lắp đặt |
 | CLA-CAMAP-001 | REQ-CAMERA-007, REQ-AP-006 | mockup + sheet | Mã ưu đãi/voucher Camera/AP đã implement? | **Chưa** (như UltraFast) | ✅ Resolved (ref) | SC-CAMERA-019, SC-AP-018 🚫 Blocked |
 | CLARY-DANGKYUF-001..005 | (UltraFast) | — | 5 clarification UltraFast | — | **Resolved** 2026-05-28 | (xem requirement_traceability.md) |
 | DEFECT-DANGKYUF-001 | REQ-DANGKYUF-004 | SC-DANGKYUF-011 | Staging hiển thị COD trong PTTT UltraFast (trái spec) | BA xác nhận: bug staging, chờ Dev fix | **Defect — Open** | TC_DANGKYUF.12 giữ FAIL |
@@ -199,4 +202,5 @@ Key data cần chuẩn bị khi execute:
 | Run automation (Internet) | 2026-06-02 | 38 Pass / 0 Fail / 58 Block | _results/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0_results_2026-06-02.xlsx | — | sync-tc-results Round 1. Automation 37 test (gói goi-giga) 37/37 PASS → 38 TC ID Pass. Block 58 = Auto?=N manual:13 + [BLOCKED]:3 + Auto=Y chưa tự động (N/A Internet: email/voucher/chung cư; cần data backend):42. Staging latency cần --retries để xanh ổn định |
 
 | DOC-CK-04 (CAMERA) | 2026-06-03 | 16 | functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx (sheet Checkout_Camera) | v1.0 | TC_CAMERA. High:9 Med:6 Low:1 | Auto Y:9 N:7 | BLOCKED:3 (TTKH "Thời gian lắp đặt" CLA-CAMERA-001; mã ưu đãi voucher; Chung cư deferred). Field validation (Họ tên/SĐT/popup/dropdown/PTTT-list/OTP) KHÔNG tạo lại — refer TC_CKCOMMON. SC bỏ (đã có ở common): SC-CAMERA-004,005,006,007,008,012. |
-| DOC-CK-04 (AP) | 2026-06-03 | 14 | functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx (sheet Checkout_AP) | v1.0 | TC_AP. High:6 Med:7 Low:1 | Auto Y:5 N:9 | BLOCKED:5 (AP không chu kỳ CLA-AP-001 x2; note giao hàng/Thời gian lắp đặt CLA-AP-002 x2; mã ưu đãi voucher). Field validation refer TC_CKCOMMON. SC bỏ: SC-AP-003,004,006,007,011. |
+| DOC-CK-04 (AP) | 2026-06-03 | 14 | functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx (sheet Checkout_AP) | v1.0 | TC_AP. High:6 Med:7 Low:1 \| Auto Y:5 N:9 \| BLOCKED:5 (AP không chu kỳ CLA-AP-001 x2; note giao hàng/Thời gian lắp đặt CLA-AP-002 x2; mã ưu đãi voucher). Field validation refer TC_CKCOMMON. SC bỏ: SC-AP-003,004,006,007,011. |
+| DOC-CK-05 (AP update) | 2026-06-06 | +1 cần thêm | functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx (sheet Checkout_AP) | v1.0 (cần update) | SC-AP-019 (label giao hàng 3-7 ngày) chưa có TC. CLA-AP-002 BLOCKED x2 → chỉ còn x1 (Thời gian lắp đặt unlocked — không có cho AP). **Cần chạy update-testcase để thêm TC_AP cho SC-AP-019 + unblock 1 TC liên quan label giao hàng.** |

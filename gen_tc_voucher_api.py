@@ -35,7 +35,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
 # ─── Paths ───────────────────────────────────────────────────────────────────
-OUT_DIR  = r"E:\AI\Ecom\ecom-pdh\03_test-cases\api"
+OUT_DIR  = "ecom-pdh/03_test-cases/api/chucnang_Voucher"
 OUT_FILE = os.path.join(OUT_DIR, "AI_ISC_ecom-pdh_v1.1_TC_API_v1.1.xlsx")
 
 # ─── Palette ─────────────────────────────────────────────────────────────────

@@ -6,9 +6,9 @@ from datetime import datetime
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-JSON_PATH   = r"E:\AI\Ecom\automation-framework\test-results\report.json"
-EXCEL_PATH  = r"E:\AI\Ecom\ecom-pdh\03_test-cases\AI_ISC_ecom-pdh_v1.1_TC_v1.0.xlsx"
-OUT_PATH    = r"E:\AI\Ecom\ecom-pdh\03_test-cases\AI_ISC_ecom-pdh_v1.1_TC_v1.0_results_20260529.xlsx"
+JSON_PATH   = "ecom-pdh/05_automation/test-results/report.json"
+EXCEL_PATH  = "ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx"
+OUT_PATH    = "ecom-pdh/03_test-cases/_results/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0_results_20260529.xlsx"
 SHEET_NAME  = "DangKy_UltraFast"
 ACTUAL_COL  = 9   # I
 EXEC_COL    = 10  # J
