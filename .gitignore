@@ -38,3 +38,15 @@ desktop.ini
 .playwright-mcp/
 .ckdump/
 *_snapshot.yml
+
+# Playwright / Allure test output (raw artifacts — không track vào git)
+06_report/
+test-results/
+allure-results/
+playwright-report/
+test-artifacts/
+report.json
+
+# LibreOffice / Excel lock files
+.~lock.*.xlsx#
+.~lock.*.ods#
