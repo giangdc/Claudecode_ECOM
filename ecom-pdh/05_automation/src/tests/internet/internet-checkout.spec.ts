@@ -344,3 +344,233 @@ test.describe('TC_CKCOMMON — Navigation', () => {
     expect(href).toContain('privacy-policy');
   });
 });
+
+// ════════════════════════ TC_CKCOMMON — GROUP A (bổ sung) ════════════════════════
+
+async function completeCODInternet(page: Page): Promise<void> {
+  const pay = await goToB2(page);
+  await pay.selectPaymentMethod('COD-COD');
+  await pay.clickThanhToan();
+  await expect(page).toHaveURL(/\/completed/, { timeout: 20000 });
+}
+
+// ── Navigation & Icon back ──────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Navigation back (Internet URL)', () => {
+
+  test('TC_CKCOMMON.3 — Kiểm tra icon back khi mở trực tiếp link đăng ký', async ({ page }) => {
+    const reg = await openB1(page);
+    // Logo link là phương tiện quay về Home khi mở trực tiếp (không có referer tongdaiwifi)
+    await expect(reg.logoLink).toBeVisible();
+    const href = await reg.logoLink.getAttribute('href');
+    expect(href).toBeTruthy();
+    expect(href).toMatch(/tongdaiwifi\.vn|fpt\.vn/i);
+  });
+
+  test('TC_CKCOMMON.4 — Kiểm tra icon back khi vào từ tongdaiwifi.vn', async ({ page }) => {
+    const product = new InternetProductPage(page);
+    await product.navigate(DETAIL_URL);
+    await product.clickDangKyNgay();
+    await expect(page).toHaveURL(/staging\.fpt\.vn\/checkout/, { timeout: 15000 });
+    const reg = new CheckoutRegisterPage(page);
+    await page.waitForSelector('input[name="full_name"]', { state: 'visible', timeout: 15000 });
+    // Quay về tongdaiwifi.vn qua logo/back
+    const href = await reg.logoLink.getAttribute('href');
+    expect(href).toMatch(/tongdaiwifi\.vn|fpt\.vn/i);
+  });
+
+});
+
+// ── Block Sản phẩm ─────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block Sản phẩm (Internet URL)', () => {
+
+  test('TC_CKCOMMON.7 — Kiểm tra Block Sản phẩm hiển thị tên, chu kỳ và giá', async ({ page }) => {
+    const reg = await openB1(page);
+    // Internet: tên gói, chu kỳ (tháng), giá hiển thị trên block sản phẩm
+    await expect(page.getByText(/Giga|goi-giga/i)).toBeVisible();
+    await expect(page.getByText(/tháng|kỳ/i).first()).toBeVisible();
+    await expect(page.getByText(/\d+\.000đ|\d+VND/i).first()).toBeVisible();
+  });
+
+});
+
+// ── Họ tên bổ sung ─────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block TTKH: Họ tên bổ sung (Internet URL)', () => {
+
+  test('TC_CKCOMMON.10 — Kiểm tra Họ tên chứa số hoặc ký tự đặc biệt → báo lỗi', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.fillPhone(VALID_PHONE);
+    await reg.fillValidAddress();
+    await reg.fillFullName('Nguyen 123 !@#');
+    await reg.tiepTucButton.scrollIntoViewIfNeeded();
+    await reg.tiepTucButton.click();
+    await expect(reg.fieldError(/Họ( và)? tên không hợp lệ|chỉ (được )?chứa chữ|không hợp lệ/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+});
+
+// ── Địa chỉ bổ sung ────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block Địa chỉ lắp đặt bổ sung (Internet URL)', () => {
+
+  test('TC_CKCOMMON.24 — Kiểm tra không chọn Tỉnh/Thành phố → báo lỗi bắt buộc', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.fillFullName(VALID_NAME);
+    await reg.fillPhone(VALID_PHONE);
+    await reg.tiepTucButton.scrollIntoViewIfNeeded();
+    await reg.tiepTucButton.click();
+    await expect(reg.fieldError(/Vui lòng chọn tỉnh|địa chỉ.*bắt buộc/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.28 — Kiểm tra đổi Tỉnh/Thành phố reset Phường/Xã và Tên đường', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.selectProvince('Hồ Chí Minh');
+    await reg.selectWard('Phường Bến Thành');
+    await reg.selectProvince('Hà Nội', 'Hà N');
+    await expect(page.getByRole('button', { name: 'Chọn phường/xã' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /Phường Bến Thành/ })).not.toBeVisible();
+  });
+
+  test('TC_CKCOMMON.30 — Kiểm tra Phường/Xã bắt buộc khi đã chọn Tỉnh', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.fillFullName(VALID_NAME);
+    await reg.fillPhone(VALID_PHONE);
+    await reg.selectProvince('Hồ Chí Minh');
+    await reg.fillSoNha('113');
+    await reg.tiepTucButton.scrollIntoViewIfNeeded();
+    await reg.tiepTucButton.click();
+    await expect(reg.fieldError(/Vui lòng chọn (?:phường|xã)/i)).toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.35 — Kiểm tra Tên đường bắt buộc sau khi đã chọn Phường/Xã', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.fillFullName(VALID_NAME);
+    await reg.fillPhone(VALID_PHONE);
+    await reg.selectProvince('Hồ Chí Minh');
+    await reg.selectWard('Phường Bến Thành');
+    await reg.fillSoNha('113');
+    await reg.tiepTucButton.scrollIntoViewIfNeeded();
+    await reg.tiepTucButton.click();
+    await expect(reg.fieldError(/Vui lòng chọn tên đường|đường.*bắt buộc/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.36 — Kiểm tra tìm kiếm và chọn Tên đường', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.selectProvince('Hồ Chí Minh');
+    await reg.selectWard('Phường Bến Thành');
+    await reg.selectStreet('Đường Lê Lai', 'Lê Lai');
+    // Street button giữ aria-label="Chọn tên đường" sau khi chọn; kiểm tra text content
+    await expect(page.locator('button[aria-label="Chọn tên đường"]')).toContainText('Lê Lai', { timeout: 8000 });
+  });
+
+});
+
+// ── Popup ĐCHC bổ sung ─────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Popup Địa chỉ hành chính cũ bổ sung (Internet URL)', () => {
+
+  test('TC_CKCOMMON.42 — Kiểm tra load phân cấp và tìm kiếm trong popup ĐCHC', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.openOldAddressPopup();
+    const districtBtn = reg.oldAddrDialog.getByRole('button', { name: 'Chọn quận/huyện' });
+    await expect(districtBtn).toBeVisible();
+    await districtBtn.click();
+    const dd = page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd.getByRole('textbox', { name: 'Nhập thông tin' })).toBeVisible({ timeout: 10000 });
+    expect(await dd.locator('p').count()).toBeGreaterThan(0);
+    await dd.getByRole('textbox', { name: 'Nhập thông tin' }).fill('1');
+    await expect(dd.locator('p').first()).toBeVisible({ timeout: 5000 });
+  });
+
+  test.fixme('TC_CKCOMMON.48 — Kiểm tra click Xác nhận đẩy địa chỉ 2-cấp vào form', async ({ page }) => {
+    // Cần test data: địa chỉ 3-cấp có mapping sang 2-cấp mới trên staging.
+    const reg = await openB1(page);
+    await reg.openOldAddressPopup();
+    // TODO: chọn đủ 4 cấp → click Xác nhận → verify địa chỉ điền vào form
+  });
+
+});
+
+// ── TTKH summary block (chỉ có ở Internet B2) ──────────────────────────────────
+test.describe('TC_CKCOMMON — Block Thông tin khách hàng — summary B2 (Internet)', () => {
+
+  test('TC_CKCOMMON.49 — Kiểm tra thu gọn/mở rộng block Thông tin khách hàng tại Bước 2', async ({ page }) => {
+    const pay = await goToB2(page);
+    // B2 Internet dùng label "Thông tin đăng ký" (không phải "Thông tin khách hàng") cho accordion summary
+    const ttkhSection = page.getByText(/Thông tin đăng ký|Thông tin khách hàng/, { exact: false }).first();
+    await expect(ttkhSection).toBeVisible({ timeout: 10000 });
+    // Họ tên đã điền ở B1 phải hiển thị trong summary
+    await expect(pay.installationInfo('Họ tên')).toBeVisible();
+  });
+
+  test('TC_CKCOMMON.50 — Kiểm tra format hiển thị địa chỉ Nhà riêng trong block TTKH', async ({ page }) => {
+    const pay = await goToB2(page);
+    // Địa chỉ format: "số nhà, tên đường, phường, tỉnh"
+    const addrLocator = pay.installationInfo('Địa chỉ');
+    await expect(addrLocator).toBeVisible({ timeout: 10000 });
+    const addrText = await addrLocator.textContent();
+    // Phải chứa thông tin địa chỉ đã điền ở B1 (HCM / Bến Thành / Lê Lai / 113)
+    expect(addrText).toMatch(/Lê Lai|Bến Thành|Hồ Chí Minh/i);
+  });
+
+  test('TC_CKCOMMON.51 — Kiểm tra block TTKH tại Bước 2 không cho chỉnh sửa', async ({ page }) => {
+    const pay = await goToB2(page);
+    await expect(pay.installationInfo('Họ tên')).toBeVisible({ timeout: 10000 });
+    // Block TTKH summary là read-only — không có input field trong vùng hiển thị
+    const ttkhBlock = page.locator('section, div').filter({ hasText: 'Thông tin khách hàng' }).first();
+    const inputsInBlock = ttkhBlock.locator('input:visible');
+    await expect(inputsInBlock).toHaveCount(0);
+  });
+
+});
+
+// ── Submit thiếu trường tổng hợp ───────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Luồng submit thiếu trường (Internet URL)', () => {
+
+  test('TC_CKCOMMON.63 — Kiểm tra click Tiếp tục khi tất cả trường để trống', async ({ page }) => {
+    const reg = await openB1(page);
+    await reg.tiepTucButton.scrollIntoViewIfNeeded();
+    await reg.tiepTucButton.click();
+    await expect(reg.fieldError(/Vui lòng nhập họ( và)? tên/)).toBeVisible({ timeout: 8000 });
+    await expect(reg.fieldError(/Vui lòng nhập số điện thoại/)).toBeVisible();
+  });
+
+});
+
+// ── Màn hình Hoàn tất ──────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Màn hình Hoàn tất (Internet URL)', () => {
+
+  test('TC_CKCOMMON.72 — Kiểm tra hiển thị Mã đơn hàng và hyperlink Theo dõi ĐH', async ({ page }) => {
+    await completeCODInternet(page);
+    await expect(page.getByText(/Mã đơn hàng/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Theo dõi ĐH', { exact: false })).toBeVisible();
+    const orderIdEl = page.getByText(/Mã đơn hàng/i);
+    const text = await orderIdEl.textContent();
+    expect(text?.replace(/Mã đơn hàng:?/, '').trim().length).toBeGreaterThan(0);
+  });
+
+  test.fixme('TC_CKCOMMON.73 — Kiểm tra click hyperlink Theo dõi đơn hàng điều hướng đúng', async ({ page }) => {
+    // FIXME: "Theo dõi ĐH" là <P> element bên trong <DIV>, không phải <a href>.
+    // Confirmed qua DOM inspect 2026-06-07: không có <a> element nào trên trang /completed.
+    // Cần BA/DEV xác nhận: element này có điều hướng không và điều hướng bằng cách nào.
+    await completeCODInternet(page);
+    const trackingLink = page.getByText('Theo dõi ĐH', { exact: false });
+    await expect(trackingLink).toBeVisible({ timeout: 15000 });
+    const href = await trackingLink.locator('xpath=ancestor-or-self::a').first().getAttribute('href')
+      .catch(async () => await page.locator('a:has-text("Theo dõi")').first().getAttribute('href'));
+    expect(href).toBeTruthy();
+  });
+
+  test('TC_CKCOMMON.74 — Kiểm tra block Thông tin khách hàng hiển thị trên màn Hoàn tất', async ({ page }) => {
+    await completeCODInternet(page);
+    await expect(page.getByText(VALID_NAME, { exact: false })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(VALID_PHONE, { exact: false })).toBeVisible();
+  });
+
+  test('TC_CKCOMMON.75 — Kiểm tra trạng thái hoàn tất: COD hiển thị Chưa thanh toán', async ({ page }) => {
+    await completeCODInternet(page);
+    await expect(page.getByText(/Đơn hàng.*thành công|đăng ký thành công/i)).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Chưa thanh toán', { exact: false })).toBeVisible();
+  });
+
+});

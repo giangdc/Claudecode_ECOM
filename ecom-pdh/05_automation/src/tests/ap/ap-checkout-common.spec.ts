@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { ApCheckoutPage } from '../../pages/ap/ap-checkout.page';
+import { ApProductDetailPage } from '../../pages/ap/ap-product-detail.page';
+import { ApOrderCompletePage } from '../../pages/ap/ap-order-complete.page';
 
 /**
  * TC_CKCOMMON — Field validation dùng chung, chạy trên màn Checkout AP.
@@ -8,9 +10,19 @@ import { ApCheckoutPage } from '../../pages/ap/ap-checkout.page';
  * CKCOMMON realized trên màn checkout AP (1 bước — /payment page chứa form + PTTT).
  */
 
-const REGISTER_URL = 'https://staging.fpt.vn/checkout/register/access-point-ax1800az?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn';
-const VALID_NAME   = 'Nguyen Van Auto';
-const VALID_PHONE  = '0901234567';
+const REGISTER_URL  = 'https://staging.fpt.vn/checkout/register/access-point-ax1800az?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn';
+const PRODUCT_URL   = 'https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/access-point-ax1800az';
+const VALID_NAME    = 'Nguyen Van Auto';
+const VALID_PHONE   = '0901234567';
+
+async function completeCOD(page: Page): Promise<void> {
+  const checkout = new ApCheckoutPage(page);
+  await checkout.start(REGISTER_URL);
+  await checkout.fillAllValid(VALID_NAME, VALID_PHONE, '113');
+  await checkout.selectPaymentMethod('COD-COD');
+  await checkout.clickThanhToan();
+  await expect(page).toHaveURL(/\/completed/, { timeout: 20000 });
+}
 
 async function openAP(page: Page): Promise<ApCheckoutPage> {
   const checkout = new ApCheckoutPage(page);
@@ -267,6 +279,218 @@ test.describe('TC_CKCOMMON — Phương thức thanh toán & Luồng thanh toán
     await checkout.selectPaymentMethod('DOMESTIC-Online');
     await checkout.clickThanhToan();
     await expect(page).not.toHaveURL(/\/payment$/, { timeout: 20000 });
+  });
+
+});
+
+// ════════════════════════ TC_CKCOMMON — GROUP A (bổ sung) ════════════════════════
+
+// ── Navigation & Icon back ──────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Navigation back (AP URL)', () => {
+
+  test('TC_CKCOMMON.3 — Kiểm tra icon back khi mở trực tiếp link đăng ký', async ({ page }) => {
+    const checkout = await openAP(page);
+    // AP 1-bước: link Quay lại luôn hiển thị trên màn payment, kể cả khi mở URL trực tiếp
+    await expect(checkout.quayLaiLink).toBeVisible();
+    const href = await checkout.quayLaiLink.getAttribute('href');
+    expect(href).toBeTruthy();
+    expect(href).toMatch(/tongdaiwifi\.vn/);
+  });
+
+  test('TC_CKCOMMON.4 — Kiểm tra icon back khi vào từ tongdaiwifi.vn', async ({ page }) => {
+    const product = new ApProductDetailPage(page);
+    await product.navigateToProduct(PRODUCT_URL);
+    await product.clickMuaNgay();
+    await page.waitForURL(/\/payment/, { timeout: 20000 });
+    const checkout = new ApCheckoutPage(page);
+    await checkout.dismissCookieBanner();
+    const href = await checkout.quayLaiLink.getAttribute('href');
+    expect(href).toMatch(/tongdaiwifi\.vn/);
+    await page.goto(href!);
+    await expect(page).toHaveURL(/tongdaiwifi\.vn/, { timeout: 15000 });
+  });
+
+});
+
+// ── Block Sản phẩm ─────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block Sản phẩm (AP URL)', () => {
+
+  test('TC_CKCOMMON.7 — Kiểm tra Block Sản phẩm hiển thị tên, số lượng và giá', async ({ page }) => {
+    await openAP(page);
+    await expect(page.getByText(/Access Point/i)).toBeVisible();
+    await expect(page.getByText(/^x\d+$/).first()).toBeVisible();
+    await expect(page.getByText(/\d+\.000đ/).first()).toBeVisible();
+  });
+
+});
+
+// ── Họ tên bổ sung ─────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block Thông tin cá nhân: Họ tên bổ sung (AP URL)', () => {
+
+  test('TC_CKCOMMON.10 — Kiểm tra Họ tên chứa số hoặc ký tự đặc biệt → báo lỗi', async ({ page }) => {
+    const checkout = await openAP(page);
+    await checkout.fillSdt(VALID_PHONE);
+    await checkout.fillValidAddress();
+    await checkout.fillHoTen('Nguyen 123 !@#');
+    await checkout.thanhToanButton.scrollIntoViewIfNeeded();
+    await checkout.thanhToanButton.click();
+    await expect(checkout.fieldError(/Họ( và)? tên không hợp lệ|chỉ (được )?chứa chữ|không hợp lệ/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+});
+
+// ── Địa chỉ bổ sung ────────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Block Địa chỉ lắp đặt bổ sung (AP URL)', () => {
+
+  test.fixme('TC_CKCOMMON.24 — Kiểm tra không chọn Tỉnh/Thành phố → báo lỗi bắt buộc', async ({ page }) => {
+    // FIXME: AP checkout pre-fills Tỉnh/Phường/Đường từ server (confirmed qua DOM inspect 2026-06-07).
+    // Scenario "Province not selected" không xảy ra được trong AP flow.
+    // TC này cần test tay hoặc implement bằng cách reset dropdown về placeholder trước khi submit.
+    const checkout = await openAP(page);
+    await checkout.fillHoTen(VALID_NAME);
+    await checkout.fillSdt(VALID_PHONE);
+    await checkout.thanhToanButton.scrollIntoViewIfNeeded();
+    await checkout.thanhToanButton.click();
+    await expect(checkout.fieldError(/Vui lòng chọn tỉnh|địa chỉ.*bắt buộc|chọn tỉnh/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.28 — Kiểm tra đổi Tỉnh/Thành phố reset Phường/Xã và Tên đường', async ({ page }) => {
+    const checkout = await openAP(page);
+    await checkout.selectProvince('Hồ Chí Minh');
+    await checkout.selectWard('Phường Bến Thành');
+    // Đổi sang tỉnh khác → các dropdown phụ thuộc phải reset
+    await checkout.selectProvince('Hà Nội', 'Hà N');
+    await expect(page.getByRole('button', { name: 'Chọn phường/xã' })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /Phường Bến Thành/ })).not.toBeVisible();
+  });
+
+  test.fixme('TC_CKCOMMON.30 — Kiểm tra Phường/Xã bắt buộc khi đã chọn Tỉnh', async ({ page }) => {
+    // FIXME: AP checkout pre-fills Tỉnh/Phường/Đường từ server (HCM).
+    // Để trigger Ward reset, phải đổi sang Province khác (VD: Hà Nội).
+    // Nhưng trên staging, Province = Hà Nội tự động điền Ward/Street và đổi PTTT sang Thẻ ATM,
+    // khiến form submit thành công thay vì hiện lỗi "Vui lòng chọn phường/xã".
+    // Cùng lý do với TC_CKCOMMON.24 — không thể automate trên AP staging hiện tại.
+    const checkout = await openAP(page);
+    await checkout.fillHoTen(VALID_NAME);
+    await checkout.fillSdt(VALID_PHONE);
+    await checkout.selectProvince('Hà Nội', 'Hà N');
+    await checkout.fillSoNha('113');
+    await checkout.thanhToanButton.scrollIntoViewIfNeeded();
+    await checkout.thanhToanButton.click();
+    await expect(checkout.fieldError(/Vui lòng chọn (?:phường|xã)/i)).toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.35 — Kiểm tra Tên đường bắt buộc sau khi đã chọn Phường/Xã', async ({ page }) => {
+    const checkout = await openAP(page);
+    await checkout.fillHoTen(VALID_NAME);
+    await checkout.fillSdt(VALID_PHONE);
+    await checkout.selectProvince('Hồ Chí Minh');
+    await checkout.selectWard('Phường Bến Thành');
+    // Không chọn Tên đường; điền Số nhà
+    await checkout.fillSoNha('113');
+    await checkout.thanhToanButton.scrollIntoViewIfNeeded();
+    await checkout.thanhToanButton.click();
+    await expect(checkout.fieldError(/Vui lòng chọn tên đường|đường.*bắt buộc/i))
+      .toBeVisible({ timeout: 8000 });
+  });
+
+  test('TC_CKCOMMON.36 — Kiểm tra tìm kiếm và chọn Tên đường', async ({ page }) => {
+    const checkout = await openAP(page);
+    await checkout.selectProvince('Hồ Chí Minh');
+    await checkout.selectWard('Phường Bến Thành');
+    await checkout.selectStreet('Đường Lê Lai', 'Lê Lai');
+    // Street button giữ aria-label="Chọn tên đường" sau khi chọn; kiểm tra text content thay vì accessible name
+    await expect(page.locator('button[aria-label="Chọn tên đường"]')).toContainText('Lê Lai', { timeout: 8000 });
+  });
+
+});
+
+// ── Popup ĐCHC bổ sung ─────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Popup Địa chỉ hành chính cũ bổ sung (AP URL)', () => {
+
+  test('TC_CKCOMMON.42 — Kiểm tra load phân cấp và tìm kiếm trong popup ĐCHC', async ({ page }) => {
+    const checkout = await openAP(page);
+    await checkout.openOldAddressPopup();
+    const dialog = checkout.oldAddrDialog;
+    // Popup mở với dropdown Quận/Huyện (cấp đầu tiên trong 3-cấp cũ)
+    const districtBtn = dialog.getByRole('button', { name: 'Chọn quận/huyện' });
+    await expect(districtBtn).toBeVisible();
+    await districtBtn.click();
+    // Dropdown danh sách mở có ô tìm kiếm và ít nhất 1 item
+    const dd = page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd.getByRole('textbox', { name: 'Nhập thông tin' })).toBeVisible({ timeout: 10000 });
+    const itemCount = await dd.locator('p').count();
+    expect(itemCount).toBeGreaterThan(0);
+    // Tìm kiếm lọc kết quả
+    await dd.getByRole('textbox', { name: 'Nhập thông tin' }).fill('1');
+    await expect(dd.locator('p').first()).toBeVisible({ timeout: 5000 });
+  });
+
+  test.fixme('TC_CKCOMMON.48 — Kiểm tra click Xác nhận đẩy địa chỉ 2-cấp vào form', async ({ page }) => {
+    // Cần test data: địa chỉ 3-cấp (Quận/Phường cũ) có mapping sang 2-cấp mới trên staging.
+    // Thực hiện thủ công cho đến khi team QA cung cấp bộ địa chỉ cụ thể.
+    const checkout = await openAP(page);
+    await checkout.openOldAddressPopup();
+    // TODO: chọn đủ 4 cấp → oldAddrConfirmButton.click() → verify soNhaInput / ward button đã điền
+  });
+
+});
+
+// ── Submit thiếu trường tổng hợp ───────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Luồng submit thiếu trường (AP URL)', () => {
+
+  test('TC_CKCOMMON.63 — Kiểm tra click Thanh toán khi tất cả trường để trống', async ({ page }) => {
+    const checkout = await openAP(page);
+    // Không điền bất kỳ trường nào → click Thanh toán
+    await checkout.thanhToanButton.scrollIntoViewIfNeeded();
+    await checkout.thanhToanButton.click();
+    // Nhiều lỗi hiển thị cùng lúc — tối thiểu Họ tên và SĐT
+    await expect(checkout.fieldError(/Vui lòng nhập họ( và)? tên/)).toBeVisible({ timeout: 8000 });
+    await expect(checkout.fieldError(/Vui lòng nhập số điện thoại/)).toBeVisible();
+  });
+
+});
+
+// ── Màn hình Hoàn tất ──────────────────────────────────────────────────────────
+test.describe('TC_CKCOMMON — Màn hình Hoàn tất (AP URL)', () => {
+
+  test('TC_CKCOMMON.72 — Kiểm tra hiển thị Mã đơn hàng và hyperlink Theo dõi ĐH', async ({ page }) => {
+    await completeCOD(page);
+    const complete = new ApOrderCompletePage(page);
+    await expect(complete.orderIdText).toBeVisible({ timeout: 15000 });
+    await expect(complete.trackingLink).toBeVisible();
+    const orderId = await complete.getOrderId();
+    expect(orderId.length).toBeGreaterThan(0);
+  });
+
+  test.fixme('TC_CKCOMMON.73 — Kiểm tra click hyperlink Theo dõi đơn hàng điều hướng đúng', async ({ page }) => {
+    // FIXME: "Theo dõi ĐH" là <P> element bên trong <DIV>, không phải <a href>.
+    // Confirmed qua DOM inspect 2026-06-07: không có <a> element nào trên trang /completed.
+    // Không thể test href navigation. Cần BA/DEV xác nhận intent: là hyperlink hay display-only label.
+    await completeCOD(page);
+    const complete = new ApOrderCompletePage(page);
+    await expect(complete.trackingLink).toBeVisible({ timeout: 15000 });
+    const href = await complete.trackingLink.getAttribute('href');
+    expect(href).toBeTruthy();
+    await page.goto(href!);
+    await expect(page).not.toHaveURL(/\/completed/, { timeout: 15000 });
+  });
+
+  test('TC_CKCOMMON.74 — Kiểm tra block Thông tin khách hàng hiển thị trên màn Hoàn tất', async ({ page }) => {
+    await completeCOD(page);
+    await expect(page.getByText(VALID_NAME, { exact: false })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(VALID_PHONE, { exact: false })).toBeVisible();
+    // Kiểm tra label "Địa chỉ" tồn tại (địa chỉ thực tế phụ thuộc vào pre-fill trên AP staging)
+    await expect(page.getByText('Địa chỉ', { exact: true })).toBeVisible();
+  });
+
+  test('TC_CKCOMMON.75 — Kiểm tra trạng thái hoàn tất: COD hiển thị Chưa thanh toán', async ({ page }) => {
+    await completeCOD(page);
+    const complete = new ApOrderCompletePage(page);
+    await expect(complete.successMessage).toBeVisible({ timeout: 15000 });
+    await expect(complete.codStatus).toBeVisible();
   });
 
 });

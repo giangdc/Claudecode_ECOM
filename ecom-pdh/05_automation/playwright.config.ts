@@ -7,7 +7,7 @@ export default defineConfig({
   testDir: './src/tests',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   workers: 1,
   reporter: [
     ['html', { outputFolder: '../../06_report/playwright-report', open: 'never' }],

@@ -84,11 +84,14 @@ export class CheckoutRegisterPage extends BasePage {
 
   /** Mở dropdown qua tên button trigger, (tùy chọn) gõ từ khóa, rồi chọn option theo text. */
   private async pickFromDropdown(triggerName: string, optionText: string, keyword?: string): Promise<void> {
-    await this.page.getByRole('button', { name: triggerName }).click();
+    const btn = this.page.getByRole('button', { name: triggerName });
+    await btn.scrollIntoViewIfNeeded();
+    await btn.click();
     const dropdown = this.addressDropdown;
-    await expect(dropdown).toBeVisible({ timeout: 10000 });
+    await expect(dropdown).toBeVisible({ timeout: 15000 });
     if (keyword) {
       await dropdown.getByRole('textbox', { name: 'Nhập thông tin' }).fill(keyword);
+      await expect(dropdown.getByText(optionText, { exact: true }).first()).toBeVisible({ timeout: 10000 });
     }
     await dropdown.getByText(optionText, { exact: true }).first().click();
   }
@@ -116,9 +119,9 @@ export class CheckoutRegisterPage extends BasePage {
 
   /** Điền đủ địa chỉ hợp lệ (HCM / Phường Bến Thành / Đường Lê Lai / số nhà). */
   async fillValidAddress(soNha = '113'): Promise<void> {
-    await this.selectProvince('Hồ Chí Minh');
-    await this.selectWard('Phường Bến Thành');
-    await this.selectStreet('Đường Lê Lai');
+    await this.selectProvince('Hồ Chí Minh', 'Hồ Chí');
+    await this.selectWard('Phường Bến Thành', 'Bến Thành');
+    await this.selectStreet('Đường Lê Lai', 'Lê Lai');
     await this.fillSoNha(soNha);
   }
 

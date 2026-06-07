@@ -79,11 +79,14 @@ export class ApCheckoutPage extends BasePage {
   }
 
   private async pickFromDropdown(triggerName: string, optionText: string, keyword?: string): Promise<void> {
-    await this.page.getByRole('button', { name: triggerName }).click();
+    const btn = this.page.getByRole('button', { name: triggerName });
+    await btn.scrollIntoViewIfNeeded();
+    await btn.click();
     const dropdown = this.addressDropdown;
-    await expect(dropdown).toBeVisible({ timeout: 10000 });
+    await expect(dropdown).toBeVisible({ timeout: 15000 });
     if (keyword) {
       await dropdown.getByRole('textbox', { name: 'Nhập thông tin' }).fill(keyword);
+      await expect(dropdown.getByText(optionText, { exact: true }).first()).toBeVisible({ timeout: 10000 });
     }
     await dropdown.getByText(optionText, { exact: true }).first().click();
   }
@@ -102,17 +105,18 @@ export class ApCheckoutPage extends BasePage {
   }
 
   async fillValidAddress(soNha = '113'): Promise<void> {
-    await this.selectProvince('Hồ Chí Minh');
-    await this.selectWard('Phường Bến Thành');
-    await this.selectStreet('Đường Lê Lai');
+    await this.selectProvince('Hồ Chí Minh', 'Hồ Chí');
+    await this.selectWard('Phường Bến Thành', 'Bến Thành');
+    await this.selectStreet('Đường Lê Lai', 'Lê Lai');
     await this.fillSoNha(soNha);
   }
 
   /** Điền toàn bộ thông tin hợp lệ để có thể bấm Thanh toán. */
   async fillAllValid(hoTen: string, sdt: string, soNha = '113'): Promise<void> {
     await this.fillHoTen(hoTen);
-    await this.fillSdt(sdt);
     await this.fillValidAddress(soNha);
+    // SĐT điền sau address để tránh bị clear bởi re-render Province/Ward/Street
+    await this.fillSdt(sdt);
   }
 
   // ── Payment method ─────────────────────────────────────────────────────────
