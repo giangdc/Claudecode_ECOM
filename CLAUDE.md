@@ -14,6 +14,14 @@ The full skill reference is in `.claude/CLAUDE.md`. This root file covers archit
 
 ---
 
+## Environment & tooling gotchas (đọc trước khi thao tác)
+
+- **Ổ đĩa là FAT32** (`E:`), không phải NTFS → không có ACL (`takeown`/`icacls` vô tác dụng), và **entry thư mục dễ hỏng/mồ côi**. Triệu chứng: một thư mục hiện trong PowerShell nhưng `cmd dir` không thấy, mọi thao tác mở/xóa/rename báo "Access denied" hoặc "does not exist", và `git reset/pull` chết với `cannot create directory ... Permission denied`. **Cách sửa:** `chkdsk E: /f` từ Command Prompt **Administrator** (đóng app đang giữ ổ E: trước, kể cả IDE). Đã xảy ra với `03_test-cases/_results` (2026-06-08).
+- **Chạy npm/npx qua PowerShell, KHÔNG qua Bash tool.** Bash tool ở đây không có `node` trong PATH (lỗi `'"node"' is not recognized`). Dùng `PowerShell` với `Set-Location <abs path>` rồi `npx playwright test ...`. Bash chỉ dùng cho `git` và `python`.
+- **Python openpyxl + Tiếng Việt:** đặt `PYTHONIOENCODING=utf-8` khi chạy script in ra console (cp1252 sẽ crash trên ký tự có dấu).
+
+---
+
 ## Skill pipeline (the core workflow)
 
 ```
@@ -137,11 +145,16 @@ ecom-pdh/05_automation/
 |---|---|
 | chucnang_checkout (dịch vụ UltraFast) | `ultrafast` |
 | chucnang_checkout (dịch vụ Internet) | `internet` |
+| chucnang_checkout (dịch vụ AP) | `ap` |
+| chucnang_checkout (dịch vụ Smart TV) | `smarttv` |
+| chucnang_checkout (dịch vụ Camera) | `camera` (TC có, chưa automation) |
 | chucnang_Voucher | `voucher` |
 | chucnang_QLnoidunggoiban | `goiban` |
 | chucnang_QLdactinh | `dactinh` |
 | chucnang_manhinhchitietthietbi | `chitietthietbi` |
 | (login / dashboard — cross-cutting) | `common` |
+
+**Page object dùng chung cho checkout thiết bị (AP / Smart TV / Camera):** 3 page object `device-checkout.page.ts`, `device-product-detail.page.ts`, `device-order-complete.page.ts` nằm ở `pages/common/` (class `Device*Page`). Các dịch vụ này có rule GIỐNG NHAU, chỉ khác label SP/giá/slug → spec truyền product params qua env (vd `SMARTTV_PRODUCT_SLUG`, `AP_PRODUCT_SLUG`). Vì page object đã ở `common/`, các module `ap`/`smarttv` chỉ có thư mục `tests/` (không có `pages/` riêng) — đúng quy tắc "logic dùng ≥2 module đẩy lên common/".
 
 **Pattern:** Test files import custom `test` from `fixtures/base.fixture.ts` (không dùng `@playwright/test` trực tiếp). Page Objects khai báo locators là `readonly` fields, methods không chứa assertions.
 
@@ -161,22 +174,7 @@ ecom-pdh/05_automation/
 | `ecom-pdh/05_automation/` | Playwright TS automation framework (moved here from root-level `automation-framework/`) |
 | `ecom-pdh/06_report/` | Toàn bộ output sau khi chạy test: `*_results_*.xlsx`, `report.json`, `playwright-report/`, `allure-results/`, `allure-report/`, `test-artifacts/` |
 
-**Modules đã analyze:**
-- `chucnang_QLnoidunggoiban` — Quản lý Nội dung Gói bán
-- `chucnang_QLdactinh` — Quản lý Đặc tính
-- `chucnang_manhinhchitietthietbi` — Chi tiết Thiết bị
-- `chucnang_Voucher` — Voucher/EVC Checkout (has `test_data_catalog.md`)
-- `chucnang_checkout` — Luồng checkout đa dịch vụ: UltraFast (automation 19/20 PASS) + CKCOMMON + Internet + **Camera + AP** (phân tích 2026-06-03, TC chưa tạo)
-
-**TC files hiện có (cấu trúc mới — mirror 02 theo module):**
-- `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_dangkyUF_v1.0.xlsx` — Checkout UltraFast (tách từ TC_v1.0 cũ)
-- `03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.0.xlsx` — Checkout Common (78 TC) + Internet (18 TC) — 2 sheet, gen 2026-06-01
-- `03_test-cases/functional/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_voucher_ui_v1.0.xlsx` — Voucher UI Checkout (tách từ TC_v1.0 cũ)
-- `03_test-cases/functional/chucnang_manhinhchitietthietbi/AI_ISC_ecom-pdh_v1.1_TC_chitietthietbi_v1.0.xlsx`
-- `03_test-cases/functional/chucnang_QLdactinh/AI_ISC_ecom-pdh_v1.1_TC_dactinh_v1.1.xlsx`
-- `03_test-cases/functional/chucnang_QLnoidunggoiban/AI_ISC_ecom-pdh_v1.1_TC_goiban_v2.0.xlsx` (đổi tên từ TC_v2.0)
-- `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v1.2.xlsx` — API TC Voucher v1.2 (100 TCs)
-- `03_test-cases/api/chucnang_Voucher/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx` — API TC Voucher v2.0 từ ECP_API_Documentation_v4 (77 TCs)
+**Modules đã analyze, TC files hiện có, và kết quả phân tích requirement per-module → xem `ecom-pdh/CLAUDE.md`** (project context). File root này chỉ giữ kiến trúc/tooling/convention dùng chung.
 
 ---
 
@@ -208,6 +206,7 @@ python sync_tc_results.py            # Sync kết quả chung
 - TC ID formula: `=IF(D10="","",$D$3&"."&COUNTA($D$10:D10))`
 - Columns A–G: TC definition; **Column H: `Auto?`** (`Y`/`N`/blank)
 - Round blocks: cols I–L per round; group headers in green `#A9D08E`
+- **Đọc TC ID bằng openpyxl:** cột B là **formula chưa có cached value** (file chưa mở bằng Excel) → `data_only=True` trả `None`. Phải **tự tính**: TC ID = `D3 & "." & (số dòng có nội dung ở cột D từ D10 đến dòng hiện tại)`. Dòng group-header (merge `B{r}:L{r}`, cột D rỗng) không tăng counter. Round 1 nằm ở cột I–L (I=Kết Quả, J=Người TH, K=ID Bugs, L=Ghi Chú).
 
 ### API (`template-testcase-api.md`)
 - Sheet = endpoint; `D4` = API code (`API_01`)
@@ -257,38 +256,4 @@ Chi tiết trong `.claude/rules/`. Key points:
 
 ## Kết quả phân tích requirement
 
-### 2026-05-25 — Gói bán / Đặc tính / Chi tiết Thiết bị
-- Xem chi tiết trong `ecom-pdh/CLAUDE.md`
-
-### 2026-05-28 — Voucher API (ECP_API_Documentation_v4)
-- **Tài liệu:** `ecom-pdh/00_input/chucnang_Voucher/ECP_API_Documentation_v4.xlsx`
-- **Tổng requirement:** 20 | **Tổng scenario:** 28 (P1:10, P2:18)
-- **Vùng rủi ro cao:** API_18 voucher/apply (Score 20)
-- **Clarifications chưa resolve:** 5 — quan trọng nhất CLA-2 (behavior is_valid=false trong voucher/check)
-- **TC API sinh ra:** `03_test-cases/api/AI_ISC_ecom-pdh_v1.1_TC_API_v2.0.xlsx` (77 TCs)
-- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_Voucher/MEMORY.md`
-
-### 2026-06-01 — Checkout đa dịch vụ (re-baseline, gồm UltraFast)
-- **Tài liệu:** DOC-CK-01 `Chucnangcheckout.xlsx` (Rule common + UltraFast + camera + internet) | DOC-CK-02 `TC_checkout.xlsx` (TC tham chiếu BA) | DOC-CK-03 `camera.png` (mockup). Lưu ý: `dang ky dich ultraFast.xlsx` đã **merge vào DOC-CK-01** và xóa.
-- **Phạm vi đã phân tích:** UltraFast (DANGKYUF) + Màn checkout chung (CKCOMMON) + Internet (INTERNET). **Chưa phân tích:** Camera, Smart Home, Smart Tivi (chờ đủ tài liệu).
-- **Tổng requirement:** 30 active (1 deferred) | **Tổng scenario:** 116 định nghĩa — 111 active (P1:50, P2:47, P3:12), 4 deferred (Chung cư), 1 blocked (voucher)
-- **Vùng rủi ro cao:** CKCOMMON Luồng thanh toán (Score 25); CKCOMMON Phường/Xã + kiểm tra chính sách giá (20); INTERNET B2 trả trước/sau + giá động (20); DANGKYUF Online 3rd party (20); Popup Địa chỉ hành chính cũ (16); Block PTTT (15)
-- **Clarifications:** 8/9 resolved 2026-06-01 (Số nhà max 50; SĐT lỗi = "Số điện thoại không hợp lệ"; Internet không Email; Chung cư deferred; trả trước/sau theo QLCS; session/countdown mọi DV; pre-fill điền toàn bộ +SC-076). Còn **1 pending: CLA-CKCOMMON-007** (nội dung popup "Chưa hỗ trợ chính sách!")
-- **UltraFast:** giữ nguyên SC-DANGKYUF-001..024 (TC + automation 19/20 đã chạy). Defect BUG-DANGKYUF-001 (COD hiển thị staging) vẫn Open.
-- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
-
-### 2026-06-06 — Checkout: update DOC-CK-05 (`Mô tả luồng checkout tongdaiwifi 0606.xlsx`)
-- **Tài liệu:** DOC-CK-05 `Mô tả luồng checkout tongdaiwifi 0606.xlsx` (update 06/06 — confirm + bổ sung rule). Rule common / UltraFast / Internet / Camera **không đổi về scenario**. AP thêm 1 SC mới.
-- **Thay đổi:** (1) Confirm format validation Họ tên trong Rule common → đồng bộ SC-CKCOMMON-008 text "họ tên" (bỏ "và"); (2) Popup ĐCHC cũ làm rõ case convert thất bại → SC-CKCOMMON-044 update; (3) AP có label cố định "Thời gian giao hàng dự kiến từ 3 đến 7 ngày" → thêm **SC-AP-019**. CLA-AP-002 Partially Resolved.
-- **Tổng module checkout:** **155 SC định nghĩa** — active 147 (P1:70 P2:62 P3:15), 5 deferred (Chung cư), 3 blocked (voucher).
-- **Pending còn lại:** CLA-CKCOMMON-007 (nội dung popup "Chưa hỗ trợ chính sách!"), CLA-CAMERA-001 ("Thời gian lắp đặt" Camera nguồn data từ đâu), CLA-AP-001 (xác nhận AP không chu kỳ).
-- **Action cần làm:** Chạy `update-testcase` cho sheet Checkout_AP để thêm TC_AP cho SC-AP-019.
-- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
-
-### 2026-06-03 — Checkout: thêm Camera + AP (bản revise `Chucnangcheckout_0306.xlsx`)
-- **Tài liệu:** DOC-CK-04 `Chucnangcheckout_0306.xlsx` (revise của DOC-CK-01, thêm sheet "Đăng ký AP"; sheet "Đăng ký camera" revise thêm địa chỉ lắp đặt) + DOC-CK-03 mockup `camera.png`. Rule common / UltraFast / Internet **không đổi**.
-- **Phạm vi thêm:** **CAMERA** (20 SC) + **AP** (18 SC). Tổng module checkout: **154 SC định nghĩa** — active 146 (P1:70 P2:61 P3:15), 5 deferred (Chung cư), 3 blocked (voucher).
-- **Đặc thù:** Camera có chu kỳ + COD + địa chỉ lắp đặt + note giao hàng 3-7 ngày + "Thời gian lắp đặt", màn 2 bước; AP chỉ số lượng (không chu kỳ), còn lại như Camera. Field validation **tái dùng CKCOMMON** → khi gen TC chỉ viết phần đặc thù (giống `gen-testcase-checkout-service`).
-- **Vùng rủi ro cao:** CAMERA/AP — Địa chỉ lắp đặt + chính sách giá (20) và B3 Luồng thanh toán COD/Online 3rd party (20).
-- **Clarifications mới:** 3 Pending — CLA-CAMERA-001 ("Thời gian lắp đặt" set ở đâu), CLA-AP-001 (AP không chu kỳ), CLA-AP-002 (note giao hàng/Thời gian lắp đặt AP). Resolved-by-mockup: Block TTCN = Họ tên + SĐT.
-- **MEMORY:** `ecom-pdh/02_analyze-requirements/chucnang_checkout/MEMORY.md`
+**Đã chuyển sang `ecom-pdh/CLAUDE.md`** (project context) — gồm đầy đủ Gói bán, Đặc tính, Chi tiết Thiết bị, Voucher, và Checkout đa dịch vụ (UltraFast/CKCOMMON/Internet/Camera/AP/Smart TV). File root chỉ giữ phần dùng chung mọi project.

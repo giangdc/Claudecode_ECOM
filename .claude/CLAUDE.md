@@ -115,54 +115,7 @@ E:\AI\Ecom\                           ← Workspace root (mở folder này trong
 
 ## Pipeline tổng quát
 
-```
-[BA cung cấp URD] → 00_input/
-        │
-        ▼
-analyze-requirement  →  02_analyze-requirements/<module>/
-        │                   MEMORY.md, test_scenario_map.md, ...
-        ├──────────────────────────────────────┐
-        ▼                                      ▼
-gen-testcase-webapp                  gen-testcase-api
-03_test-cases/functional/<module>/   03_test-cases/api/<module>/
-*.xlsx (mirror 1:1 với 02)           *.xlsx
-        │
-        ├── gen-testcase-checkout-service  (dịch vụ Checkout mới)
-        │   03_test-cases/functional/<module>/TC_checkout.xlsx  (thêm sheet mới)
-        │
-        ▼
-update-testcase  (khi có URD mới)
-03_test-cases/functional|api/<module>/*_v2.0.xlsx, v3.0...
-        │
-        ▼  ── Automation lane (Web UI) ──────────────────────────
-        │  [một lần] generate_automation_framework
-        │  → <project>/05_automation/  (NẰM TRONG project folder)
-        │
-        ▼
-generate_automation_from_testcases
-  └─ Input: 03_test-cases/*.xlsx  (chỉ TC có cột H "Auto?" = Y)
-  └─ Input: URL ứng dụng (phải accessible, không sau VPN)
-  → 05_automation/src/pages/<module>/*.ts    (Page Object classes)
-  → 05_automation/src/tests/<module>/*.spec.ts  (Test scripts, đã chạy PASS)
-
-generate_data_verify   (nhiều dịch vụ cùng layout, khác data)
-  └─ Input: test-data/service_data.xlsx    (mỗi gói/dịch vụ = 1 dòng)
-  └─ Input: Base URL
-  → 05_automation/src/utils/service-data-reader.ts
-  → 05_automation/src/tests/service-data-verify.spec.ts
-  [thêm gói mới: chỉ thêm dòng vào Excel, không chạy lại skill]
-        │
-        ▼ (sau khi chạy npx playwright test --reporter=json)
-sync-tc-results
-  └─ Input: 06_report/report.json        (tự ghi theo playwright.config.ts)
-  └─ Input: 03_test-cases/functional/<module>/*.xlsx
-  → 06_report/*_results_{date}.xlsx                (Pass/Fail điền vào cột Actual Result)
-```
-
-**Prerequisite automation lane:**
-- `<project>/05_automation/` chưa tồn tại → chạy `generate_automation_framework` trước
-- App URL accessible trực tiếp từ máy (MCP browser tool cần inspect DOM thực tế)
-- TC Excel đã được đánh dấu cột H `Auto? = Y/N`
+**Sơ đồ pipeline đầy đủ + key rules (manual / folder mirror / automation lane) → xem `../CLAUDE.md` mục "Skill pipeline".** File này chỉ liệt kê *skill nào dùng khi nào* (2 bảng trên).
 
 ---
 
@@ -174,16 +127,6 @@ Khi skills đọc template, path tương đối được tính từ **root của
 
 ---
 
-## Naming Conventions (toàn workspace)
+## Naming Conventions & Language Rule
 
-- **TC Excel Web/Mobile:** `03_test-cases/functional/<module>/AI_ISC_[project]_[version]_TC_[module]_v[tc_version].xlsx`
-- **TC Excel API:** `03_test-cases/api/<module>/AI_ISC_[project]_[version]_TC_API_v[tc_version].xlsx`
-- **Rule mirror:** mỗi thư mục module trong `02_analyze-requirements/` phải có thư mục TC tương ứng trong `03_test-cases/functional/` và/hoặc `api/`.
-- **TC ID (web):** `TC_[MODULE].[NNN]` — VD: `TC_LOGIN.1`
-- **TC ID (api):** `API_[NN].[NNN]` — VD: `API_01.3`
-- **Scenario ID:** `SC-[MODULE]-[NNN]`
-- **Requirement ID:** `REQ-[MODULE]-[NNN]`
-
-## Language Rule
-- Nội dung TC, mô tả, steps, expected result: **Tiếng Việt có dấu**
-- Technical terms, status (Pass/Fail/Blocked), priority, field names: **Tiếng Anh**
+**Đã hợp nhất vào `../CLAUDE.md`** (mục "Naming conventions" + "Language rule") để tránh trùng 3 file. Quy tắc mirror 02↔03 cũng nằm ở root (mục "Key rule — folder mirror").
