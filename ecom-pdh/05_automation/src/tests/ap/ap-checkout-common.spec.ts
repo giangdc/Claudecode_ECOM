@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { ApCheckoutPage } from '../../pages/ap/ap-checkout.page';
-import { ApProductDetailPage } from '../../pages/ap/ap-product-detail.page';
-import { ApOrderCompletePage } from '../../pages/ap/ap-order-complete.page';
+import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
+import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
+import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
 
 /**
  * TC_CKCOMMON — Field validation dùng chung, chạy trên màn Checkout AP.
@@ -10,13 +10,16 @@ import { ApOrderCompletePage } from '../../pages/ap/ap-order-complete.page';
  * CKCOMMON realized trên màn checkout AP (1 bước — /payment page chứa form + PTTT).
  */
 
-const REGISTER_URL  = 'https://staging.fpt.vn/checkout/register/access-point-ax1800az?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn';
-const PRODUCT_URL   = 'https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/access-point-ax1800az';
+// Product params — override qua env để chạy gói AP-layout khác (TV, Smart Home...).
+const SLUG          = process.env.AP_PRODUCT_SLUG || 'access-point-ax1800az';
+const REGISTER_URL  = process.env.AP_REGISTER_URL || `https://staging.fpt.vn/checkout/register/${SLUG}?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn`;
+const PRODUCT_URL   = process.env.AP_PRODUCT_URL  || `https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/${SLUG}`;
+const PRODUCT_NAME_RE = new RegExp(process.env.AP_PRODUCT_NAME_RE || 'Access Point', 'i');
 const VALID_NAME    = 'Nguyen Van Auto';
 const VALID_PHONE   = '0901234567';
 
 async function completeCOD(page: Page): Promise<void> {
-  const checkout = new ApCheckoutPage(page);
+  const checkout = new DeviceCheckoutPage(page);
   await checkout.start(REGISTER_URL);
   await checkout.fillAllValid(VALID_NAME, VALID_PHONE, '113');
   await checkout.selectPaymentMethod('COD-COD');
@@ -24,8 +27,8 @@ async function completeCOD(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/completed/, { timeout: 20000 });
 }
 
-async function openAP(page: Page): Promise<ApCheckoutPage> {
-  const checkout = new ApCheckoutPage(page);
+async function openAP(page: Page): Promise<DeviceCheckoutPage> {
+  const checkout = new DeviceCheckoutPage(page);
   await checkout.start(REGISTER_URL);
   return checkout;
 }
@@ -298,11 +301,11 @@ test.describe('TC_CKCOMMON — Navigation back (AP URL)', () => {
   });
 
   test('TC_CKCOMMON.4 — Kiểm tra icon back khi vào từ tongdaiwifi.vn', async ({ page }) => {
-    const product = new ApProductDetailPage(page);
+    const product = new DeviceProductDetailPage(page);
     await product.navigateToProduct(PRODUCT_URL);
     await product.clickMuaNgay();
     await page.waitForURL(/\/payment/, { timeout: 20000 });
-    const checkout = new ApCheckoutPage(page);
+    const checkout = new DeviceCheckoutPage(page);
     await checkout.dismissCookieBanner();
     const href = await checkout.quayLaiLink.getAttribute('href');
     expect(href).toMatch(/tongdaiwifi\.vn/);
@@ -317,7 +320,7 @@ test.describe('TC_CKCOMMON — Block Sản phẩm (AP URL)', () => {
 
   test('TC_CKCOMMON.7 — Kiểm tra Block Sản phẩm hiển thị tên, số lượng và giá', async ({ page }) => {
     await openAP(page);
-    await expect(page.getByText(/Access Point/i)).toBeVisible();
+    await expect(page.getByText(PRODUCT_NAME_RE).first()).toBeVisible();
     await expect(page.getByText(/^x\d+$/).first()).toBeVisible();
     await expect(page.getByText(/\d+\.000đ/).first()).toBeVisible();
   });
@@ -458,7 +461,7 @@ test.describe('TC_CKCOMMON — Màn hình Hoàn tất (AP URL)', () => {
 
   test('TC_CKCOMMON.72 — Kiểm tra hiển thị Mã đơn hàng và hyperlink Theo dõi ĐH', async ({ page }) => {
     await completeCOD(page);
-    const complete = new ApOrderCompletePage(page);
+    const complete = new DeviceOrderCompletePage(page);
     await expect(complete.orderIdText).toBeVisible({ timeout: 15000 });
     await expect(complete.trackingLink).toBeVisible();
     const orderId = await complete.getOrderId();
@@ -470,7 +473,7 @@ test.describe('TC_CKCOMMON — Màn hình Hoàn tất (AP URL)', () => {
     // Confirmed qua DOM inspect 2026-06-07: không có <a> element nào trên trang /completed.
     // Không thể test href navigation. Cần BA/DEV xác nhận intent: là hyperlink hay display-only label.
     await completeCOD(page);
-    const complete = new ApOrderCompletePage(page);
+    const complete = new DeviceOrderCompletePage(page);
     await expect(complete.trackingLink).toBeVisible({ timeout: 15000 });
     const href = await complete.trackingLink.getAttribute('href');
     expect(href).toBeTruthy();
@@ -488,7 +491,7 @@ test.describe('TC_CKCOMMON — Màn hình Hoàn tất (AP URL)', () => {
 
   test('TC_CKCOMMON.75 — Kiểm tra trạng thái hoàn tất: COD hiển thị Chưa thanh toán', async ({ page }) => {
     await completeCOD(page);
-    const complete = new ApOrderCompletePage(page);
+    const complete = new DeviceOrderCompletePage(page);
     await expect(complete.successMessage).toBeVisible({ timeout: 15000 });
     await expect(complete.codStatus).toBeVisible();
   });

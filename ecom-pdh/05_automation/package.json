@@ -7,9 +7,9 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
-    "test:report": "playwright show-report ../../06_report/playwright-report",
-    "allure:generate": "allure generate ../../06_report/allure-results --clean -o ../../06_report/allure-report",
-    "allure:open": "allure open ../../06_report/allure-report",
+    "test:report": "playwright show-report ../06_report/playwright-report",
+    "allure:generate": "allure generate ../06_report/allure-results --clean -o ../06_report/allure-report",
+    "allure:open": "allure open ../06_report/allure-report",
     "lint": "tsc --noEmit"
   },
   "devDependencies": {

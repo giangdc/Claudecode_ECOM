@@ -1,11 +1,11 @@
 import { Page, Locator } from '@playwright/test';
-import { BasePage } from '../common/base.page';
+import { BasePage } from './base.page';
 
 /**
  * Màn Hoàn tất đơn hàng AP — URL /checkout/{id}/completed.
  * Locators verified từ DOM thực tế (access-point-ax1800az, 2026-06-07).
  */
-export class ApOrderCompletePage extends BasePage {
+export class DeviceOrderCompletePage extends BasePage {
   readonly successMessage: Locator;
   readonly orderIdText: Locator;
   readonly codStatus: Locator;

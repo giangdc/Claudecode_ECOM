@@ -1,4 +1,5 @@
 # MEMORY — Analyze Requirements Output (Module CHECKOUT)
+> 2026-06-08 — **Smart TV (SMARTTV)** xác nhận có rule GIỐNG HỆT AP (B1 chỉ số lượng — không chu kỳ; COD + địa chỉ lắp đặt; label giao hàng 3-7 ngày; KHÔNG có "Thời gian lắp đặt"), chỉ khác label SP/giá/slug trên UI (gói staging: Smart TV -TV SAMSUNG QA55Q60BAKXXV, 4.500.000đ, slug `tv-samsung-qa55q60bakxxv`). → TC clone từ AP sang sheet **Checkout_SmartTV** (15 TC, TC_SMARTTV.1→15); automation `tests/smarttv/` dùng chung page object `pages/common/device-*`. Không phát sinh SC mới (tái dùng SC-AP-*).
 > Cập nhật lần cuối: 2026-06-06 — Phân tích DOC-CK-05 `Mô tả luồng checkout tongdaiwifi 0606.xlsx`: (1) confirm format validation Họ tên trong Rule common (đồng bộ SC-CKCOMMON-008 text "họ tên"); (2) làm rõ popup ĐCHC cũ — case convert thất bại (SC-CKCOMMON-044 update); (3) AP có label cố định "Thời gian giao hàng 3-7 ngày" → thêm SC-AP-019, CLA-AP-002 Partially Resolved. Tổng SC: 154→155 (active 146→147).
 > 2026-06-03 — Phân tích bản revise `Chucnangcheckout_0306.xlsx` (DOC-CK-04): thêm 2 sub-module **CAMERA** (20 SC) + **AP** (18 SC). UltraFast/CKCOMMON/Internet **không đổi** (Rule common chỉ đổi format STT). Field validation Camera/AP **tái dùng CKCOMMON** (chỉ test phần đặc thù dịch vụ). 3 clarification Pending mới: CLA-CAMERA-001, CLA-AP-001, CLA-AP-002.
 > 2026-06-01 (lần 2) — BA resolve 8/9 clarification: Số nhà max 50; text lỗi SĐT = "Số điện thoại không hợp lệ"; Internet không có Email; **Chung cư Deferred**; trả trước/sau do QLCS; session/countdown áp dụng mọi DV; pre-fill địa chỉ điền toàn bộ (+SC-CKCOMMON-076). Còn Pending: CLA-CKCOMMON-007 (nội dung popup).
@@ -11,8 +12,8 @@
 - Dự án: ecom-pdh (FPT Telecom ISC/ECP) | Môi trường: Staging | URL: http://ecp-stag.fpt.net/
 - Môi trường liên quan checkout: staging.tongdaiwifi.vn, fpt.vn/checkout, web-admin (saleplatform-stag.fpt.net/web-admin), inside (đối soát HĐ)
 - Module này: **CHECKOUT** — luồng checkout dùng chung cho nhiều dịch vụ.
-- Phạm vi đã phân tích: **UltraFast (DANGKYUF)** + **Màn checkout chung (CKCOMMON)** + **Internet (INTERNET)** + **Camera (CAMERA)** + **Access Point (AP)**.
-- **Chưa phân tích (chờ tài liệu):** Smart Home, Smart Tivi.
+- Phạm vi đã phân tích: **UltraFast (DANGKYUF)** + **Màn checkout chung (CKCOMMON)** + **Internet (INTERNET)** + **Camera (CAMERA)** + **Access Point (AP)** + **Smart TV (SMARTTV — clone rule AP, 2026-06-08)**.
+- **Chưa phân tích (chờ tài liệu):** Smart Home. (Smart Tivi đã xử lý: rule = AP, xem changelog 2026-06-08.)
 - Khác biệt cốt lõi: UltraFast online-only (không COD), chỉ SĐT (+Email), 1 bước; Internet đầy đủ COD+Online, có địa chỉ lắp đặt, 3 bước, trả trước/trả sau; **Camera** COD+Online, có chu kỳ + địa chỉ lắp đặt, màn 2 bước, note giao hàng 3-7 ngày; **AP** COD+Online, **chỉ số lượng (không chu kỳ)** + địa chỉ lắp đặt, màn 2 bước. Camera/AP tái dùng rule field của CKCOMMON.
 
 ---

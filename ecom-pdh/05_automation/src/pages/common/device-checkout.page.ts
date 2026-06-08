@@ -1,14 +1,14 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from '../common/base.page';
+import { BasePage } from './base.page';
 
-export type ApPaymentMethodCode = 'COD-COD' | 'DOMESTIC-Online' | 'MOMO-Online' | 'VIETQR-Online';
+export type DevicePaymentMethodCode = 'COD-COD' | 'DOMESTIC-Online' | 'MOMO-Online' | 'VIETQR-Online';
 
 /**
- * Màn checkout AP (Access Point) — 1 bước (URL /register → redirect thẳng /payment).
+ * Màn checkout thiết bị (AP / Smart TV / Camera) — page object DÙNG CHUNG — 1 bước (URL /register → redirect thẳng /payment).
  * Gồm block TTKH (form nhập liệu), Địa chỉ, PTTT, nút Thanh toán, nút Quay lại.
  * Locators verified từ DOM thực tế (access-point-ax1800az, 2026-06-07).
  */
-export class ApCheckoutPage extends BasePage {
+export class DeviceCheckoutPage extends BasePage {
   // ── Block Thông tin khách hàng ─────────────────────────────────────────────
   readonly hoTenInput: Locator;
   readonly sdtInput: Locator;
@@ -120,11 +120,11 @@ export class ApCheckoutPage extends BasePage {
   }
 
   // ── Payment method ─────────────────────────────────────────────────────────
-  paymentMethodRadio(code: ApPaymentMethodCode): Locator {
+  paymentMethodRadio(code: DevicePaymentMethodCode): Locator {
     return this.page.locator(`#payment-method-${code}`);
   }
 
-  async selectPaymentMethod(code: ApPaymentMethodCode): Promise<void> {
+  async selectPaymentMethod(code: DevicePaymentMethodCode): Promise<void> {
     const radio = this.paymentMethodRadio(code);
     await expect(radio).toBeVisible();
     await radio.click();

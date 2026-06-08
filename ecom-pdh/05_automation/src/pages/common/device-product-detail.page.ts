@@ -1,11 +1,11 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { BasePage } from '../common/base.page';
+import { BasePage } from './base.page';
 
 /**
  * Trang chi tiết sản phẩm AP (Access Point) trên staging.tongdaiwifi.vn.
  * Locators verified từ DOM thực tế (access-point-ax1800az, 2026-06-07).
  */
-export class ApProductDetailPage extends BasePage {
+export class DeviceProductDetailPage extends BasePage {
   readonly productTitle: Locator;
   readonly muaNgayButton: Locator;
 

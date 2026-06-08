@@ -10,9 +10,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 1,
   workers: 1,
   reporter: [
-    ['html', { outputFolder: '../../06_report/playwright-report', open: 'never' }],
-    ['allure-playwright', { resultsDir: '../../06_report/allure-results' }],
-    ['json', { outputFile: '../../06_report/report.json' }],
+    ['html', { outputFolder: '../06_report/playwright-report', open: 'never' }],
+    ['allure-playwright', { resultsDir: '../06_report/allure-results' }],
+    ['json', { outputFile: '../06_report/report.json' }],
     ['list'],
   ],
   use: {
@@ -28,5 +28,5 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     },
   ],
-  outputDir: '../../06_report/test-artifacts',
+  outputDir: '../06_report/test-artifacts',
 });

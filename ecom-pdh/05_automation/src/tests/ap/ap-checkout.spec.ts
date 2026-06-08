@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
-import { ApProductDetailPage } from '../../pages/ap/ap-product-detail.page';
-import { ApCheckoutPage } from '../../pages/ap/ap-checkout.page';
-import { ApOrderCompletePage } from '../../pages/ap/ap-order-complete.page';
+import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
+import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
+import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
 
 /**
  * Automation cho module CHECKOUT — luồng AP (Access Point AX1800AZ).
@@ -10,14 +10,18 @@ import { ApOrderCompletePage } from '../../pages/ap/ap-order-complete.page';
  * AP checkout: URL /register → redirect thẳng /payment (1 bước, không qua /register page).
  */
 
-const PRODUCT_URL   = 'https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/access-point-ax1800az';
-const REGISTER_URL  = 'https://staging.fpt.vn/checkout/register/access-point-ax1800az?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn';
+// Product params — override qua env để chạy gói AP-layout khác (TV, Smart Home...).
+// Mặc định: Access Point AX1800AZ.
+const SLUG          = process.env.AP_PRODUCT_SLUG || 'access-point-ax1800az';
+const PRODUCT_URL   = process.env.AP_PRODUCT_URL  || `https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/${SLUG}`;
+const REGISTER_URL  = process.env.AP_REGISTER_URL || `https://staging.fpt.vn/checkout/register/${SLUG}?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn`;
+const PRODUCT_NAME  = process.env.AP_PRODUCT_NAME  || 'Access Point AX1800AZ Gb';
+const PRODUCT_PRICE = process.env.AP_PRODUCT_PRICE || '1.100.000đ';
 const VALID_NAME    = 'Nguyen Van Auto';
 const VALID_PHONE   = '0901234567';
-const PRODUCT_NAME  = 'Access Point AX1800AZ Gb';
 
-async function openPayment(page: Page): Promise<ApCheckoutPage> {
-  const checkout = new ApCheckoutPage(page);
+async function openPayment(page: Page): Promise<DeviceCheckoutPage> {
+  const checkout = new DeviceCheckoutPage(page);
   await checkout.start(REGISTER_URL);
   return checkout;
 }
@@ -33,7 +37,7 @@ async function fillAndSubmitCOD(page: Page): Promise<void> {
 test.describe('TC_AP — Điều hướng từ trang sản phẩm', () => {
 
   test('TC_AP.2 — Kiểm tra nút Mua ngay điều hướng vào luồng checkout AP', async ({ page }) => {
-    const product = new ApProductDetailPage(page);
+    const product = new DeviceProductDetailPage(page);
     await product.navigateToProduct(PRODUCT_URL);
     await product.clickMuaNgay();
     await expect(page).toHaveURL(/staging\.fpt\.vn\/checkout/, { timeout: 20000 });
@@ -48,7 +52,7 @@ test.describe('TC_AP — Thông tin sản phẩm trong màn Checkout', () => {
     const checkout = await openPayment(page);
     await expect(page.getByText(PRODUCT_NAME, { exact: false })).toBeVisible();
     await expect(page.getByText(/^x\d+$/).first()).toBeVisible();
-    await expect(page.getByText('1.100.000đ', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(PRODUCT_PRICE, { exact: false }).first()).toBeVisible();
     await expect(page.getByText('Chu kỳ', { exact: false })).not.toBeVisible();
   });
 
@@ -113,7 +117,7 @@ test.describe('TC_AP — Luồng thanh toán', () => {
   test('TC_AP.10 — Kiểm tra luồng COD đầy đủ → màn Hoàn tất với trạng thái Chưa thanh toán', async ({ page }) => {
     await fillAndSubmitCOD(page);
     await expect(page).toHaveURL(/\/completed/, { timeout: 20000 });
-    const complete = new ApOrderCompletePage(page);
+    const complete = new DeviceOrderCompletePage(page);
     await expect(complete.successMessage).toBeVisible();
     await expect(complete.codStatus).toBeVisible();
     await expect(complete.orderIdText).toBeVisible();
