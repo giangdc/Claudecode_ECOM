@@ -114,7 +114,7 @@ test.describe('TC_AP — Luồng thanh toán', () => {
     await expect(page).not.toHaveURL(/\/payment$/, { timeout: 20000 });
   });
 
-  test('TC_AP.10 — Kiểm tra luồng COD đầy đủ → màn Hoàn tất với trạng thái Chưa thanh toán', async ({ page }) => {
+  test('TC_AP.10 — Kiểm tra luồng COD đầy đủ → màn Hoàn tất với trạng thái Chưa thanh toán', async ({ page }, testInfo) => {
     await fillAndSubmitCOD(page);
     await expect(page).toHaveURL(/\/completed/, { timeout: 20000 });
     const complete = new DeviceOrderCompletePage(page);
@@ -123,6 +123,7 @@ test.describe('TC_AP — Luồng thanh toán', () => {
     await expect(complete.orderIdText).toBeVisible();
     const orderId = await complete.getOrderId();
     expect(orderId).toBeTruthy();
+    testInfo.annotations.push({ type: 'orderId', description: orderId });
   });
 
 });
