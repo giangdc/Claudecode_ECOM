@@ -184,4 +184,47 @@ export class DeviceCheckoutPage extends BasePage {
     await this.oldAddressLink.click();
     await expect(this.oldAddrDialog).toBeVisible({ timeout: 10000 });
   }
+
+  /**
+   * Chọn lần lượt Tỉnh → Quận/Huyện → Phường/Xã → Tên đường trong popup Địa chỉ hành chính cũ.
+   * Sau khi gọi xong thì bấm oldAddrConfirmButton bên ngoài để confirm.
+   * Các text phải khớp chính xác với giá trị trong dropdown (xem checkout.data.ts).
+   */
+  async selectOldAddress(
+    province: string, district: string, ward: string, area: string,
+    provinceKeyword?: string, districtKeyword?: string, wardKeyword?: string,
+  ): Promise<void> {
+    const dialog = this.oldAddrDialog;
+
+    // Level 1: Tỉnh/Thành phố
+    await dialog.getByRole('button', { name: 'Chọn tỉnh thành phố' }).click();
+    let dd = this.page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd).toBeVisible({ timeout: 10000 });
+    await dd.getByRole('textbox', { name: 'Nhập thông tin' }).fill(provinceKeyword ?? province);
+    await dd.getByText(province, { exact: true }).first().click();
+
+    // Level 2: Quận/Huyện
+    await dialog.getByRole('button', { name: 'Chọn quận/huyện' }).click();
+    dd = this.page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd).toBeVisible({ timeout: 10000 });
+    await dd.getByRole('textbox', { name: 'Nhập thông tin' }).fill(districtKeyword ?? district);
+    await dd.getByText(district, { exact: true }).first().click();
+
+    // Level 3: Phường/Xã
+    await dialog.getByRole('button', { name: 'Chọn phường/xã' }).click();
+    dd = this.page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd).toBeVisible({ timeout: 10000 });
+    await dd.getByRole('textbox', { name: 'Nhập thông tin' }).fill(wardKeyword ?? ward);
+    await dd.getByText(ward, { exact: true }).first().click();
+
+    // Level 4: Tên đường / Khu vực
+    await dialog.getByRole('button', { name: 'Chọn tên đường' }).click();
+    dd = this.page.locator('[role="dialog"][data-state="open"]').last();
+    await expect(dd).toBeVisible({ timeout: 10000 });
+    const searchBox = dd.getByRole('textbox', { name: 'Nhập thông tin' });
+    if (await searchBox.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await searchBox.fill(area);
+    }
+    await dd.getByText(area, { exact: true }).first().click();
+  }
 }

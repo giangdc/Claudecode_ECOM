@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { ProductDetailPage } from '../../pages/ultrafast/product-detail.page';
 import { CheckoutUltrafastPage } from '../../pages/ultrafast/checkout-ultrafast.page';
+import { checkoutData } from '../../../test-data/checkout/checkout.data';
 
 const PRODUCT_URL  = 'https://staging.tongdaiwifi.vn/dich-vu-so/goi-hyperfast-2';
 const CHECKOUT_URL = 'https://staging.fpt.vn/checkout/register/goi-hyperfast-2?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn&sl=1&month=1';
-const VALID_PHONE  = '0901234567';
+const VALID_PHONE  = checkoutData.validPhone;
 
 async function openCheckout(page: any): Promise<CheckoutUltrafastPage> {
   const checkout = new CheckoutUltrafastPage(page);
@@ -108,7 +109,7 @@ test.describe('TC_DANGKYUF — Block Thông tin cá nhân: Số điện thoại'
   test('TC_DANGKYUF.10 — Kiểm tra icon X xóa nội dung đã nhập trong trường SĐT', async ({ page }) => {
     const checkout = await openCheckout(page);
 
-    await checkout.fillPhone('0901234567');
+    await checkout.fillPhone(VALID_PHONE);
     await expect(checkout.clearPhoneButton).toBeVisible();
     await checkout.clearPhoneButton.click();
 

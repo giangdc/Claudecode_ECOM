@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { InternetProductPage } from '../../pages/internet/internet-product.page';
 import { CheckoutRegisterPage } from '../../pages/internet/checkout-register.page';
 import { CheckoutPaymentPage } from '../../pages/internet/checkout-payment.page';
+import { checkoutData } from '../../../test-data/checkout/checkout.data';
 
 /**
  * Automation cho module CHECKOUT — luồng Internet (gói goi-giga).
@@ -11,8 +12,8 @@ import { CheckoutPaymentPage } from '../../pages/internet/checkout-payment.page'
  */
 const DETAIL_URL   = 'https://staging.tongdaiwifi.vn/internet/goi-giga';
 const REGISTER_URL = 'https://staging.fpt.vn/checkout/register/goi-giga?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn';
-const VALID_NAME   = 'Nguyen Van Auto';
-const VALID_PHONE  = '0901234567';
+const VALID_NAME   = checkoutData.validName;
+const VALID_PHONE  = checkoutData.validPhone;
 
 async function openB1(page: Page): Promise<CheckoutRegisterPage> {
   const reg = new CheckoutRegisterPage(page);

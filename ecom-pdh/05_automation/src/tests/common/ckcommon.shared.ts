@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
 import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
 import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
+import { checkoutData } from '../../../test-data/checkout/checkout.data';
 
 /**
  * TC_CKCOMMON — Shared suite chạy được trên mọi dịch vụ có màn checkout 1-bước (AP / SmartTV / Camera).
@@ -20,8 +21,8 @@ export interface CkcommonParams {
 
 export function runCkcommonSuite(params: CkcommonParams): void {
   const { serviceLabel, registerUrl, productUrl } = params;
-  const VALID_NAME  = params.validName  ?? 'Nguyen Van Auto';
-  const VALID_PHONE = params.validPhone ?? '0901234567';
+  const VALID_NAME  = params.validName  ?? checkoutData.validName;
+  const VALID_PHONE = params.validPhone ?? checkoutData.validPhone;
 
   async function openCheckout(page: Page): Promise<DeviceCheckoutPage> {
     const checkout = new DeviceCheckoutPage(page);
@@ -338,10 +339,23 @@ export function runCkcommonSuite(params: CkcommonParams): void {
       await expect(checkout.oldAddrDialog).toBeHidden();
     });
 
-    test.fixme('TC_CKCOMMON.45 — Kiểm tra click Xác nhận đẩy địa chỉ 2-cấp vào form', async ({ page }) => {
-      // Cần địa chỉ 3-cấp cũ có mapping sang 2-cấp mới trên staging.
+    test('TC_CKCOMMON.45 — Kiểm tra click Xác nhận đẩy địa chỉ 2-cấp vào form', async ({ page }) => {
       const checkout = await openCheckout(page);
       await checkout.openOldAddressPopup();
+      await checkout.selectOldAddress(
+        checkoutData.oldAddress.province,
+        checkoutData.oldAddress.district,
+        checkoutData.oldAddress.ward,
+        checkoutData.oldAddress.area,
+        checkoutData.oldAddress.provinceKeyword,
+        checkoutData.oldAddress.districtKeyword,
+        checkoutData.oldAddress.wardKeyword,
+      );
+      await checkout.oldAddrConfirmButton.click();
+      await expect(page.getByRole('button', { name: 'Chọn tỉnh thành phố' }))
+        .toContainText(checkoutData.oldAddress.expectedProvince, { timeout: 10000 });
+      await expect(page.getByRole('button', { name: 'Chọn phường/xã' }))
+        .toContainText(checkoutData.oldAddress.expectedWardNew, { timeout: 10000 });
     });
 
   });

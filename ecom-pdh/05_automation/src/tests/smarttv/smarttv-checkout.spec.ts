@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
 import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
 import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
+import { checkoutData } from '../../../test-data/checkout/checkout.data';
 
 /**
  * Automation cho module CHECKOUT — luồng Smart TV.
@@ -17,8 +18,8 @@ const PRODUCT_URL   = process.env.SMARTTV_PRODUCT_URL   || `https://staging.tong
 const REGISTER_URL  = process.env.SMARTTV_REGISTER_URL  || `https://staging.fpt.vn/checkout/register/${SLUG}?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn`;
 const PRODUCT_NAME  = process.env.SMARTTV_PRODUCT_NAME  || 'Smart TV -TV SAMSUNG QA55Q60BAKXXV';
 const PRODUCT_PRICE = process.env.SMARTTV_PRODUCT_PRICE || '4.500.000đ';
-const VALID_NAME    = 'Nguyen Van Auto';
-const VALID_PHONE   = '0901234567';
+const VALID_NAME    = checkoutData.validName;
+const VALID_PHONE   = checkoutData.validPhone;
 
 async function openPayment(page: Page): Promise<DeviceCheckoutPage> {
   const checkout = new DeviceCheckoutPage(page);
