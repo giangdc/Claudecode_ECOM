@@ -1,10 +1,10 @@
 import { runCkcommonSuite } from '../common/ckcommon.shared';
 import { checkoutData, productUrl, registerUrl } from '../../../test-data/checkout/checkout.data';
 
-const AP = checkoutData.services.ap;
+const CAMERA = checkoutData.services.camera;
 
 runCkcommonSuite({
-  serviceLabel: 'AP',
-  registerUrl:  registerUrl(AP.slug),
-  productUrl:   productUrl(AP.slug),
+  serviceLabel: 'Camera',
+  registerUrl:  registerUrl(CAMERA.slug),
+  productUrl:   productUrl(CAMERA.slug),
 });

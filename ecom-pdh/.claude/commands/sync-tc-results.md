@@ -151,6 +151,34 @@ reporter: [['json', { outputFile: '../../06_report/report.json' }]]
    - Nếu `round_number` user chỉ định vượt quá số round hiện có → thêm Round block mới (copy format từ Round 1)
    - Tính offset cột theo round: `actual_col = base_actual_col + (round - 1) * 4`
 
+---
+
+### ⚠️ Trường hợp đặc biệt: 1 TC chạy trên NHIỀU dịch vụ (shared suite)
+
+> Áp dụng khi 1 sheet TC dùng chung được automation chạy lặp lại trên nhiều dịch vụ
+> (VD sheet `Checkout_Common` / `TC_CKCOMMON` — chạy trên Internet/Camera/AP/SmartTV).
+> Yêu cầu nghiệp vụ: **ghi nhận kết quả RIÊNG cho từng dịch vụ** để biết dịch vụ nào Pass/Fail.
+
+Khi đó các block I→L, M→P, Q→T, U→X **KHÔNG phải Round 1/2/3**, mà là **block CỐ ĐỊNH theo dịch vụ**:
+
+| Block | Cột | Header row 7 = tên dịch vụ |
+|---|---|---|
+| 1 | I–L (9) | `Internet` |
+| 2 | M–P (13) | `Camera` |
+| 3 | Q–T (17) | `AP` |
+| 4 | U–X (21) | `SmartTV` |
+
+**Cách phân biệt dịch vụ trong report:** automation đặt prefix `[ServiceLabel]` trong `describe` title
+(VD `[AP] TC_CKCOMMON.5`, `[SmartTV] TC_CKCOMMON.5`). Dịch vụ chạy KHÔNG có prefix → khớp dịch vụ "gốc"
+của sheet (VD Internet realize CKCOMMON ngay trên màn Internet, không prefix). Parse:
+- Regex service: `/\[(AP|SmartTV|Camera)\]/` trên title các suite cha (đệ quy) → gán cho mọi spec con.
+- Key map = `(TC_ID, service)`; service=`None` cho test không prefix.
+- Ghi `results[(tcid, svc)]` vào đúng block của `svc`. Mỗi TC điền song song N ô (N = số dịch vụ).
+- Dịch vụ nào không có trong run này → block đó = `Block` + ghi chú `chưa chạy cho {dịch vụ}`.
+
+> **Checkout đã có script chuẩn** — KHÔNG sync thủ công, chạy: `python sync_tc_checkout.py` (root).
+> Mapping 4 block + logic prefix nằm trong `CKCOMMON_SERVICES` của script đó. Sửa cấu trúc block → sửa cả script.
+
 4. **Build map TC_ID → (sheet, row_index):**
    ```python
    tc_map = {}

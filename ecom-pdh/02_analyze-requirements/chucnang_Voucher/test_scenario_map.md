@@ -1,6 +1,7 @@
-# Test Scenario Map — chucnang_Voucher (API)
-## Tổng quan: 32 scenarios — P1:13 P2:16 P3:3
+# Test Scenario Map — chucnang_Voucher (API + UI)
+## Tổng quan: 46 scenarios — API: 32 (P1:13 P2:16 P3:3) | UI: 14 (P1:8 P2:6 P3:0)
 > Cập nhật 2026-05-28: xóa SC-008 (CLARY-004 resolved: case data=null không tồn tại); cập nhật HTTP status mapping (CLARY-001); cập nhật SC-027,028 (CLARY-005)
+> Cập nhật 2026-06-10: append 14 UI scenarios từ DOC-VOUCHER-UI-01 (figma_ui_analysis.docx)
 
 Base URL: `http://ecp-api-stag.fpt.net/ordering`
 Auth: `X-Checkout-Token` header | **401** chỉ khi CHECKOUT_TOKEN_INVALID; còn lại 400
@@ -71,3 +72,27 @@ Auth: `X-Checkout-Token` header | **401** chỉ khi CHECKOUT_TOKEN_INVALID; còn
 | SC-VOUCHER-API-031 | Response structure — error case | REQ-VOUCHER-API-006 | Sheets 16-19 | Bất kỳ API nào trả về lỗi | Kiểm tra cấu trúc response lỗi | success=false, error.code và error.message có giá trị, data=null, meta.timestamp populated | P2 | Negative |
 | SC-VOUCHER-API-032 | Accept-Language header — ngôn ngữ vi vs en | REQ-VOUCHER-API-006 | Sheets 16-19, HEADERS | Checkout session hợp lệ | Gửi request với Accept-Language: en và vi | error.message và nội dung trả về đúng ngôn ngữ yêu cầu | P3 | Functional |
 | SC-VOUCHER-API-033 | Lỗi hệ thống — BUSINESS_INTERNAL_ERROR | REQ-VOUCHER-API-001..004 | Sheets 16-19 | Hệ thống backend gặp lỗi nội bộ | Kích hoạt kịch bản lỗi hệ thống (mock hoặc với data đặc biệt) | Trả về **500**, error.code="BUSINESS_INTERNAL_ERROR" | P3 | Error Handling |
+
+---
+
+## VOUCHER-UI — Giao diện Web/Mobile (DOC-VOUCHER-UI-01)
+
+> Platform: Web Desktop + Mobile (iOS/Android)
+> ⚠️ CLA-FIGMA-001,002,003,004 chưa resolve → SC-UI-010,011,012 và một phần SC-UI-002,005 blocked/partial
+
+| Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
+|---|---|---|---|---|---|---|---|---|
+| SC-VOUCHER-UI-001 | Section Chọn ưu đãi — default state (chưa áp voucher) | REQ-VOUCHER-UI-001 | DOC-VOUCHER-UI-01 §1.2, §2.6, Case C1/F1 | KH đang ở trang Checkout (Cart hoặc Checkout full), chưa áp dụng voucher nào | Xem section Thông tin thanh toán | Link "Nhập các mã ưu đãi của bạn" (Cart) hoặc button "Chọn ưu đãi" + button "Áp dụng" (Checkout) hiển thị; ô voucher trống | P1 | UI |
+| SC-VOUCHER-UI-002 | Modal Chọn ưu đãi — cấu trúc đầy đủ khi có voucher | REQ-VOUCHER-UI-002 | DOC-VOUCHER-UI-01 §4.1, Case C2/F2/F3 | KH click "Chọn ưu đãi" / "Nhập các mã ưu đãi", hệ thống trả về có voucher khả dụng | Modal mở | Title "Chọn ưu đãi", nút X, 2 tab ("Mã giảm giá" / "Ưu đãi"), danh sách voucher card có data, button "Xác nhận" / "Đồng ý" hiển thị đủ | P1 | UI / Functional |
+| SC-VOUCHER-UI-003 | Voucher card — hiển thị đúng thông tin | REQ-VOUCHER-UI-002 | DOC-VOUCHER-UI-01 §4.2, Case C2 | Modal "Chọn ưu đãi" đang mở, danh sách có voucher | Xem từng voucher card trong list | Mỗi card hiển thị: icon/thumbnail, tên voucher (bold), mô tả ngắn, ngày hết hạn, control chọn (radio/checkbox ⚠️ CLA-FIGMA-003), link "Điều kiện" | P1 | UI |
+| SC-VOUCHER-UI-004 | Modal Chọn ưu đãi — Empty State | REQ-VOUCHER-UI-003 | DOC-VOUCHER-UI-01 §5, Case C3/F4, Note N2 | KH click mở modal, không có voucher nào khả dụng cho KH/đơn hàng hiện tại | Modal mở | Hiển thị: icon empty state illustration + text "Tất tiếc, ngay lúc này chưa có ưu đãi." (không hiển thị list, không hiển thị button Xác nhận) | P1 | UI / Functional |
+| SC-VOUCHER-UI-005 | Chọn voucher — icon tick xanh khi selected | REQ-VOUCHER-UI-004 | DOC-VOUCHER-UI-01 §4.2 item 6, Case C4/F5 | Modal đang mở, có danh sách voucher | KH click chọn 1 voucher | Voucher card được chọn hiển thị icon tick xanh (check mark); các voucher khác không có tick (⚠️ CLA-FIGMA-003: nếu multi-select → nhiều tick) | P1 | Functional |
+| SC-VOUCHER-UI-006 | Áp dụng voucher — checkout summary cập nhật | REQ-VOUCHER-UI-004 | DOC-VOUCHER-UI-01 Case C4/F5, §2.6 | KH đã chọn voucher trong modal → click "Xác nhận" | Modal đóng | Tên voucher hiển thị trong section "Thông tin thanh toán"; giá trị giảm/tổng cần thanh toán cập nhật đúng theo voucher đã chọn | P1 | Functional |
+| SC-VOUCHER-UI-007 | Xem Chi tiết Ưu đãi / Điều khoản | REQ-VOUCHER-UI-005 | DOC-VOUCHER-UI-01 §6, §6.1, Case C5/F6 | Modal "Chọn ưu đãi" đang mở, KH click link "Điều kiện" trên voucher card | Màn hình chi tiết mở | Hiển thị đầy đủ: header banner (icon + tên + mô tả + HSD), hạn sử dụng, mô tả ưu đãi, áp dụng cho dịch vụ, phương thức thanh toán, section điều khoản (expandable với bullet list) | P1 | UI |
+| SC-VOUCHER-UI-008 | Áp dụng voucher từ màn hình Chi tiết | REQ-VOUCHER-UI-005 | DOC-VOUCHER-UI-01 §6, Case C6/F6 | KH đang xem màn hình Chi tiết Ưu đãi | KH click button "Sử dụng ưu đãi" | Voucher được áp dụng; quay về trang Checkout; voucher hiển thị trong section Thông tin thanh toán với tên và giá trị giảm đúng | P1 | Functional |
+| SC-VOUCHER-UI-009 | Mobile — voucher áp dụng hiển thị trong sticky bottom bar | REQ-VOUCHER-UI-009 | DOC-VOUCHER-UI-01 §3.6, Case C9/F2/F3/F5 | KH dùng mobile (iOS/Android), đã áp dụng voucher thành công | Xem màn checkout mobile | Sticky bottom bar hiển thị: tên voucher (hoặc icon voucher), tổng cần thanh toán sau giảm đã cập nhật, button "Tiếp tục" vẫn khả dụng | P2 | UI |
+| SC-VOUCHER-UI-010 | Lọc voucher theo điều kiện đơn hàng — chỉ hiển thị voucher match | REQ-VOUCHER-UI-006 | DOC-VOUCHER-UI-01 Note N1/N3, Case C7, MISSING M01 | KH mở modal, hệ thống có voucher nhưng một số không match điều kiện PTTT/dịch vụ của đơn hàng | Modal hiển thị | Chỉ các voucher match điều kiện đơn hàng hiện tại mới hiển thị trong list; voucher không match không xuất hiện hoặc bị ẩn ⚠️ CLA-FIGMA-001: quy tắc filter chưa rõ | P2 | Functional |
+| SC-VOUCHER-UI-011 | PTTT không match voucher — thông báo hệ thống | REQ-VOUCHER-UI-008 | DOC-VOUCHER-UI-01 Note N2/N4, MISSING M04 | KH đã chọn voucher yêu cầu PTTT=COD, sau đó đổi PTTT sang Momo | Hệ thống phát hiện mismatch | Hệ thống hiển thị thông báo (popup/snackbar?) giải thích voucher không áp dụng được, hướng dẫn KH chọn lại ⚠️ CLA-FIGMA-004: luồng xử lý cụ thể chưa rõ (đang open — uConn_Nam) | P2 | Functional |
+| SC-VOUCHER-UI-012 | Voucher card trạng thái disabled / đã dùng / hết hạn | REQ-VOUCHER-UI-007 | DOC-VOUCHER-UI-01 Case C8, MISSING M02 | Trong danh sách voucher có voucher đã sử dụng hoặc hết hạn | Modal hiển thị | Voucher không khả dụng: card bị mờ (dimmed) hoặc có indicator trạng thái, không cho phép click chọn ⚠️ CLA-FIGMA-002: UI state cụ thể chưa được thiết kế trong Figma | P2 | UI |
+| SC-VOUCHER-UI-013 | Đóng modal Chọn ưu đãi bằng nút X — giữ nguyên trạng thái | REQ-VOUCHER-UI-002 | DOC-VOUCHER-UI-01 §4.1 item 2 | Modal "Chọn ưu đãi" đang mở, KH đang xem list (chưa chọn hoặc đã chọn) | KH click nút X | Modal đóng; trạng thái checkout không thay đổi; voucher đã áp dụng trước đó (nếu có) vẫn giữ nguyên | P2 | Functional |
+| SC-VOUCHER-UI-014 | Hủy chọn voucher đã áp dụng | REQ-VOUCHER-UI-004 | DOC-VOUCHER-UI-01 Case C1/C4, §2.6 | KH đã áp dụng voucher trong checkout, mở lại modal | KH bỏ chọn voucher → Xác nhận | Voucher bị gỡ; giá trị giảm trả về 0; section Thông tin thanh toán hiển thị lại trạng thái rỗng (link/button "Chọn ưu đãi") | P2 | Functional |

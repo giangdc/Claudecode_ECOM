@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
 import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
 import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
+import { FoxpayGatewayPage } from '../../pages/common/foxpay-gateway.page';
 import { checkoutData } from '../../../test-data/checkout/checkout.data';
 
 /**
@@ -409,12 +410,16 @@ export function runCkcommonSuite(params: CkcommonParams): void {
       await expect(page).not.toHaveURL(/\/payment/, { timeout: 20000 });
     });
 
-    test('TC_CKCOMMON.61 — Kiểm tra thanh toán Online điều hướng cổng 3rd party', async ({ page }) => {
+    test('TC_CKCOMMON.61 — Kiểm tra thanh toán Online (thẻ nội địa) hoàn tất qua cổng FoxPay/NAPAS', async ({ page }) => {
       const checkout = await openCheckout(page);
       await checkout.fillAllValid(VALID_NAME, VALID_PHONE, '113');
       await checkout.selectPaymentMethod('DOMESTIC-Online');
       await checkout.clickThanhToan();
-      await expect(page).not.toHaveURL(/\/payment$/, { timeout: 20000 });
+
+      // Điều hướng sang cổng 3rd party (FoxPay) rồi hoàn tất thanh toán thẻ nội địa qua NAPAS.
+      await expect(page).toHaveURL(/foxpay\.vn/, { timeout: 25000 });
+      const gateway = new FoxpayGatewayPage(page);
+      await gateway.payDomestic(checkoutData.payment.atm);
     });
 
   });

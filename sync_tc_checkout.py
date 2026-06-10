@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Sync Playwright JSON report → TC Excel (Checkout) v1.2.
-- TC_CKCOMMON: ghi 3 Round (AP=col9, SmartTV=col13, Camera=col17).
+- TC_CKCOMMON: ghi 4 block CỐ ĐỊNH theo dịch vụ
+  (Internet=col9, Camera=col13, AP=col17, SmartTV=col21) → nhìn phát biết dịch vụ nào Fail.
+  Internet chạy CKCOMMON trên màn Internet, report KHÔNG có prefix [svc] → khớp key (tid, None).
+  AP/SmartTV/Camera chạy qua runCkcommonSuite → describe title có prefix [AP]/[SmartTV]/[Camera].
 - Các TC khác: ghi Round 1 (col9) như trước.
 Chạy từ thư mục gốc: python sync_tc_checkout.py
 """
@@ -12,18 +15,20 @@ ROOT        = os.path.dirname(os.path.abspath(__file__))
 REPORT      = os.path.join(ROOT, 'ecom-pdh/06_report/report.json')
 EXCEL       = os.path.join(ROOT, 'ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.2.xlsx')
 RESULTS_DIR = os.path.join(ROOT, 'ecom-pdh/06_report')
-DATE        = '2026-06-09'
+DATE        = '2026-06-10'
 EXECUTOR    = 'Auto'
 
 TCID_RE    = re.compile(r'(?:TC_[A-Z0-9_]+\.\d+|API_\d+\.\d+)')
 SERVICE_RE = re.compile(r'\[(AP|SmartTV|Camera)\]')
 
-# Col bắt đầu cho từng Round của sheet Checkout_Common
-CKCOMMON_ROUNDS = {
-    'AP':      9,   # I–L
-    'SmartTV': 13,  # M–P
-    'Camera':  17,  # Q–T
-}
+# Sheet Checkout_Common — 4 block cố định theo dịch vụ: (label, col bắt đầu, key dịch vụ trong report)
+# svc_key=None nghĩa là khớp test KHÔNG có prefix [svc] (Internet realize CKCOMMON trên màn Internet).
+CKCOMMON_SERVICES = [
+    ('Internet', 9,  None),       # I–L
+    ('Camera',   13, 'Camera'),   # M–P
+    ('AP',       17, 'AP'),       # Q–T
+    ('SmartTV',  21, 'SmartTV'),  # U–X
+]
 
 # ── 1. Parse report → {(TC_ID, service|None): 'Pass'/'Fail'} ───────────────
 results:   dict[tuple, str] = {}   # (tid, svc) → status
@@ -108,31 +113,31 @@ for ws in wb.worksheets:
         auto = str(ws.cell(r, 8).value or '').strip().upper()
 
         if is_ckcommon:
-            # Ghi riêng cho từng service vào đúng cột Round
-            for svc, col_start in CKCOMMON_ROUNDS.items():
-                key = (tcid, svc)
+            # Ghi riêng từng dịch vụ vào đúng block (Internet/Camera/AP/SmartTV)
+            for label, col_start, svc_key in CKCOMMON_SERVICES:
+                key = (tcid, svc_key)
                 if key in results:
                     matched_keys.add(key)
                     res  = results[key]
-                    note = f'Auto {DATE} — {svc}'
+                    note = f'Auto {DATE} — {label}'
                     oid  = order_ids.get(key, '')
                     if res == 'Pass':
                         summary['Pass'] += 1
                     else:
                         summary['Fail'] += 1
-                        fails.append((ws.title, r, tcid, svc))
+                        fails.append((ws.title, r, tcid, label))
                     fill_round(ws, r, col_start, res, note, order_id=oid)
                 elif '[BLOCKED' in exp:
                     fill_round(ws, r, col_start, 'Block',
-                               f'Block: [BLOCKED] chờ BA confirm — {svc}')
+                               f'Block: [BLOCKED] chờ BA confirm — {label}')
                     summary['Block'] += 1
                 elif auto == 'N':
                     fill_round(ws, r, col_start, 'Block',
-                               f'Block: TC manual (Auto?=N) — {svc}')
+                               f'Block: TC manual (Auto?=N) — {label}')
                     summary['Block'] += 1
                 else:
                     fill_round(ws, r, col_start, 'Block',
-                               f'Block: chưa chạy cho {svc} trong run này')
+                               f'Block: chưa chạy cho {label} trong run này')
                     summary['Block'] += 1
         else:
             # Các sheet khác: ghi Round 1 (col 9)

@@ -1,5 +1,5 @@
 # MEMORY — Analyze Requirements Output
-> Cập nhật lần cuối: 2026-05-28 — Update: CLARY-001,004,005 Resolved; CLARY-002 Pending BA; xóa SC-008; cập nhật HTTP status mapping
+> Cập nhật lần cuối: 2026-06-10 — Append DOC-VOUCHER-UI-01 (figma_ui_analysis.docx): +9 UI requirements, +14 UI scenarios, +4 clarifications (CLA-FIGMA-001→004)
 
 ---
 
@@ -18,6 +18,7 @@
 | DOC ID | File | Loại | Ngày phân tích | Status | Modules liên quan |
 |---|---|---|---|---|---|
 | DOC-VOUCHER-API-01 | ECP_API_voucher_v1.xlsx | API Spec | 2026-05-28 | Analyzed | VOUCHER_API (4 endpoints) |
+| DOC-VOUCHER-UI-01 | figma_ui_analysis.docx | Figma UI Analysis | 2026-06-10 | Analyzed | VOUCHER_UI (6 frames, 10 cases, 4 Figma notes) |
 
 ---
 
@@ -31,7 +32,13 @@
 | VOUCHER_API — voucher/check | DOC-VOUCHER-API-01 | 1 (REQ-004) | 7 | 3 | 4 | 0 | Medium |
 | VOUCHER_API — Cross-cutting Auth | DOC-VOUCHER-API-01 | 1 (REQ-005) | — | — | — | — | High |
 | VOUCHER_API — Response Contract | DOC-VOUCHER-API-01 | 1 (REQ-006) | 4 | 1 | 1 | 2 | Medium |
-| **TOTAL** | | **6** | **32** | **13** | **16** | **3** | |
+| **TOTAL API** | | **6** | **32** | **13** | **16** | **3** | |
+| VOUCHER_UI — Modal Chọn ưu đãi (list + empty) | DOC-VOUCHER-UI-01 | 3 (REQ-UI-002,003,006) | 6 | 3 | 3 | 0 | High |
+| VOUCHER_UI — Chọn + Áp dụng voucher | DOC-VOUCHER-UI-01 | 2 (REQ-UI-001,004) | 4 | 3 | 1 | 0 | High |
+| VOUCHER_UI — Chi tiết Điều khoản | DOC-VOUCHER-UI-01 | 1 (REQ-UI-005) | 2 | 2 | 0 | 0 | Medium |
+| VOUCHER_UI — PTTT mismatch + disabled state | DOC-VOUCHER-UI-01 | 2 (REQ-UI-007,008) | 2 | 0 | 2 | 0 | High |
+| VOUCHER_UI — Mobile sticky bar | DOC-VOUCHER-UI-01 | 1 (REQ-UI-009) | 1 | 0 | 1 | 0 | Low |
+| **TOTAL UI** | | **9** | **14** (⚠️ 3 partial block) | **8** | **6** | **0** | |
 
 ---
 
@@ -72,6 +79,20 @@
 | SC-VOUCHER-API-031 | response structure — error case | Cross-API | DOC-VOUCHER-API-01 | P2 | Negative | ⏳ Chưa tạo |
 | SC-VOUCHER-API-032 | Accept-Language vi vs en | Cross-API | DOC-VOUCHER-API-01 | P3 | Functional | ⏳ Chưa tạo |
 | SC-VOUCHER-API-033 | BUSINESS_INTERNAL_ERROR → 500 | Cross-API | DOC-VOUCHER-API-01 | P3 | Error Handling | ⏳ Chưa tạo |
+| SC-VOUCHER-UI-001 | Section Chọn ưu đãi — default state | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | UI | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-002 | Modal Chọn ưu đãi — cấu trúc đầy đủ | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | UI/Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-003 | Voucher card — hiển thị đúng thông tin | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | UI | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-004 | Modal — Empty State (không có voucher) | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | UI/Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-005 | Chọn voucher — icon tick xanh | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-006 | Áp dụng voucher — summary cập nhật | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-007 | Xem Chi tiết Ưu đãi / Điều khoản | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | UI | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-008 | Áp dụng từ màn hình Chi tiết | VOUCHER_UI | DOC-VOUCHER-UI-01 | P1 | Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-009 | Mobile — sticky bottom bar | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | UI | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-010 | Lọc voucher theo điều kiện đơn hàng | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | Functional | 🚫 Partial block (CLA-FIGMA-001) |
+| SC-VOUCHER-UI-011 | PTTT mismatch — thông báo hệ thống | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | Functional | 🚫 Blocked (CLA-FIGMA-004) |
+| SC-VOUCHER-UI-012 | Voucher card disabled/đã dùng/hết hạn | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | UI | 🚫 Partial block (CLA-FIGMA-002) |
+| SC-VOUCHER-UI-013 | Đóng modal — giữ nguyên trạng thái | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | Functional | ✅ Đã tạo (TC_VOU) |
+| SC-VOUCHER-UI-014 | Hủy chọn voucher đã áp dụng | VOUCHER_UI | DOC-VOUCHER-UI-01 | P2 | Functional | ✅ Đã tạo (TC_VOU) |
 
 > Chi tiết Given/When/Then → xem `test_scenario_map.md`
 
@@ -99,6 +120,10 @@ Key fields cần chuẩn bị khi execute:
 | CLARY-003 | REQ-VOUCHER-API-003 | Sheet 18 | Giới hạn số voucher tối đa trong 1 lần apply? | Chưa có rule tối đa trong spec | **Open** | Boundary TC apply (tạm bỏ qua) |
 | CLARY-004 | REQ-VOUCHER-API-002 | Sheet 17 | data=null trong response 200 là gì? | Thực tế không có case này | **Resolved** 2026-05-28 | SC-008 đã xóa khỏi scope |
 | CLARY-005 | REQ-VOUCHER-API-004 | Sheet 19 | voucher_type mismatch → is_valid=false hay VOUCHER_INVALID? | VOUCHER_INVALID (400) | **Resolved** 2026-05-28 | SC-027,028 đã cập nhật |
+| CLA-FIGMA-001 | REQ-VOUCHER-UI-006 | DOC-VOUCHER-UI-01 MISSING M01 | Quy tắc filter voucher trong modal — điều kiện nào để voucher appear/hidden? | Chưa có | **Open** ⚠️ High | SC-VOUCHER-UI-010 partial block |
+| CLA-FIGMA-002 | REQ-VOUCHER-UI-007 | DOC-VOUCHER-UI-01 MISSING M02 | Voucher disabled/used/expired — UI thể hiện ra sao? | Figma chưa thiết kế state này | **Open** | SC-VOUCHER-UI-012 partial block |
+| CLA-FIGMA-003 | REQ-VOUCHER-UI-002 | DOC-VOUCHER-UI-01 MISSING M03 | Giới hạn chọn voucher: 1 (Radio) hay nhiều (Checkbox)? | Figma không nhất quán — cần BA confirm | **Open** ⚠️ High | SC-VOUCHER-UI-002,005 expected result chưa xác định |
+| CLA-FIGMA-004 | REQ-VOUCHER-UI-008 | DOC-VOUCHER-UI-01 Note N4, MISSING M04 | PTTT mismatch với voucher (VD: Momo vs COD voucher) → hệ thống xử lý thế nào? | Đang open — Dev uConn_Nam hỏi trong Figma Note N4 | **Open** ⚠️ High | SC-VOUCHER-UI-011 blocked |
 
 ---
 
@@ -107,3 +132,4 @@ Key fields cần chuẩn bị khi execute:
 | DOC ID | Ngày tạo/cập nhật | Tổng TC | File Excel | TC Version | Ghi chú |
 |---|---|---|---|---|---|
 | DOC-VOUCHER-API-01 | 2026-05-28 | 69 | AI_ISC_ecom-pdh_v1.1_TC_API_v1.2.xlsx | v1.2 | 4 sheets: API_16(14), API_17(15), API_18(22), API_19(18). CLARY-002: SC-018 BLOCKED. gen-testcase-api-v3. |
+| DOC-VOUCHER-UI-01 | 2026-06-10 | 11 mới (TC_VOU.20→30) + fix TC_VOU.19 | AI_ISC_ecom-pdh_v1.1_TC_voucher_ui_v1.0.xlsx | v1.0 append | Append vào sheet Voucher_UI_Checkout. Nhóm 7: 8 TCs ready (High:5 Medium:3), 3 BLOCKED (CLA-FIGMA-001,002,004). Auto?=Y cho 10 TCs, N cho TC_VOU.23 (visual check). |

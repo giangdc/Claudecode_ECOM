@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
 import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
 import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
-import { checkoutData } from '../../../test-data/checkout/checkout.data';
+import { checkoutData, productUrl, registerUrl } from '../../../test-data/checkout/checkout.data';
 
 /**
  * Automation cho module CHECKOUT — luồng AP (Access Point AX1800AZ).
@@ -11,13 +11,12 @@ import { checkoutData } from '../../../test-data/checkout/checkout.data';
  * AP checkout: URL /register → redirect thẳng /payment (1 bước, không qua /register page).
  */
 
-// Product params — override qua env để chạy gói AP-layout khác (TV, Smart Home...).
-// Mặc định: Access Point AX1800AZ.
-const SLUG          = process.env.AP_PRODUCT_SLUG || 'access-point-ax1800az';
-const PRODUCT_URL   = process.env.AP_PRODUCT_URL  || `https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/${SLUG}`;
-const REGISTER_URL  = process.env.AP_REGISTER_URL || `https://staging.fpt.vn/checkout/register/${SLUG}?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn`;
-const PRODUCT_NAME  = process.env.AP_PRODUCT_NAME  || 'Access Point AX1800AZ Gb';
-const PRODUCT_PRICE = process.env.AP_PRODUCT_PRICE || '1.100.000đ';
+// Product params — đọc từ nguồn sự thật duy nhất test-data/checkout/checkout.data.ts (services.ap).
+const AP            = checkoutData.services.ap;
+const PRODUCT_URL   = productUrl(AP.slug);
+const REGISTER_URL  = registerUrl(AP.slug);
+const PRODUCT_NAME  = AP.productName;
+const PRODUCT_PRICE = AP.price;
 const VALID_NAME    = checkoutData.validName;
 const VALID_PHONE   = checkoutData.validPhone;
 

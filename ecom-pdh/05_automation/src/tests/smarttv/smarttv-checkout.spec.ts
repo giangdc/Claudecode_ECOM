@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { DeviceProductDetailPage } from '../../pages/common/device-product-detail.page';
 import { DeviceCheckoutPage } from '../../pages/common/device-checkout.page';
 import { DeviceOrderCompletePage } from '../../pages/common/device-order-complete.page';
-import { checkoutData } from '../../../test-data/checkout/checkout.data';
+import { checkoutData, productUrl, registerUrl } from '../../../test-data/checkout/checkout.data';
 
 /**
  * Automation cho module CHECKOUT — luồng Smart TV.
@@ -12,12 +12,12 @@ import { checkoutData } from '../../../test-data/checkout/checkout.data';
  * label giao hàng 3-7 ngày, KHÔNG có "Thời gian lắp đặt"), chỉ khác label SP/giá → dùng chung Device* page object.
  */
 
-// Product params — mặc định gói TV Samsung QA55Q60BAKXXV; override qua env để chạy gói Smart TV khác.
-const SLUG          = process.env.SMARTTV_PRODUCT_SLUG  || 'tv-samsung-qa55q60bakxxv';
-const PRODUCT_URL   = process.env.SMARTTV_PRODUCT_URL   || `https://staging.tongdaiwifi.vn/thiet-bi-thong-minh/${SLUG}`;
-const REGISTER_URL  = process.env.SMARTTV_REGISTER_URL  || `https://staging.fpt.vn/checkout/register/${SLUG}?salechannelcode=tongdaiwifi&url=http://staging.tongdaiwifi.vn`;
-const PRODUCT_NAME  = process.env.SMARTTV_PRODUCT_NAME  || 'Smart TV -TV SAMSUNG QA55Q60BAKXXV';
-const PRODUCT_PRICE = process.env.SMARTTV_PRODUCT_PRICE || '4.500.000đ';
+// Product params — đọc từ nguồn sự thật duy nhất test-data/checkout/checkout.data.ts (services.smarttv).
+const SMARTTV       = checkoutData.services.smarttv;
+const PRODUCT_URL   = productUrl(SMARTTV.slug);
+const REGISTER_URL  = registerUrl(SMARTTV.slug);
+const PRODUCT_NAME  = SMARTTV.productName;
+const PRODUCT_PRICE = SMARTTV.price;
 const VALID_NAME    = checkoutData.validName;
 const VALID_PHONE   = checkoutData.validPhone;
 
