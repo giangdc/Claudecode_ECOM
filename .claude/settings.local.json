@@ -14,7 +14,19 @@
       "Bash(git -C /run/media/giangdc2/DISK1_VOL1/AI/Ecom log --oneline -3)",
       "Bash(git -C /run/media/giangdc2/DISK1_VOL1/AI/Ecom add ecom-pdh/.claude/ ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.2.xlsx ecom-pdh/05_automation/src/tests/common/ckcommon.shared.ts ecom-pdh/05_automation/src/tests/smarttv/smarttv-checkout-common.spec.ts ecom-pdh/05_automation/src/tests/ap/ap-checkout-common.spec.ts ecom-pdh/05_automation/src/tests/ap/ap-checkout.spec.ts sync_tc_checkout.py .claude/settings.local.json .gitignore .mcp.json CLAUDE.md ecom-pdh/05_automation/src/tests/internet/internet-checkout.spec.ts ecom-pdh/05_automation/src/tests/ultrafast/ultrafast-checkout.spec.ts ecom-pdh/05_automation/src/tests/common/dashboard.spec.ts ecom-pdh/05_automation/src/tests/common/login.spec.ts ecom-pdh/05_automation/playwright.config.ts ecom-pdh/05_automation/package.json ecom-pdh/05_automation/tsconfig.json ecom-pdh/05_automation/src/pages/ ecom-pdh/05_automation/src/fixtures/ ecom-pdh/05_automation/src/utils/ ecom-pdh/05_automation/task.md ecom-pdh/05_automation/task_checkout.md ecom-pdh/05_automation/test-data/ ecom-pdh/05_automation/README.md ecom-pdh/02_analyze-requirements/ ecom-pdh/00_input/ gen_tc_camera_ap.py gen_tc_checkout_camera.py gen_tc_ultrafast.py gen_tc_voucher_api.py gen_tc_voucher_api_v12.py gen_tc_voucher_api_v2.py recon_ultrafast.mjs sync_tc_results.py)",
       "Bash(git -C /run/media/giangdc2/DISK1_VOL1/AI/Ecom add -u -- .claude/CLAUDE.md .claude/commands/ .claude/rules/ .claude/skills/ .claude/template/)",
-      "Bash(git -C /run/media/giangdc2/DISK1_VOL1/AI/Ecom status --short)"
+      "Bash(git -C /run/media/giangdc2/DISK1_VOL1/AI/Ecom status --short)",
+      "Bash(git *)",
+      "Bash(npx tsc *)",
+      "Bash(node node_modules/typescript/bin/tsc --noEmit)",
+      "Bash(node node_modules/@playwright/test/cli.js test src/tests/ap/ --reporter=line,json)",
+      "Bash(node node_modules/@playwright/test/cli.js test src/tests/ap/ --reporter=line)",
+      "Bash(node node_modules/@playwright/test/cli.js test src/tests/ap/ --reporter=list)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(PYTHONIOENCODING=utf-8 python3 *)"
     ]
   },
   "enableAllProjectMcpServers": true,
