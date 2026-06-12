@@ -90,7 +90,7 @@ GROUPS = [
                 "Kiểm tra báo lỗi khi nhập Số điện thoại ít hơn 10 số",
                 "- Đang ở màn hình Checkout UltraFast\n- Trường Số điện thoại đang trống\nDữ liệu test: SĐT 9 số (VD: 090123456)",
                 "1. Click vào trường \"Số điện thoại\"\n2. Nhập SĐT 9 số (VD: 090123456)\n3. Click ra ngoài trường hoặc click button \"Thanh toán\"",
-                "- Hiển thị thông báo lỗi: \"Số điện thoại không hợp lệ.\"\n- Border đỏ xuất hiện quanh textbox",
+                "- Hiển thị thông báo lỗi: \"Số điện thoại không đúng.\"\n- Border đỏ xuất hiện quanh textbox",
                 "Y"
             ),
             (
@@ -98,7 +98,7 @@ GROUPS = [
                 "Kiểm tra báo lỗi khi nhập Số điện thoại không bắt đầu bằng 0",
                 "- Đang ở màn hình Checkout UltraFast\n- Trường Số điện thoại đang trống\nDữ liệu test: SĐT 10 số bắt đầu bằng 1 (VD: 1901234567)",
                 "1. Click vào trường \"Số điện thoại\"\n2. Nhập SĐT 10 số không bắt đầu bằng 0 (VD: 1901234567)\n3. Click ra ngoài trường hoặc click \"Thanh toán\"",
-                "- Hiển thị thông báo lỗi: \"Số điện thoại không hợp lệ.\"\n- Border đỏ xuất hiện quanh textbox",
+                "- Hiển thị thông báo lỗi: \"Số điện thoại không đúng.\"\n- Border đỏ xuất hiện quanh textbox",
                 "Y"
             ),
             (

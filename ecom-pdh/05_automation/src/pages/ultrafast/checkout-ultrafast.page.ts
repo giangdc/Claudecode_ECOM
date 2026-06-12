@@ -98,7 +98,7 @@ export class CheckoutUltrafastPage extends BasePage {
   }
 
   async getPhoneValidationError(): Promise<string> {
-    const error = this.page.locator('p').filter({ hasText: /Vui lòng nhập số điện thoại|Số điện thoại chưa đúng/ });
+    const error = this.page.locator('p').filter({ hasText: /Vui lòng nhập số điện thoại|Số điện thoại không đúng/ });
     await expect(error).toBeVisible({ timeout: 5000 });
     return (await error.textContent()) ?? '';
   }

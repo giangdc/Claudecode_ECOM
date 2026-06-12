@@ -124,7 +124,7 @@ test.describe('TC_CKCOMMON — Block Thông tin cá nhân: Số điện thoại'
     await reg.fillValidAddress();
     await reg.fillPhone('090abc1234');
     await reg.clickTiepTuc();
-    await expect(reg.fieldError(/Số điện thoại (không hợp lệ|chưa đúng)/)).toBeVisible({ timeout: 8000 });
+    await expect(reg.fieldError(/Số điện thoại không đúng/)).toBeVisible({ timeout: 8000 });
   });
 
   test('TC_CKCOMMON.16 — Kiểm tra SĐT 10 số không bắt đầu bằng 0', async ({ page }) => {
@@ -133,7 +133,7 @@ test.describe('TC_CKCOMMON — Block Thông tin cá nhân: Số điện thoại'
     await reg.fillValidAddress();
     await reg.fillPhone('1901234567');
     await reg.clickTiepTuc();
-    await expect(reg.fieldError(/Số điện thoại (không hợp lệ|chưa đúng)/)).toBeVisible({ timeout: 8000 });
+    await expect(reg.fieldError(/Số điện thoại không đúng/)).toBeVisible({ timeout: 8000 });
   });
 
   test('TC_CKCOMMON.17 — Kiểm tra SĐT không cho nhập quá 10 số', async ({ page }) => {

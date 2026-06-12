@@ -12,10 +12,16 @@ import json, re, os, shutil, openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 
 ROOT        = os.path.dirname(os.path.abspath(__file__))
-REPORT      = os.path.join(ROOT, 'ecom-pdh/06_report/report.json')
+# Run 2026-06-11: 3 report tách theo dịch vụ thiết bị (mỗi report = CKCOMMON[svc] + case riêng svc).
+# Internet KHÔNG có trong run này → block Internet sẽ là Block.
+REPORTS     = [
+    os.path.join(ROOT, 'ecom-pdh/06_report/report_ap.json'),
+    os.path.join(ROOT, 'ecom-pdh/06_report/report_camera.json'),
+    os.path.join(ROOT, 'ecom-pdh/06_report/report_smarttv.json'),
+]
 EXCEL       = os.path.join(ROOT, 'ecom-pdh/03_test-cases/functional/chucnang_checkout/AI_ISC_ecom-pdh_v1.1_TC_checkout_v1.2.xlsx')
 RESULTS_DIR = os.path.join(ROOT, 'ecom-pdh/06_report')
-DATE        = '2026-06-10'
+DATE        = '2026-06-11'
 EXECUTOR    = 'Auto'
 
 TCID_RE    = re.compile(r'(?:TC_[A-Z0-9_]+\.\d+|API_\d+\.\d+)')
@@ -61,8 +67,12 @@ def walk(node: dict, service: str | None = None) -> None:
             if oid:
                 order_ids[key] = oid
 
-with open(REPORT, encoding='utf-8') as f:
-    walk(json.load(f))
+for rep in REPORTS:
+    if not os.path.exists(rep):
+        print(f'WARN: report khong ton tai, bo qua: {rep}')
+        continue
+    with open(rep, encoding='utf-8') as f:
+        walk(json.load(f))
 
 total_pass = sum(1 for v in results.values() if v == 'Pass')
 total_fail = sum(1 for v in results.values() if v == 'Fail')

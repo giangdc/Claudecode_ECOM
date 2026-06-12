@@ -42,8 +42,8 @@
 |---|---|---|---|---|---|---|---|---|
 | SC-DANGKYUF-004 | SĐT hợp lệ — nhập thành công | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout, trường Số điện thoại đang trống | User nhập SĐT hợp lệ: 10 số, bắt đầu bằng 0 (VD: 0901234567) | Textbox chấp nhận, không hiển thị lỗi, border bình thường; icon X xuất hiện cuối textbox | P1 | Functional |
 | SC-DANGKYUF-005 | SĐT bỏ trống — required validation | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout, trường Số điện thoại để trống | User click button "Thanh toán" mà không nhập SĐT | Hệ thống KHÔNG thực hiện thanh toán; hiển thị lỗi "Vui lòng nhập số điện thoại."; border đỏ quanh trường SĐT | P1 | Negative |
-| SC-DANGKYUF-006 | SĐT < 10 số — sai định dạng | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout | User nhập SĐT ít hơn 10 số (VD: 090123456 — 9 số) | Hiển thị lỗi "Số điện thoại chưa đúng, mời nhập lại"; border đỏ quanh textbox | P2 | Negative |
-| SC-DANGKYUF-007 | SĐT không bắt đầu bằng 0 — sai định dạng | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout | User nhập SĐT 10 số nhưng không bắt đầu bằng 0 (VD: 1901234567) | Hiển thị lỗi "Số điện thoại chưa đúng, mời nhập lại"; border đỏ quanh textbox | P2 | Negative |
+| SC-DANGKYUF-006 | SĐT < 10 số — sai định dạng | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout | User nhập SĐT ít hơn 10 số (VD: 090123456 — 9 số) | Hiển thị lỗi "Số điện thoại không đúng"; border đỏ quanh textbox | P2 | Negative |
+| SC-DANGKYUF-007 | SĐT không bắt đầu bằng 0 — sai định dạng | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout | User nhập SĐT 10 số nhưng không bắt đầu bằng 0 (VD: 1901234567) | Hiển thị lỗi "Số điện thoại không đúng"; border đỏ quanh textbox | P2 | Negative |
 | SC-DANGKYUF-008 | SĐT boundary — không cho nhập quá 10 số | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đang ở màn hình Checkout | User cố nhập SĐT vượt quá 10 ký tự (VD: 09012345678 — 11 số) | Hệ thống chỉ nhận đúng 10 ký tự đầu, không cho nhập thêm ký tự thứ 11 | P2 | Boundary |
 | SC-DANGKYUF-009 | Icon X xóa data SĐT | REQ-DANGKYUF-003 | DOC-CK-01 (Rule common), Row 3 | User đã nhập bất kỳ ký tự nào vào textbox Số điện thoại | User nhìn thấy icon X xuất hiện ở cuối textbox rồi click vào icon X | Toàn bộ nội dung trong textbox SĐT bị xóa; icon X biến mất | P2 | UI |
 
@@ -136,8 +136,8 @@
 |---|---|---|---|---|---|---|---|---|
 | SC-CKCOMMON-012 | SĐT hợp lệ → pass | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3 | Đang ở Checkout, SĐT trống | User nhập SĐT 10 số bắt đầu bằng 0 | Chấp nhận, không lỗi; icon X hiện | P1 | Functional |
 | SC-CKCOMMON-013 | SĐT trống → required | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R38 | Đang ở Checkout, SĐT trống | User click ra ngoài/submit mà không nhập | Border đỏ + "Vui lòng nhập số điện thoại." | P1 | Negative |
-| SC-CKCOMMON-014 | SĐT chứa ký tự không phải số → invalid | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R39 | Đang ở Checkout | User nhập/paste SĐT có ký tự không phải số | Hiển thị "Số điện thoại không hợp lệ" (text chuẩn màn chung — CLA-CKCOMMON-004 Resolved) | P2 | Negative |
-| SC-CKCOMMON-015 | SĐT 10 số nhưng đầu khác 0 → invalid | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R40 | Đang ở Checkout | User nhập 10 số bắt đầu khác 0 | Hiển thị "Số điện thoại không hợp lệ" | P2 | Negative |
+| SC-CKCOMMON-014 | SĐT chứa ký tự không phải số → invalid | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R39 | Đang ở Checkout | User nhập/paste SĐT có ký tự không phải số | Hiển thị "Số điện thoại không đúng" (text chuẩn màn chung — CLA-CKCOMMON-004 Resolved) | P2 | Negative |
+| SC-CKCOMMON-015 | SĐT 10 số nhưng đầu khác 0 → invalid | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R40 | Đang ở Checkout | User nhập 10 số bắt đầu khác 0 | Hiển thị "Số điện thoại không đúng" | P2 | Negative |
 | SC-CKCOMMON-016 | SĐT > 10 số → tự cắt còn 10 | REQ-CKCOMMON-005 | DOC-CK-01 (Rule common) R3; DOC-CK-02 R41 | Đang ở Checkout | User nhập/paste > 10 chữ số | Chỉ hiển thị 10 số, tự cắt từ số thứ 11 | P2 | Boundary |
 | SC-CKCOMMON-017 | Icon X hiển thị & xóa SĐT | REQ-CKCOMMON-005 | DOC-CK-02 R36-37 | User đã nhập ký tự vào SĐT | User click icon X | Xóa toàn bộ SĐT và ẩn icon X | P3 | UI |
 
@@ -335,7 +335,7 @@
 | Scenario ID | Feature | Req ID | DOC Source | Given | When | Then | Priority | Test Type |
 |---|---|---|---|---|---|---|---|---|
 | SC-CAMERA-004 | Họ tên + SĐT hợp lệ | REQ-CAMERA-003 | DOC-CK-04 (camera) R33-35; Rule common R2,R3; mockup | Đang ở B2 | Nhập Họ tên + SĐT hợp lệ | Chấp nhận data; **validation chi tiết refer CKCOMMON C4/C5** (Họ tên ≤100, chỉ chữ; SĐT 10 số bắt đầu 0) | P1 | Functional |
-| SC-CAMERA-005 | Họ tên/SĐT trống hoặc sai định dạng | REQ-CAMERA-003 | Rule common R2,R3; refer SC-CKCOMMON-007→017 | Đang ở B2 | Để trống / nhập sai định dạng rồi blur | Border đỏ + message theo Rule common ("Vui lòng nhập họ tên." / "Số điện thoại không hợp lệ"...) — **dùng lại bộ TC CKCOMMON** | P2 | Negative |
+| SC-CAMERA-005 | Họ tên/SĐT trống hoặc sai định dạng | REQ-CAMERA-003 | Rule common R2,R3; refer SC-CKCOMMON-007→017 | Đang ở B2 | Để trống / nhập sai định dạng rồi blur | Border đỏ + message theo Rule common ("Vui lòng nhập họ tên." / "Số điện thoại không đúng"...) — **dùng lại bộ TC CKCOMMON** | P2 | Negative |
 
 ### Feature CAM4: B2 — Block Địa chỉ lắp đặt
 

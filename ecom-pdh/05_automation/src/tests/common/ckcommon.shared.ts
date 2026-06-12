@@ -147,7 +147,7 @@ export function runCkcommonSuite(params: CkcommonParams): void {
       await checkout.fillSdt('090abc1234');
       await checkout.thanhToanButton.scrollIntoViewIfNeeded();
       await checkout.thanhToanButton.click();
-      await expect(checkout.fieldError(/Số điện thoại (không hợp lệ|chưa đúng)/)).toBeVisible({ timeout: 8000 });
+      await expect(checkout.fieldError(/Số điện thoại không đúng/)).toBeVisible({ timeout: 8000 });
     });
 
     test('TC_CKCOMMON.13 — Kiểm tra SĐT 10 số không bắt đầu bằng 0', async ({ page }) => {
@@ -157,7 +157,7 @@ export function runCkcommonSuite(params: CkcommonParams): void {
       await checkout.fillSdt('1901234567');
       await checkout.thanhToanButton.scrollIntoViewIfNeeded();
       await checkout.thanhToanButton.click();
-      await expect(checkout.fieldError(/Số điện thoại (không hợp lệ|chưa đúng)/)).toBeVisible({ timeout: 8000 });
+      await expect(checkout.fieldError(/Số điện thoại không đúng/)).toBeVisible({ timeout: 8000 });
     });
 
     test('TC_CKCOMMON.14 — Kiểm tra SĐT không cho nhập quá 10 số', async ({ page }) => {
